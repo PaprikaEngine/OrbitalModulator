@@ -9,6 +9,10 @@ crate-type = ["cdylib", "rlib"]
 
 # ライブラリ専用 - バイナリターゲット削除
 
+[[bin]]
+name = "test_volume_fix"
+path = "test_volume_fix.rs"
+
 [dependencies]
 # オーディオエンジン
 cpal = "0.16"
