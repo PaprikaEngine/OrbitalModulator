@@ -383,8 +383,238 @@ impl Application {
                 self.audio_engine.stop();
                 println!("Exiting interactive mode");
             },
+
+            Commands::Live => {
+                println!("Starting live command mode...");
+                println!("Type 'help' for available commands, 'exit' to quit");
+                println!("Audio will continue running in the background");
+                
+                self.run_live_mode()?;
+            },
         }
 
+        Ok(())
+    }
+
+    fn run_live_mode(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        // Set up Ctrl+C handler
+        let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+        let r = running.clone();
+        
+        ctrlc::set_handler(move || {
+            r.store(false, std::sync::atomic::Ordering::SeqCst);
+        }).expect("Error setting Ctrl+C handler");
+
+        loop {
+            // Check for Ctrl+C
+            if !running.load(std::sync::atomic::Ordering::SeqCst) {
+                break;
+            }
+            print!("live> ");
+            std::io::Write::flush(&mut std::io::stdout()).unwrap();
+            
+            let mut input = String::new();
+            if std::io::stdin().read_line(&mut input).is_err() {
+                break;
+            }
+            
+            let input = input.trim();
+            if input.is_empty() {
+                continue;
+            }
+            
+            match input {
+                "exit" | "quit" => break,
+                "help" => {
+                    println!("Available commands:");
+                    println!("  create <type> <name>     - Create new node");
+                    println!("  remove <name>            - Remove node");
+                    println!("  connect <src:port> <dst:port> - Connect nodes");
+                    println!("  disconnect <src:port> <dst:port> - Disconnect nodes");
+                    println!("  connect-by-id <src_id> <src_port> <dst_id> <dst_port> - Connect by ID");
+                    println!("  disconnect-by-id <src_id> <src_port> <dst_id> <dst_port> - Disconnect by ID");
+                    println!("  set <node> <param> <value> - Set parameter");
+                    println!("  set-by-id <id> <param> <value> - Set parameter by ID");
+                    println!("  get <node> <param>       - Get parameter");
+                    println!("  get-by-id <id> <param>   - Get parameter by ID");
+                    println!("  list                     - List all nodes");
+                    println!("  info <name>              - Show node details");
+                    println!("  graph                    - Show node graph");
+                    println!("  tree                     - Show node tree");
+                    println!("  save <file>              - Save to file");
+                    println!("  load <file>              - Load from file");
+                    println!("  play                     - Start audio");
+                    println!("  stop                     - Stop audio");
+                    println!("  help                     - Show this help");
+                    println!("  exit                     - Exit live mode");
+                },
+                "list" => {
+                    let nodes = self.audio_engine.list_nodes();
+                    if nodes.is_empty() {
+                        println!("No nodes found");
+                    } else {
+                        println!("Nodes:");
+                        for (id, name, node_type) in nodes {
+                            println!("  {} ({}) - {}", name, node_type, id);
+                        }
+                    }
+                },
+                "graph" => {
+                    println!("{}", self.audio_engine.get_graph_visualization());
+                },
+                "tree" => {
+                    println!("{}", self.audio_engine.get_node_tree());
+                },
+                "play" => {
+                    match self.audio_engine.start() {
+                        Ok(_) => println!("Audio playback started"),
+                        Err(e) => eprintln!("Error starting audio: {}", e),
+                    }
+                },
+                "stop" => {
+                    self.audio_engine.stop();
+                    println!("Audio playback stopped");
+                },
+                _ if input.starts_with("create ") => {
+                    let parts: Vec<&str> = input[7..].split_whitespace().collect();
+                    if parts.len() >= 2 {
+                        let node_type = parts[0];
+                        let name = parts[1];
+                        match self.audio_engine.create_node(node_type, name.to_string()) {
+                            Ok(id) => {
+                                self.node_name_to_id.insert(name.to_string(), id);
+                                println!("Created {} node '{}' (ID: {})", node_type, name, id);
+                            },
+                            Err(e) => eprintln!("Error creating node: {}", e),
+                        }
+                    } else {
+                        eprintln!("Usage: create <type> <name>");
+                    }
+                },
+                _ if input.starts_with("remove ") => {
+                    let name = &input[7..];
+                    if let Some(&node_id) = self.node_name_to_id.get(name) {
+                        match self.audio_engine.remove_node(node_id) {
+                            Ok(_) => {
+                                self.node_name_to_id.remove(name);
+                                println!("Removed node '{}'", name);
+                            },
+                            Err(e) => eprintln!("Error removing node: {}", e),
+                        }
+                    } else {
+                        eprintln!("Error: Node '{}' not found", name);
+                    }
+                },
+                _ if input.starts_with("save ") => {
+                    let filename = &input[5..];
+                    match self.audio_engine.save_to_file(filename) {
+                        Ok(_) => println!("Saved to {}", filename),
+                        Err(e) => eprintln!("Error: {}", e),
+                    }
+                },
+                _ if input.starts_with("load ") => {
+                    let filename = &input[5..];
+                    match self.audio_engine.load_from_file(filename) {
+                        Ok(_) => {
+                            // Clear name-to-id mapping as IDs have changed
+                            self.node_name_to_id.clear();
+                            println!("Loaded from {}", filename);
+                        },
+                        Err(e) => eprintln!("Error: {}", e),
+                    }
+                },
+                _ if input.starts_with("set ") => {
+                    let parts: Vec<&str> = input[4..].split_whitespace().collect();
+                    if parts.len() >= 3 {
+                        let node = parts[0];
+                        let param = parts[1];
+                        if let Ok(value) = parts[2].parse::<f32>() {
+                            if let Some(&node_id) = self.node_name_to_id.get(node) {
+                                match self.audio_engine.set_node_parameter(node_id, param, value) {
+                                    Ok(_) => println!("Set {}.{} = {}", node, param, value),
+                                    Err(e) => eprintln!("Error: {}", e),
+                                }
+                            } else {
+                                eprintln!("Error: Node '{}' not found", node);
+                            }
+                        } else {
+                            eprintln!("Invalid value");
+                        }
+                    } else {
+                        eprintln!("Usage: set <node> <param> <value>");
+                    }
+                },
+                _ if input.starts_with("set-by-id ") => {
+                    let parts: Vec<&str> = input[11..].split_whitespace().collect();
+                    if parts.len() >= 3 {
+                        let id = parts[0];
+                        let param = parts[1];
+                        if let Ok(value) = parts[2].parse::<f32>() {
+                            match self.audio_engine.set_node_parameter_by_id(id, param, value) {
+                                Ok(_) => println!("Set {}.{} = {}", id, param, value),
+                                Err(e) => eprintln!("Error: {}", e),
+                            }
+                        } else {
+                            eprintln!("Invalid value");
+                        }
+                    } else {
+                        eprintln!("Usage: set-by-id <id> <param> <value>");
+                    }
+                },
+                _ if input.starts_with("connect ") => {
+                    let parts: Vec<&str> = input[8..].split_whitespace().collect();
+                    if parts.len() >= 2 {
+                        match (cli::parse_node_port(parts[0]), cli::parse_node_port(parts[1])) {
+                            (Ok((source_node, source_port)), Ok((target_node, target_port))) => {
+                                let source_id = self.node_name_to_id.get(&source_node);
+                                let target_id = self.node_name_to_id.get(&target_node);
+                                
+                                if let (Some(&source_id), Some(&target_id)) = (source_id, target_id) {
+                                    match self.audio_engine.connect_nodes(source_id, &source_port, target_id, &target_port) {
+                                        Ok(_) => println!("Connected {}:{} -> {}:{}", source_node, source_port, target_node, target_port),
+                                        Err(e) => eprintln!("Error connecting nodes: {}", e),
+                                    }
+                                } else {
+                                    eprintln!("Error: One or both nodes not found");
+                                }
+                            },
+                            _ => eprintln!("Usage: connect <source:port> <target:port>"),
+                        }
+                    } else {
+                        eprintln!("Usage: connect <source:port> <target:port>");
+                    }
+                },
+                _ if input.starts_with("disconnect ") => {
+                    let parts: Vec<&str> = input[11..].split_whitespace().collect();
+                    if parts.len() >= 2 {
+                        match (cli::parse_node_port(parts[0]), cli::parse_node_port(parts[1])) {
+                            (Ok((source_node, source_port)), Ok((target_node, target_port))) => {
+                                let source_id = self.node_name_to_id.get(&source_node);
+                                let target_id = self.node_name_to_id.get(&target_node);
+                                
+                                if let (Some(&source_id), Some(&target_id)) = (source_id, target_id) {
+                                    match self.audio_engine.disconnect_nodes(source_id, &source_port, target_id, &target_port) {
+                                        Ok(_) => println!("Disconnected {}:{} -> {}:{}", source_node, source_port, target_node, target_port),
+                                        Err(e) => eprintln!("Error disconnecting nodes: {}", e),
+                                    }
+                                } else {
+                                    eprintln!("Error: One or both nodes not found");
+                                }
+                            },
+                            _ => eprintln!("Usage: disconnect <source:port> <target:port>"),
+                        }
+                    } else {
+                        eprintln!("Usage: disconnect <source:port> <target:port>");
+                    }
+                },
+                _ => {
+                    eprintln!("Unknown command: {}", input);
+                    eprintln!("Type 'help' for available commands");
+                }
+            }
+        }
+        
+        println!("Exiting live mode");
         Ok(())
     }
 }
@@ -395,22 +625,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     app.handle_command(cli.command)?;
 
-    // If audio is running, keep the application alive
+    // If audio is running, enter live command mode
     if app.audio_engine.is_running() {
-        println!("Press Ctrl+C to stop...");
-        
-        // Set up Ctrl+C handler
-        let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
-        let r = running.clone();
-        
-        ctrlc::set_handler(move || {
-            r.store(false, std::sync::atomic::Ordering::SeqCst);
-        }).expect("Error setting Ctrl+C handler");
-
-        while running.load(std::sync::atomic::Ordering::SeqCst) {
-            std::thread::sleep(std::time::Duration::from_millis(100));
-        }
-
+        println!("Audio is running. Entering live command mode...");
+        println!("Type 'help' for available commands, 'exit' to quit, or Ctrl+C to stop");
+        app.run_live_mode()?;
         app.audio_engine.stop();
     }
 

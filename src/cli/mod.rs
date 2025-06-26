@@ -119,6 +119,8 @@ pub enum Commands {
     Demo,
     /// Run interactive mode for dynamic control
     Interactive,
+    /// Start live command mode (audio keeps running, accepts commands)
+    Live,
 }
 
 pub fn parse_node_port(input: &str) -> Result<(String, String), String> {
