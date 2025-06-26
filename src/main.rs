@@ -285,15 +285,10 @@ impl Application {
             Commands::Interactive => {
                 println!("Starting interactive mode...");
                 println!("Type 'help' for available commands, 'exit' to quit");
+                println!("Use 'demo' command to create a sample setup, or build from scratch");
                 
-                // Create demo setup
-                let osc_id = self.audio_engine.create_node("sine_oscillator", "osc".to_string())?;
-                let out_id = self.audio_engine.create_node("output", "out".to_string())?;
-                self.audio_engine.connect_nodes(osc_id, "audio_out", out_id, "audio_in_l")?;
-                self.audio_engine.connect_nodes(osc_id, "audio_out", out_id, "audio_in_r")?;
-                
-                println!("Created demo setup: Oscillator (ID: {}) -> Output (ID: {})", osc_id, out_id);
-                self.audio_engine.start()?;
+                let mut osc_id: Option<uuid::Uuid> = None;
+                let mut out_id: Option<uuid::Uuid> = None;
                 
                 loop {
                     print!("orbital> ");
@@ -313,9 +308,10 @@ impl Application {
                         "exit" | "quit" => break,
                         "help" => {
                             println!("Available commands:");
-                            println!("  freq <value>   - Set oscillator frequency (Hz)");
-                            println!("  amp <value>    - Set oscillator amplitude (0.0-1.0)");
-                            println!("  vol <value>    - Set output volume (0.0-1.0)");
+                            println!("  demo           - Create demo setup (oscillator + output)");
+                            println!("  freq <value>   - Set oscillator frequency (Hz) [requires demo]");
+                            println!("  amp <value>    - Set oscillator amplitude (0.0-1.0) [requires demo]");
+                            println!("  vol <value>    - Set output volume (0.0-1.0) [requires demo]");
                             println!("  graph          - Show node graph");
                             println!("  tree           - Show node tree");
                             println!("  save <file>    - Save current setup to file");
@@ -328,6 +324,20 @@ impl Application {
                         },
                         "tree" => {
                             println!("{}", self.audio_engine.get_node_tree());
+                        },
+                        "demo" => {
+                            // Create demo setup
+                            let demo_osc_id = self.audio_engine.create_node("sine_oscillator", "osc".to_string())?;
+                            let demo_out_id = self.audio_engine.create_node("output", "out".to_string())?;
+                            self.audio_engine.connect_nodes(demo_osc_id, "audio_out", demo_out_id, "audio_in_l")?;
+                            self.audio_engine.connect_nodes(demo_osc_id, "audio_out", demo_out_id, "audio_in_r")?;
+                            
+                            osc_id = Some(demo_osc_id);
+                            out_id = Some(demo_out_id);
+                            
+                            println!("Created demo setup: Oscillator (ID: {}) -> Output (ID: {})", demo_osc_id, demo_out_id);
+                            self.audio_engine.start()?;
+                            println!("Demo started! Use freq/amp/vol commands to control.");
                         },
                         _ if input.starts_with("save ") => {
                             let filename = &input[5..];
@@ -344,33 +354,45 @@ impl Application {
                             }
                         },
                         _ if input.starts_with("freq ") => {
-                            if let Ok(freq) = input[5..].parse::<f32>() {
-                                match self.audio_engine.set_node_parameter(osc_id, "frequency", freq) {
-                                    Ok(_) => println!("Set frequency to {}Hz", freq),
-                                    Err(e) => eprintln!("Error: {}", e),
+                            if let Some(osc) = osc_id {
+                                if let Ok(freq) = input[5..].parse::<f32>() {
+                                    match self.audio_engine.set_node_parameter(osc, "frequency", freq) {
+                                        Ok(_) => println!("Set frequency to {}Hz", freq),
+                                        Err(e) => eprintln!("Error: {}", e),
+                                    }
+                                } else {
+                                    eprintln!("Invalid frequency value");
                                 }
                             } else {
-                                eprintln!("Invalid frequency value");
+                                eprintln!("No oscillator found. Use 'demo' command first.");
                             }
                         },
                         _ if input.starts_with("amp ") => {
-                            if let Ok(amp) = input[4..].parse::<f32>() {
-                                match self.audio_engine.set_node_parameter(osc_id, "amplitude", amp) {
-                                    Ok(_) => println!("Set amplitude to {}", amp),
-                                    Err(e) => eprintln!("Error: {}", e),
+                            if let Some(osc) = osc_id {
+                                if let Ok(amp) = input[4..].parse::<f32>() {
+                                    match self.audio_engine.set_node_parameter(osc, "amplitude", amp) {
+                                        Ok(_) => println!("Set amplitude to {}", amp),
+                                        Err(e) => eprintln!("Error: {}", e),
+                                    }
+                                } else {
+                                    eprintln!("Invalid amplitude value");
                                 }
                             } else {
-                                eprintln!("Invalid amplitude value");
+                                eprintln!("No oscillator found. Use 'demo' command first.");
                             }
                         },
                         _ if input.starts_with("vol ") => {
-                            if let Ok(vol) = input[4..].parse::<f32>() {
-                                match self.audio_engine.set_node_parameter(out_id, "master_volume", vol) {
-                                    Ok(_) => println!("Set volume to {}", vol),
-                                    Err(e) => eprintln!("Error: {}", e),
+                            if let Some(out) = out_id {
+                                if let Ok(vol) = input[4..].parse::<f32>() {
+                                    match self.audio_engine.set_node_parameter(out, "master_volume", vol) {
+                                        Ok(_) => println!("Set volume to {}", vol),
+                                        Err(e) => eprintln!("Error: {}", e),
+                                    }
+                                } else {
+                                    eprintln!("Invalid volume value");
                                 }
                             } else {
-                                eprintln!("Invalid volume value");
+                                eprintln!("No output found. Use 'demo' command first.");
                             }
                         },
                         _ => {
@@ -387,7 +409,7 @@ impl Application {
             Commands::Live => {
                 println!("Starting live command mode...");
                 println!("Type 'help' for available commands, 'exit' to quit");
-                println!("Audio will continue running in the background");
+                println!("Create nodes and connections as needed, then 'play' to start audio");
                 
                 self.run_live_mode()?;
             },
