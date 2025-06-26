@@ -1,0 +1,28 @@
+[package]
+name = "orbital-modulator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# オーディオエンジン
+cpal = "0.16"
+fundsp = { version = "0.20", features = ["std"] }
+dasp = "0.11"
+
+# CLI
+clap = { version = "4.4", features = ["derive"] }
+
+# シリアライゼーション
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# ユーティリティ
+uuid = { version = "1.6", features = ["v4", "serde"] }
+anyhow = "1.0"
+thiserror = "1.0"
+
+# 非同期・並行処理
+tokio = { version = "1.35", features = ["full"] }
+dashmap = "5.5"
+ctrlc = "3.4"
