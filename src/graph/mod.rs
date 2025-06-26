@@ -33,7 +33,7 @@ pub struct Node {
     pub output_ports: Vec<Port>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct AudioGraph {
     pub nodes: HashMap<Uuid, Node>,
     pub connections: Vec<Connection>,

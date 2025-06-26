@@ -201,12 +201,18 @@ impl Application {
                 println!("Audio playback stopped");
             },
 
-            Commands::Save { filename: _ } => {
-                println!("Save functionality not yet implemented");
+            Commands::Save { filename } => {
+                match self.audio_engine.save_to_file(&filename) {
+                    Ok(_) => println!("Successfully saved to {}", filename),
+                    Err(e) => eprintln!("Error saving: {}", e),
+                }
             },
 
-            Commands::Load { filename: _ } => {
-                println!("Load functionality not yet implemented");
+            Commands::Load { filename } => {
+                match self.audio_engine.load_from_file(&filename) {
+                    Ok(_) => println!("Successfully loaded from {}", filename),
+                    Err(e) => eprintln!("Error loading: {}", e),
+                }
             },
 
             Commands::Demo => {
@@ -312,6 +318,8 @@ impl Application {
                             println!("  vol <value>    - Set output volume (0.0-1.0)");
                             println!("  graph          - Show node graph");
                             println!("  tree           - Show node tree");
+                            println!("  save <file>    - Save current setup to file");
+                            println!("  load <file>    - Load setup from file");
                             println!("  help           - Show this help");
                             println!("  exit           - Exit interactive mode");
                         },
@@ -320,6 +328,20 @@ impl Application {
                         },
                         "tree" => {
                             println!("{}", self.audio_engine.get_node_tree());
+                        },
+                        _ if input.starts_with("save ") => {
+                            let filename = &input[5..];
+                            match self.audio_engine.save_to_file(filename) {
+                                Ok(_) => println!("Saved to {}", filename),
+                                Err(e) => eprintln!("Error: {}", e),
+                            }
+                        },
+                        _ if input.starts_with("load ") => {
+                            let filename = &input[5..];
+                            match self.audio_engine.load_from_file(filename) {
+                                Ok(_) => println!("Loaded from {}", filename),
+                                Err(e) => eprintln!("Error: {}", e),
+                            }
                         },
                         _ if input.starts_with("freq ") => {
                             if let Ok(freq) = input[5..].parse::<f32>() {

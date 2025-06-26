@@ -5,6 +5,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use crate::graph::AudioGraph;
 use crate::nodes::{AudioNode, create_node};
 use std::collections::{HashMap, HashSet};
+use std::fs;
 use uuid::Uuid;
 
 pub struct AudioEngine {
@@ -383,6 +384,104 @@ impl AudioEngine {
 
     pub fn is_running(&self) -> bool {
         self.is_running.load(Ordering::Relaxed)
+    }
+
+    pub fn save_to_file(&self, filename: &str) -> Result<(), String> {
+        let graph = self.graph.lock().unwrap();
+        
+        // Serialize the graph to JSON
+        let json = serde_json::to_string_pretty(&*graph)
+            .map_err(|e| format!("Failed to serialize graph: {}", e))?;
+        
+        // Write to file
+        fs::write(filename, json)
+            .map_err(|e| format!("Failed to write file: {}", e))?;
+        
+        println!("Saved {} nodes and {} connections to {}", 
+                graph.nodes.len(), graph.connections.len(), filename);
+        Ok(())
+    }
+
+    pub fn load_from_file(&mut self, filename: &str) -> Result<(), String> {
+        // Stop audio if running
+        let was_running = self.is_running();
+        if was_running {
+            self.stop();
+        }
+
+        // Read file
+        let json = fs::read_to_string(filename)
+            .map_err(|e| format!("Failed to read file: {}", e))?;
+        
+        // Deserialize the graph
+        let loaded_graph: crate::graph::AudioGraph = serde_json::from_str(&json)
+            .map_err(|e| format!("Failed to deserialize graph: {}", e))?;
+        
+        // Clear current graph and node instances
+        {
+            let mut graph = self.graph.lock().unwrap();
+            *graph = loaded_graph;
+        }
+        
+        // Recreate node instances based on the loaded graph
+        self.recreate_node_instances()?;
+        
+        println!("Loaded {} nodes and {} connections from {}", 
+                self.list_nodes().len(), 
+                self.graph.lock().unwrap().connections.len(), 
+                filename);
+        
+        // Restart audio if it was running
+        if was_running {
+            self.start().map_err(|e| format!("Failed to restart audio: {}", e))?;
+        }
+        
+        Ok(())
+    }
+
+    fn recreate_node_instances(&mut self) -> Result<(), String> {
+        let graph = self.graph.lock().unwrap();
+        let nodes_to_create: Vec<(Uuid, String, String, HashMap<String, f32>)> = graph.nodes.iter()
+            .map(|(id, node)| (*id, node.node_type.clone(), node.name.clone(), node.parameters.clone()))
+            .collect();
+        drop(graph); // Release the lock before modifying instances
+        
+        let mut instances = self.node_instances.lock().unwrap();
+        instances.clear();
+        
+        for (node_id, node_type, node_name, parameters) in nodes_to_create {
+            // Create node instance based on node type
+            let mut node_instance = create_node(&node_type, node_name)?;
+            
+            // Apply saved parameters to the node instance
+            for (param, value) in &parameters {
+                match node_type.as_str() {
+                    "sine_oscillator" => {
+                        if let Some(sine_osc) = node_instance.as_any_mut().downcast_mut::<crate::nodes::SineOscillatorNode>() {
+                            match param.as_str() {
+                                "frequency" => sine_osc.set_frequency(*value),
+                                "amplitude" => sine_osc.set_amplitude(*value),
+                                _ => {}
+                            }
+                        }
+                    }
+                    "output" => {
+                        if let Some(output_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OutputNode>() {
+                            match param.as_str() {
+                                "master_volume" => output_node.set_master_volume(*value),
+                                "mute" => output_node.set_mute(*value != 0.0),
+                                _ => {}
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            
+            instances.insert(node_id, node_instance);
+        }
+        
+        Ok(())
     }
 
     fn audio_callback(

@@ -1,0 +1,71 @@
+{
+  "nodes": {
+    "02b2cf94-7ef4-4f2b-9ad0-9b1ce1018e48": {
+      "id": "02b2cf94-7ef4-4f2b-9ad0-9b1ce1018e48",
+      "node_type": "sine_oscillator",
+      "name": "osc",
+      "parameters": {
+        "frequency": 440.0,
+        "amplitude": 0.5
+      },
+      "input_ports": [
+        {
+          "name": "frequency_cv",
+          "port_type": "CV"
+        },
+        {
+          "name": "amplitude_cv",
+          "port_type": "CV"
+        }
+      ],
+      "output_ports": [
+        {
+          "name": "audio_out",
+          "port_type": "AudioMono"
+        }
+      ]
+    },
+    "3eb63d89-4868-4f9c-b73c-a8fb5d861f7a": {
+      "id": "3eb63d89-4868-4f9c-b73c-a8fb5d861f7a",
+      "node_type": "output",
+      "name": "out",
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      },
+      "input_ports": [
+        {
+          "name": "audio_in_l",
+          "port_type": "AudioMono"
+        },
+        {
+          "name": "audio_in_r",
+          "port_type": "AudioMono"
+        },
+        {
+          "name": "master_volume_cv",
+          "port_type": "CV"
+        }
+      ],
+      "output_ports": []
+    }
+  },
+  "connections": [
+    {
+      "source_node": "02b2cf94-7ef4-4f2b-9ad0-9b1ce1018e48",
+      "source_port": "audio_out",
+      "target_node": "3eb63d89-4868-4f9c-b73c-a8fb5d861f7a",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "02b2cf94-7ef4-4f2b-9ad0-9b1ce1018e48",
+      "source_port": "audio_out",
+      "target_node": "3eb63d89-4868-4f9c-b73c-a8fb5d861f7a",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "processing_order": [
+    "02b2cf94-7ef4-4f2b-9ad0-9b1ce1018e48",
+    "3eb63d89-4868-4f9c-b73c-a8fb5d861f7a"
+  ]
+}
