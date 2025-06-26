@@ -105,6 +105,23 @@ impl AudioEngine {
                         "amplitude" => sine_osc.set_amplitude(value),
                         _ => return Err(format!("Unknown parameter: {}", param)),
                     }
+                } else if let Some(osc) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OscillatorNode>() {
+                    match param {
+                        "frequency" => osc.set_frequency(value),
+                        "amplitude" => osc.set_amplitude(value),
+                        "waveform" => {
+                            let waveform = match value as u8 {
+                                0 => crate::nodes::WaveformType::Sine,
+                                1 => crate::nodes::WaveformType::Triangle,
+                                2 => crate::nodes::WaveformType::Sawtooth,
+                                3 => crate::nodes::WaveformType::Pulse,
+                                _ => return Err(format!("Invalid waveform value: {}", value)),
+                            };
+                            osc.set_waveform(waveform);
+                        },
+                        "pulse_width" => osc.set_pulse_width(value),
+                        _ => return Err(format!("Unknown parameter: {}", param)),
+                    }
                 } else if let Some(output_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OutputNode>() {
                     match param {
                         "master_volume" => output_node.set_master_volume(value),
@@ -461,6 +478,26 @@ impl AudioEngine {
                             match param.as_str() {
                                 "frequency" => sine_osc.set_frequency(*value),
                                 "amplitude" => sine_osc.set_amplitude(*value),
+                                _ => {}
+                            }
+                        }
+                    }
+                    "triangle_oscillator" | "sawtooth_oscillator" | "pulse_oscillator" | "oscillator" => {
+                        if let Some(osc) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OscillatorNode>() {
+                            match param.as_str() {
+                                "frequency" => osc.set_frequency(*value),
+                                "amplitude" => osc.set_amplitude(*value),
+                                "waveform" => {
+                                    let waveform = match *value as u8 {
+                                        0 => crate::nodes::WaveformType::Sine,
+                                        1 => crate::nodes::WaveformType::Triangle,
+                                        2 => crate::nodes::WaveformType::Sawtooth,
+                                        3 => crate::nodes::WaveformType::Pulse,
+                                        _ => crate::nodes::WaveformType::Sine, // Default
+                                    };
+                                    osc.set_waveform(waveform);
+                                },
+                                "pulse_width" => osc.set_pulse_width(*value),
                                 _ => {}
                             }
                         }
