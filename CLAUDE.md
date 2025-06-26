@@ -188,15 +188,31 @@ trait SynthModule {
 
 **接続ルール:**
 
-- 同じタイプのポート間のみ接続可能
+- 同じタイプのポート間のみ接続可能（AudioMono ↔ AudioMono, CV ↔ CV等）
+- 1つの入力ポートには1つの出力ポートのみ接続可能
 - 1つの出力ポートから複数の入力ポートへの分岐は可能
-- 1つの入力ポートに複数の出力ポートの接続は不可
+- ノード自身への接続（自己ループ）は禁止
+- 循環参照（A→B→A）の接続は自動検出して禁止
+
+**循環参照防止機能:**
+
+1. **事前検証**: 接続追加時に循環が発生しないかチェック
+2. **グラフ検証**: `validate_graph()`メソッドで全体の循環チェック
+3. **トポロジカルソート**: 処理順序決定時に循環を検出
+4. **エラー処理**: 循環検出時は接続を拒否し、明確なエラーメッセージを表示
 
 **ノードグラフ処理:**
 
 - DAG（有向非循環グラフ）として構築
 - トポロジカルソートによる処理順序決定
-- デッドロック検出とサイクル回避
+- リアルタイム循環検出とサイクル回避
+
+**接続コマンド:**
+
+- `connect <source_node>:<source_port> <target_node>:<target_port>` - 名前ベース接続
+- `connect-by-id <source_id> <source_port> <target_id> <target_port>` - IDベース接続
+- `disconnect <source_node>:<source_port> <target_node>:<target_port>` - 名前ベース切断
+- `disconnect-by-id <source_id> <source_port> <target_id> <target_port>` - IDベース切断
 
 ### Audio Outputノード
 **ノードタイプ:** `output`

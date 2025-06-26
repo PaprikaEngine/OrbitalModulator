@@ -214,12 +214,7 @@ impl AudioEngine {
         visited: &mut HashSet<Uuid>
     ) {
         if visited.contains(&node_id) {
-            // If already visited, just show reference
-            if let Some(node) = graph.nodes.get(&node_id) {
-                let indent = "  ".repeat(depth);
-                output.push_str(&format!("{}↳ {} (already shown above)\n", indent, node.name));
-            }
-            return;
+            return; // Avoid infinite loops
         }
         visited.insert(node_id);
         
@@ -250,21 +245,11 @@ impl AudioEngine {
                 }
             }
             
-            // Group connections by target node to avoid duplication
-            let mut grouped_children: HashMap<Uuid, Vec<(String, String)>> = HashMap::new();
-            for (child_id, source_port, target_port) in children {
-                grouped_children.entry(child_id)
-                    .or_insert_with(Vec::new)
-                    .push((source_port, target_port));
-            }
-            
             // Display connections and recurse to children
-            for (child_id, connections) in grouped_children {
+            for (child_id, source_port, target_port) in children {
+                output.push_str(&format!("{}   └─ {}:{} → ", indent, source_port, target_port));
                 if let Some(child_node) = graph.nodes.get(&child_id) {
-                    output.push_str(&format!("{}   └─ Connections to {}:\n", indent, child_node.name));
-                    for (source_port, target_port) in &connections {
-                        output.push_str(&format!("{}      {}:{} → {}:{}\n", indent, node.name, source_port, child_node.name, target_port));
-                    }
+                    output.push_str(&format!("{}:{}\n", child_node.name, target_port));
                     self.build_tree_branch(graph, child_id, output, depth + 1, visited);
                 }
             }
@@ -273,6 +258,8 @@ impl AudioEngine {
                 output.push('\n');
             }
         }
+        
+        visited.remove(&node_id);
     }
 
     pub fn get_graph_visualization(&self) -> String {
@@ -379,6 +366,7 @@ impl AudioEngine {
 
         stream.play()?;
         self._stream = Some(stream);
+        
         self.is_running.store(true, Ordering::Relaxed);
 
         println!("Audio engine started - Sample Rate: {}Hz, Buffer Size: {}", 
