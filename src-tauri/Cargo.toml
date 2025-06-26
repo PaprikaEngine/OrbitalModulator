@@ -1,11 +1,11 @@
 [package]
-name = "app"
+name = "orbital-modulator-app"
 version = "0.1.0"
-description = "A Tauri App"
+description = "Orbital Modulator Synthesizer"
 authors = ["you"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "orbital-modulator"
 edition = "2021"
 rust-version = "1.60"
 
@@ -23,5 +23,5 @@ tauri = { version = "1.5", features = ["dialog-open", "dialog-save", "fs-read-fi
 orbital-modulator = { path = ".." }
 
 [[bin]]
-name = "app"
+name = "orbital-modulator"
 path = "src/main.rs"

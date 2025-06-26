@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "Orbital Modulator",
+    "productName": "orbital-modulator",
     "version": "0.1.0"
   },
   "tauri": {
