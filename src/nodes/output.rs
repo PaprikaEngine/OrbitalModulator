@@ -31,31 +31,50 @@ impl AudioNode for OutputNode {
         self
     }
 
-    fn process(&mut self, inputs: &HashMap<String, &[f32]>, _outputs: &mut HashMap<String, &mut [f32]>) {
+    fn process(&mut self, inputs: &HashMap<String, &[f32]>, outputs: &mut HashMap<String, &mut [f32]>) {
         // Get input signals
         let left_input = inputs.get("audio_in_l").copied().unwrap_or(&[]);
         let right_input = inputs.get("audio_in_r").copied().unwrap_or(&[]);
         let volume_cv = inputs.get("master_volume_cv").copied().unwrap_or(&[]);
 
-        // This is the final output node - we would typically send to CPAL here
-        // For now, we'll prepare the final mixed output
-        
-        if self.mute {
-            return; // No output when muted
+        // Get the mixed output buffer - we'll use this to store our final processed audio
+        if let Some(mixed_output) = outputs.get_mut("mixed_output") {
+            // Clear the output buffer
+            for sample in mixed_output.iter_mut() {
+                *sample = 0.0;
+            }
+
+            if self.mute {
+                return; // No output when muted - buffer stays at zero
+            }
+
+            // Calculate effective volume (parameter + CV modulation)
+            let effective_volume = if volume_cv.is_empty() {
+                self.master_volume
+            } else {
+                (self.master_volume + volume_cv[0] * 0.1).clamp(0.0, 1.0)
+            };
+
+            // Mix left and right inputs and apply volume
+            let buffer_size = mixed_output.len();
+            
+            for i in 0..buffer_size {
+                let mut sample = 0.0;
+                
+                // Mix left channel
+                if i < left_input.len() {
+                    sample += left_input[i];
+                }
+                
+                // Mix right channel
+                if i < right_input.len() {
+                    sample += right_input[i];
+                }
+                
+                // Apply master volume
+                mixed_output[i] = sample * effective_volume;
+            }
         }
-
-        // Calculate effective volume (parameter + CV modulation)
-        let _effective_volume = if volume_cv.is_empty() {
-            self.master_volume
-        } else {
-            (self.master_volume + volume_cv[0] * 0.1).clamp(0.0, 1.0)
-        };
-
-        // Mix and apply volume
-        let _buffer_size = left_input.len().max(right_input.len());
-        
-        // In a real implementation, this would be sent to CPAL output stream
-        // Processing is handled silently
     }
 
     fn create_node_info(&self, name: String) -> Node {
@@ -82,7 +101,12 @@ impl AudioNode for OutputNode {
                     port_type: PortType::CV,
                 },
             ],
-            output_ports: vec![], // No outputs - this is the final node
+            output_ports: vec![
+                Port {
+                    name: "mixed_output".to_string(),
+                    port_type: PortType::AudioMono,
+                },
+            ]
         }
     }
 }

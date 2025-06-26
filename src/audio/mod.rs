@@ -601,22 +601,13 @@ impl AudioEngine {
                     node_outputs.insert((node_id, port_name), buffer);
                 }
                 
-                // If this is an output node, copy to final output
+                // If this is an output node, copy its processed output to final output
                 if node_info.node_type == "output" {
-                    // For output nodes, we don't actually copy anything since they handle output internally
-                    // But if there were audio inputs, we could mix them to final_output here
-                    
-                    // For now, let's find the first connected source and copy it to final output
-                    for connection in &graph.connections {
-                        if connection.target_node == node_id {
-                            let source_key = (connection.source_node, connection.source_port.clone());
-                            if let Some(source_data) = node_outputs.get(&source_key) {
-                                for (i, &sample) in source_data.iter().enumerate() {
-                                    if i < final_output.len() {
-                                        final_output[i] += sample * 0.5; // Mix with reduced volume
-                                    }
-                                }
-                                break; // Only use first connection for now
+                    let output_key = (node_id, "mixed_output".to_string());
+                    if let Some(mixed_data) = node_outputs.get(&output_key) {
+                        for (i, &sample) in mixed_data.iter().enumerate() {
+                            if i < final_output.len() {
+                                final_output[i] += sample; // Use the output node's processed audio directly
                             }
                         }
                     }
