@@ -79,13 +79,6 @@ impl AudioNode for SineOscillatorNode {
 
             // Advance phase for next buffer
             self.advance_phase(buffer_size);
-
-            // Debug output
-            if !output_buffer.is_empty() {
-                let max_level = output_buffer.iter().map(|x| x.abs()).fold(0.0, f32::max);
-                println!("Sine Oscillator: freq={:.1}Hz, amp={:.2}, level={:.3}", 
-                        self.frequency, self.amplitude, max_level);
-            }
         }
     }
 

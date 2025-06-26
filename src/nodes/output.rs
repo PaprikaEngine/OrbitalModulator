@@ -45,30 +45,17 @@ impl AudioNode for OutputNode {
         }
 
         // Calculate effective volume (parameter + CV modulation)
-        let effective_volume = if volume_cv.is_empty() {
+        let _effective_volume = if volume_cv.is_empty() {
             self.master_volume
         } else {
             (self.master_volume + volume_cv[0] * 0.1).clamp(0.0, 1.0)
         };
 
         // Mix and apply volume
-        let buffer_size = left_input.len().max(right_input.len());
+        let _buffer_size = left_input.len().max(right_input.len());
         
         // In a real implementation, this would be sent to CPAL output stream
-        // For now, we'll just simulate processing
-        println!("Output Node: Processing {} samples at volume {:.2}", 
-                buffer_size, effective_volume);
-
-        if !left_input.is_empty() || !right_input.is_empty() {
-            let left_level = if left_input.is_empty() { 0.0 } else { 
-                left_input.iter().map(|x| x.abs()).fold(0.0, f32::max) 
-            };
-            let right_level = if right_input.is_empty() { 0.0 } else { 
-                right_input.iter().map(|x| x.abs()).fold(0.0, f32::max) 
-            };
-            
-            println!("  L: {:.3} R: {:.3}", left_level * effective_volume, right_level * effective_volume);
-        }
+        // Processing is handled silently
     }
 
     fn create_node_info(&self, name: String) -> Node {

@@ -352,7 +352,7 @@ impl AudioEngine {
 
         let graph = Arc::clone(&self.graph);
         let node_instances = Arc::clone(&self.node_instances);
-        let is_running = Arc::clone(&self.is_running);
+        let _is_running = Arc::clone(&self.is_running);
 
         let stream = device.build_output_stream(
             &config.into(),
