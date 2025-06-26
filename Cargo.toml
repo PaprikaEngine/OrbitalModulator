@@ -3,14 +3,21 @@ name = "orbital-modulator"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "orbital_modulator"
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 # オーディオエンジン
 cpal = "0.16"
 fundsp = { version = "0.20", features = ["std"] }
 dasp = "0.11"
 
-# CLI
-clap = { version = "4.4", features = ["derive"] }
+# GUI only - no CLI dependencies needed
+
+# Tauri
+tauri = { version = "1.8", features = ["dialog-open", "dialog-save", "fs-read-file", "fs-write-file", "shell-open"] }
+tauri-build = "1.5"
 
 # シリアライゼーション
 serde = { version = "1.0", features = ["derive"] }
@@ -25,4 +32,6 @@ thiserror = "1.0"
 # 非同期・並行処理
 tokio = { version = "1.35", features = ["full"] }
 dashmap = "5.5"
-ctrlc = "3.4"
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }

@@ -9,13 +9,17 @@ use std::fs;
 use uuid::Uuid;
 
 pub struct AudioEngine {
-    graph: Arc<Mutex<AudioGraph>>,
+    pub graph: Arc<Mutex<AudioGraph>>,
     node_instances: Arc<Mutex<HashMap<Uuid, Box<dyn AudioNode + Send>>>>,
     is_running: Arc<AtomicBool>,
     _stream: Option<Stream>,
     sample_rate: f32,
     buffer_size: usize,
 }
+
+// AudioEngineをSend + Syncにするため
+unsafe impl Send for AudioEngine {}
+unsafe impl Sync for AudioEngine {}
 
 impl AudioEngine {
     pub fn new(sample_rate: f32, buffer_size: usize) -> Result<Self, Box<dyn std::error::Error>> {

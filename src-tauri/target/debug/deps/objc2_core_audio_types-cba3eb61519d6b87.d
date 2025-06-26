@@ -1,0 +1,9 @@
+/Users/mirabilis/dev/OrbitalModulator/src-tauri/target/debug/deps/libobjc2_core_audio_types-cba3eb61519d6b87.rmeta: /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/lib.rs /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/mod.rs /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/CoreAudioBaseTypes.rs
+
+/Users/mirabilis/dev/OrbitalModulator/src-tauri/target/debug/deps/libobjc2_core_audio_types-cba3eb61519d6b87.rlib: /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/lib.rs /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/mod.rs /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/CoreAudioBaseTypes.rs
+
+/Users/mirabilis/dev/OrbitalModulator/src-tauri/target/debug/deps/objc2_core_audio_types-cba3eb61519d6b87.d: /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/lib.rs /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/mod.rs /Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/CoreAudioBaseTypes.rs
+
+/Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/lib.rs:
+/Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/mod.rs:
+/Users/mirabilis/.cargo/registry/src/index.crates.io-6f17d22bba15001f/objc2-core-audio-types-0.3.1/src/generated/CoreAudioBaseTypes.rs:
