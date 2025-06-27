@@ -1,5 +1,80 @@
 {
-  "nodes": {},
-  "connections": [],
-  "processing_order": []
+  "nodes": {
+    "4a123bb1-8a44-4b48-978e-c44f8cd4657c": {
+      "id": "4a123bb1-8a44-4b48-978e-c44f8cd4657c",
+      "node_type": "oscillator",
+      "name": "Aaaaa",
+      "parameters": {
+        "amplitude": 0.05,
+        "waveform": 1.0,
+        "pulse_width": 0.24,
+        "frequency": 440.0
+      },
+      "input_ports": [
+        {
+          "name": "frequency_cv",
+          "port_type": "CV"
+        },
+        {
+          "name": "amplitude_cv",
+          "port_type": "CV"
+        },
+        {
+          "name": "waveform_cv",
+          "port_type": "CV"
+        },
+        {
+          "name": "pulse_width_cv",
+          "port_type": "CV"
+        }
+      ],
+      "output_ports": [
+        {
+          "name": "audio_out",
+          "port_type": "AudioMono"
+        }
+      ]
+    },
+    "5a0338a1-cd8d-4266-a34b-40e4dc57a825": {
+      "id": "5a0338a1-cd8d-4266-a34b-40e4dc57a825",
+      "node_type": "output",
+      "name": "Sssss",
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      },
+      "input_ports": [
+        {
+          "name": "audio_in_l",
+          "port_type": "AudioMono"
+        },
+        {
+          "name": "audio_in_r",
+          "port_type": "AudioMono"
+        },
+        {
+          "name": "master_volume_cv",
+          "port_type": "CV"
+        }
+      ],
+      "output_ports": [
+        {
+          "name": "mixed_output",
+          "port_type": "AudioMono"
+        }
+      ]
+    }
+  },
+  "connections": [
+    {
+      "source_node": "4a123bb1-8a44-4b48-978e-c44f8cd4657c",
+      "source_port": "audio_out",
+      "target_node": "5a0338a1-cd8d-4266-a34b-40e4dc57a825",
+      "target_port": "audio_in_l"
+    }
+  ],
+  "processing_order": [
+    "4a123bb1-8a44-4b48-978e-c44f8cd4657c",
+    "5a0338a1-cd8d-4266-a34b-40e4dc57a825"
+  ]
 }

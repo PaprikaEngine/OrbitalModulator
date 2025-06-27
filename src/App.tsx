@@ -13,7 +13,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import OscillatorNode from './components/OscillatorNode';
 import OutputNode from './components/OutputNode';
 import Toolbar from './components/Toolbar';
@@ -49,7 +49,8 @@ function App() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isAudioRunning, setIsAudioRunning] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('Ready');
+  const [statusMessage, setStatusMessage] = useState('Initializing...');
+  const [tauriReady, setTauriReady] = useState(false);
 
   // Load nodes and connections from Rust backend
   const loadGraph = useCallback(async () => {
@@ -242,7 +243,20 @@ function App() {
 
   // Initial load
   useEffect(() => {
-    loadGraph();
+    const initApp = async () => {
+      try {
+        setStatusMessage('Connecting to Tauri...');
+        await loadGraph();
+        setTauriReady(true);
+        setStatusMessage('Ready');
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+        setStatusMessage('Connection failed - check console');
+        setTauriReady(false);
+      }
+    };
+    
+    initApp();
   }, [loadGraph]);
 
   // Check audio status periodically
@@ -259,6 +273,24 @@ function App() {
     const interval = setInterval(checkAudioStatus, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  if (!tauriReady) {
+    return (
+      <div style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'center', 
+        alignItems: 'center',
+        fontSize: '18px',
+        color: '#333'
+      }}>
+        <div style={{ marginBottom: '20px' }}>🎵 Orbital Modulator</div>
+        <div style={{ fontSize: '14px', opacity: 0.7 }}>{statusMessage}</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>

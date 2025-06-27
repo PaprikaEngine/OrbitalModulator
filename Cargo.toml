@@ -7,11 +7,7 @@ edition = "2021"
 name = "orbital_modulator"
 crate-type = ["cdylib", "rlib"]
 
-# ライブラリ専用 - バイナリターゲット削除
-
-[[bin]]
-name = "test_volume_fix"
-path = "test_volume_fix.rs"
+# ライブラリ専用 - Tauriアプリはsrc-tauriにあります
 
 [dependencies]
 # オーディオエンジン
@@ -22,8 +18,8 @@ dasp = "0.11"
 # GUI only - no CLI dependencies needed
 
 # Tauri
-tauri = { version = "1.8", features = ["dialog-open", "dialog-save", "fs-read-file", "fs-write-file", "shell-open"] }
-tauri-build = "1.5"
+tauri = { version = "2.0", features = [] }
+tauri-build = "2.0"
 
 # シリアライゼーション
 serde = { version = "1.0", features = ["derive"] }
@@ -40,4 +36,4 @@ tokio = { version = "1.35", features = ["full"] }
 dashmap = "5.5"
 
 [build-dependencies]
-tauri-build = { version = "1.5", features = [] }
+tauri-build = { version = "2.0", features = [] }

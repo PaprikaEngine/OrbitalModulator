@@ -1,80 +1,52 @@
 {
+  "productName": "orbital-modulator",
+  "version": "0.1.0",
+  "identifier": "com.orbital.modulator",
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "devPath": "http://localhost:1420",
-    "distDir": "./dist"
+    "frontendDist": "./dist",
+    "devUrl": "http://localhost:1420"
   },
-  "package": {
-    "productName": "orbital-modulator",
-    "version": "0.1.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "dialog": {
-        "open": true,
-        "save": true
-      },
-      "fs": {
-        "readFile": true,
-        "writeFile": true,
-        "scope": ["**"]
-      }
-    },
-    "bundle": {
-      "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
-      "deb": {
-        "depends": []
-      },
-      "externalBin": [],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.orbital.modulator",
-      "longDescription": "A modular synthesizer with node-based architecture",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "Modular Synthesizer",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
-      }
-    },
-    "security": {
-      "csp": null
-    },
-    "updater": {
-      "active": false
-    },
+  "app": {
     "windows": [
       {
-        "fullscreen": false,
-        "height": 800,
-        "resizable": true,
         "title": "orbital-modulator",
         "width": 1200,
+        "height": 800,
         "minWidth": 800,
-        "minHeight": 600
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false
       }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "category": "DeveloperTool",
+    "copyright": "",
+    "shortDescription": "Modular Synthesizer",
+    "longDescription": "A modular synthesizer with node-based architecture",
+    "targets": "all",
+    "icon": [
+      "src-tauri/icons/icon.icns"
     ]
+  },
+  "plugins": {
+    "shell": {
+      "open": true
+    },
+    "dialog": {
+      "open": true,
+      "save": true
+    },
+    "fs": {
+      "readFile": true,
+      "writeFile": true,
+      "scope": ["**"]
+    }
   }
 }
