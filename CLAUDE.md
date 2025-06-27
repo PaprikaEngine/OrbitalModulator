@@ -346,13 +346,65 @@ pub struct AudioGraph {
 }
 ```
 
+## 実装済み機能
+
+### オシロスコープノード
+
+**実装日:** 2025-06-27
+
+**ノードタイプ:** `oscilloscope`
+
+**機能:**
+- リアルタイムオーディオ波形表示
+- CRT風オシロスコープUI
+- トリガーシステム（Auto/Normal/Single）
+- 自動測定機能（Vpp, Vrms, 周波数, 周期）
+- パススルー機能（入力信号をそのまま出力）
+
+**パラメーター:**
+- `time_div` (Time/Div) - 0.1ms~100ms - 水平軸時間分解能
+- `volt_div` (Volt/Div) - 0.1V~10V - 垂直軸電圧分解能  
+- `trigger_level` (Trigger Level) - -10V~+10V - トリガーレベル
+- `position_h` (H Position) - -50%~+50% - 水平位置調整
+- `position_v` (V Position) - -50%~+50% - 垂直位置調整
+
+**入力ポート:**
+- `audio_in` (Audio Mono) - モニター対象のオーディオ信号
+
+**出力ポート:**
+- `audio_out` (Audio Mono) - 入力信号をパススルー
+
+**技術仕様:**
+- バッファサイズ: 512~8192サンプル（時間分解能に応じて調整）
+- 更新頻度: 30FPS（Canvas描画）
+- 測定更新: 1024サンプルごと
+- グロー効果付きCRT風描画
+- HTML5 Canvas + TypeScript実装
+
+**ファイル:**
+- `src/nodes/oscilloscope.rs` - Rustバックエンド実装
+- `src/components/OscilloscopeNode.tsx` - Reactフロントエンド実装
+- `src/styles/oscilloscope.css` - CRT風スタイル
+- `src/tauri_commands.rs` - データ取得API (`get_oscilloscope_data`)
+
 ## 次のステップ
 
-- [ ] 基本プロジェクト構造作成
-- [ ] ノード・グラフシステム実装
-- [ ] CLIフレームワーク実装
-- [ ] 基本オシレーターノード実装
-- [ ] Audio Outputノード実装
-- [ ] ノード接続システム実装
-- [ ] オーディオエンジン統合
-- [ ] 設定保存・読み込み機能実装
+- [x] 基本プロジェクト構造作成
+- [x] ノード・グラフシステム実装
+- [x] CLIフレームワーク実装
+- [x] 基本オシレーターノード実装
+- [x] Audio Outputノード実装
+- [x] ノード接続システム実装
+- [x] オーディオエンジン統合
+- [x] 設定保存・読み込み機能実装
+- [x] オシロスコープノード実装
+
+### 今後の拡張予定
+
+- [ ] FFTスペクトラムアナライザー
+- [ ] エンベロープジェネレーター (ADSR)
+- [ ] LFO (Low Frequency Oscillator)
+- [ ] フィルターノード (VCF)
+- [ ] アンプ/VCAノード
+- [ ] ミキサーノード
+- [ ] エフェクトノード (リバーブ、ディレイ等)

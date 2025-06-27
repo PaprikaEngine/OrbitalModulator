@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 pub struct AudioEngine {
     pub graph: Arc<Mutex<AudioGraph>>,
-    node_instances: Arc<Mutex<HashMap<Uuid, Box<dyn AudioNode + Send>>>>,
+    pub node_instances: Arc<Mutex<HashMap<Uuid, Box<dyn AudioNode + Send>>>>,
     is_running: Arc<AtomicBool>,
     _stream: Option<Stream>,
     sample_rate: f32,

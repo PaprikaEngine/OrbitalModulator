@@ -37,7 +37,8 @@ fn main() {
             stop_audio,
             is_audio_running,
             save_project,
-            load_project
+            load_project,
+            get_oscilloscope_data
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

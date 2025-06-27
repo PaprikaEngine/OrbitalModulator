@@ -1,8 +1,10 @@
 pub mod output;
 pub mod oscillator;
+pub mod oscilloscope;
 
 pub use output::OutputNode;
 pub use oscillator::{SineOscillatorNode, OscillatorNode, WaveformType};
+pub use oscilloscope::{OscilloscopeNode, TriggerMode, TriggerSlope, Measurements};
 
 use crate::graph::Node;
 use std::collections::HashMap;
@@ -13,7 +15,7 @@ pub trait AudioNode: Send {
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
 }
 
-pub fn create_node(node_type: &str, _name: String) -> Result<Box<dyn AudioNode>, String> {
+pub fn create_node(node_type: &str, name: String) -> Result<Box<dyn AudioNode>, String> {
     match node_type {
         "output" => Ok(Box::new(OutputNode::new())),
         "sine_oscillator" => Ok(Box::new(SineOscillatorNode::new(44100.0))),
@@ -21,6 +23,7 @@ pub fn create_node(node_type: &str, _name: String) -> Result<Box<dyn AudioNode>,
         "sawtooth_oscillator" => Ok(Box::new(OscillatorNode::new(44100.0, WaveformType::Sawtooth))),
         "pulse_oscillator" => Ok(Box::new(OscillatorNode::new(44100.0, WaveformType::Pulse))),
         "oscillator" => Ok(Box::new(OscillatorNode::new(44100.0, WaveformType::Sine))), // Default to sine
+        "oscilloscope" => Ok(Box::new(OscilloscopeNode::new(uuid::Uuid::new_v4().to_string(), name))),
         _ => Err(format!("Unknown node type: {}", node_type)),
     }
 }

@@ -28,6 +28,21 @@ pub struct ConnectionInfo {
     pub target_port: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OscilloscopeData {
+    pub waveform: Vec<f32>,
+    pub measurements: MeasurementData,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MeasurementData {
+    pub vpp: f32,
+    pub vrms: f32,
+    pub frequency: f32,
+    pub period: f32,
+    pub duty_cycle: f32,
+}
+
 pub type AudioEngineState = Arc<Mutex<AudioEngine>>;
 
 #[tauri::command]
@@ -196,4 +211,59 @@ pub async fn load_project(
 ) -> Result<(), String> {
     let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     engine.load_from_file(&filename)
+}
+
+#[tauri::command]
+pub async fn get_oscilloscope_data(
+    engine: State<'_, AudioEngineState>,
+    node_id: String,
+) -> Result<OscilloscopeData, String> {
+    use crate::nodes::OscilloscopeNode;
+    
+    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let uuid = Uuid::parse_str(&node_id).map_err(|_| "Invalid UUID format".to_string())?;
+    
+    // ノードインスタンスを取得
+    let mut node_instances = engine.node_instances.lock().map_err(|e| format!("Failed to lock node instances: {}", e))?;
+    
+    if let Some(node_instance) = node_instances.get_mut(&uuid) {
+        if let Some(osc_node) = node_instance.as_any_mut().downcast_mut::<OscilloscopeNode>() {
+            // 波形データ取得
+            let waveform_data = osc_node.get_waveform_data();
+            let measurements_data = osc_node.get_measurements();
+            
+            let waveform = if let Ok(data) = waveform_data.lock() {
+                data.clone()
+            } else {
+                Vec::new()
+            };
+            
+            let measurements = if let Ok(data) = measurements_data.lock() {
+                MeasurementData {
+                    vpp: data.vpp,
+                    vrms: data.vrms,
+                    frequency: data.frequency,
+                    period: data.period,
+                    duty_cycle: data.duty_cycle,
+                }
+            } else {
+                MeasurementData {
+                    vpp: 0.0,
+                    vrms: 0.0,
+                    frequency: 0.0,
+                    period: 0.0,
+                    duty_cycle: 0.0,
+                }
+            };
+            
+            Ok(OscilloscopeData {
+                waveform,
+                measurements,
+            })
+        } else {
+            Err("Node is not an oscilloscope node".to_string())
+        }
+    } else {
+        Err("Node not found".to_string())
+    }
 }
