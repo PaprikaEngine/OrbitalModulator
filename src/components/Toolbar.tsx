@@ -35,6 +35,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
     { value: 'triangle_oscillator', label: 'Triangle Oscillator' },
     { value: 'sawtooth_oscillator', label: 'Sawtooth Oscillator' },
     { value: 'pulse_oscillator', label: 'Pulse Oscillator' },
+    { value: 'oscilloscope', label: 'Oscilloscope' },
     { value: 'output', label: 'Audio Output' },
   ];
 
