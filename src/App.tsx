@@ -79,8 +79,8 @@ function App() {
       }));
 
       // Convert Rust connections to ReactFlow edges
-      const flowEdges: Edge[] = connections.map((conn, index) => ({
-        id: `e${index}`,
+      const flowEdges: Edge[] = connections.map((conn) => ({
+        id: `${conn.source_node}:${conn.source_port}->${conn.target_node}:${conn.target_port}`,
         source: conn.source_node,
         target: conn.target_node,
         sourceHandle: conn.source_port,
@@ -115,7 +115,7 @@ function App() {
         
         setEdges((eds) => addEdge({
           ...params,
-          id: `e${eds.length}`,
+          id: `${params.source}:${params.sourceHandle}->${params.target}:${params.targetHandle}`,
           label: `${params.sourceHandle} → ${params.targetHandle}`,
           labelStyle: { fontSize: 10 },
         }, eds));
@@ -168,6 +168,35 @@ function App() {
       setStatusMessage(`Remove failed: ${error}`);
     }
   }, [selectedNode, setNodes, setEdges]);
+
+  // Handle edge deletion
+  const onEdgesDelete = useCallback(async (deletedEdges: Edge[]) => {
+    for (const edge of deletedEdges) {
+      try {
+        // Parse the edge ID to get source and target information
+        // Edge ID format: "sourceNodeId:sourcePort->targetNodeId:targetPort"
+        const [sourceInfo, targetInfo] = edge.id.split('->');
+        const [sourceNodeId, sourcePort] = sourceInfo.split(':');
+        const [targetNodeId, targetPort] = targetInfo.split(':');
+
+        // Call Tauri to disconnect the nodes
+        await invoke('disconnect_nodes', {
+          sourceNodeId,
+          sourcePort,
+          targetNodeId,
+          targetPort,
+        });
+
+        setStatusMessage(`Disconnected ${sourceNodeId}:${sourcePort} from ${targetNodeId}:${targetPort}`);
+      } catch (error) {
+        console.error('Failed to disconnect nodes:', error);
+        setStatusMessage(`Failed to disconnect: ${error}`);
+      }
+    }
+
+    // Update local edges state
+    setEdges((eds) => eds.filter((e) => !deletedEdges.some((deleted) => deleted.id === e.id)));
+  }, [setEdges]);
 
   // Update node parameter
   const updateParameter = useCallback(async (nodeId: string, param: string, value: number) => {
@@ -359,8 +388,10 @@ function App() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onEdgesDelete={onEdgesDelete}
         nodeTypes={nodeTypes}
         fitView
+        deleteKeyCode="Delete"
       >
         <Controls />
         <MiniMap />
@@ -386,7 +417,7 @@ function App() {
       )}
 
       <div className="status-bar">
-        {statusMessage} | Engine: {isAudioEngineRunning ? 'Running' : 'Stopped'} | Nodes: {nodes.length} | Connections: {edges.length}
+        {statusMessage} | Engine: {isAudioEngineRunning ? 'Running' : 'Stopped'} | Nodes: {nodes.length} | Connections: {edges.length} | Tip: Select connection and press Delete to disconnect
       </div>
     </div>
   );
