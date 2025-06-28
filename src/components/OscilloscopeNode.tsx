@@ -262,7 +262,10 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
       {/* オシロスコープ本体 */}
       <div className="oscilloscope-container">
         {/* コントロールパネル */}
-        <div className="control-panel">
+        <div 
+          className="control-panel"
+          onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+        >
           <div className="control-section">
             <label>VOLT/DIV</label>
             <select 
@@ -314,12 +317,19 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
         <div className="oscilloscope-screen">
           <canvas
             ref={canvasRef}
-            style={{ width: '400px', height: '300px' }}
+            style={{ 
+              width: '400px', 
+              height: '300px',
+              pointerEvents: 'none' // Canvas がドラッグを妨げないようにする
+            }}
           />
         </div>
 
         {/* 測定値表示 */}
-        <div className="measurements">
+        <div 
+          className="measurements"
+          onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+        >
           <div className="measurement">
             <span className="label">Vpp:</span>
             <span className="value">{measurements.vpp.toFixed(2)}V</span>
