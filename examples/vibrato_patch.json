@@ -1,0 +1,70 @@
+{
+  "patch_name": "Vibrato Effect",
+  "description": "LFO-controlled vibrato effect using frequency modulation",
+  "nodes": [
+    {
+      "id": "main_osc",
+      "type": "oscillator",
+      "name": "Main Oscillator",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "frequency": 261.63,
+        "amplitude": 0.8,
+        "waveform": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "vibrato_lfo",
+      "type": "lfo",
+      "name": "Vibrato LFO",
+      "position": { "x": 100, "y": 350 },
+      "parameters": {
+        "frequency": 5.5,
+        "amplitude": 0.05,
+        "waveform": 0,
+        "phase_offset": 0.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "main_osc",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "main_osc",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    },
+    {
+      "source_node": "vibrato_lfo",
+      "source_port": "cv_out",
+      "target_node": "main_osc",
+      "target_port": "frequency_cv"
+    }
+  ],
+  "notes": [
+    "Vibrato Effect Patch:",
+    "- Main oscillator generates base tone (sine wave)",
+    "- LFO modulates oscillator frequency at 5.5Hz",
+    "- Creates classic vibrato/frequency modulation effect", 
+    "- Small LFO amplitude (0.05) for subtle pitch variation",
+    "- Adjust LFO frequency for faster/slower vibrato rate",
+    "- Adjust LFO amplitude for wider/narrower pitch wobble"
+  ]
+}

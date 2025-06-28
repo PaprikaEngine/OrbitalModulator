@@ -566,6 +566,13 @@ impl AudioEngine {
                             }
                         }
                     }
+                    "lfo" => {
+                        if let Some(lfo_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::LFONode>() {
+                            if let Err(_) = lfo_node.set_parameter(param, *value) {
+                                // Parameter setting failed
+                            }
+                        }
+                    }
                     "output" => {
                         if let Some(output_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OutputNode>() {
                             match param.as_str() {

@@ -3,12 +3,14 @@ pub mod oscillator;
 pub mod oscilloscope;
 pub mod filter;
 pub mod envelope;
+pub mod lfo;
 
 pub use output::OutputNode;
 pub use oscillator::{SineOscillatorNode, OscillatorNode, WaveformType};
 pub use oscilloscope::{OscilloscopeNode, TriggerMode, TriggerSlope, Measurements};
 pub use filter::{VCFNode, FilterType};
 pub use envelope::{ADSRNode, EnvelopeState};
+pub use lfo::{LFONode, LFOWaveform};
 
 use crate::graph::Node;
 use std::collections::HashMap;
@@ -30,6 +32,7 @@ pub fn create_node(node_type: &str, name: String) -> Result<Box<dyn AudioNode>, 
         "oscilloscope" => Ok(Box::new(OscilloscopeNode::new(uuid::Uuid::new_v4().to_string(), name))),
         "filter" => Ok(Box::new(VCFNode::new(44100.0))),
         "adsr" => Ok(Box::new(ADSRNode::new(44100.0))),
+        "lfo" => Ok(Box::new(LFONode::new(uuid::Uuid::new_v4().to_string(), name))),
         _ => Err(format!("Unknown node type: {}", node_type)),
     }
 }

@@ -1,0 +1,69 @@
+{
+  "patch_name": "Tremolo Effect",
+  "description": "LFO-controlled tremolo effect using amplitude modulation",
+  "nodes": [
+    {
+      "id": "main_osc",
+      "type": "oscillator",
+      "name": "Main Oscillator",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "frequency": 440.0,
+        "amplitude": 0.8,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "tremolo_lfo",
+      "type": "lfo",
+      "name": "Tremolo LFO",
+      "position": { "x": 100, "y": 350 },
+      "parameters": {
+        "frequency": 4.0,
+        "amplitude": 0.3,
+        "waveform": 0,
+        "phase_offset": 0.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "main_osc",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "main_osc",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    },
+    {
+      "source_node": "tremolo_lfo",
+      "source_port": "cv_out",
+      "target_node": "main_osc",
+      "target_port": "amplitude_cv"
+    }
+  ],
+  "notes": [
+    "Tremolo Effect Patch:",
+    "- Main oscillator generates base tone (sawtooth wave)",
+    "- LFO modulates oscillator amplitude at 4Hz",
+    "- Creates classic tremolo/amplitude modulation effect",
+    "- Adjust LFO frequency for faster/slower tremolo",
+    "- Adjust LFO amplitude for deeper/shallower effect"
+  ]
+}
