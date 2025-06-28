@@ -1,0 +1,126 @@
+{
+  "patch_name": "Ambient Noise Texture",
+  "description": "Pink noise with LFO modulation for ambient soundscapes",
+  "nodes": [
+    {
+      "id": "pink_noise",
+      "type": "noise",
+      "name": "Pink Noise",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "noise_type": 1,
+        "amplitude": 0.4,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "amplitude_lfo",
+      "type": "lfo",
+      "name": "Amplitude LFO",
+      "position": { "x": 100, "y": 350 },
+      "parameters": {
+        "frequency": 0.3,
+        "amplitude": 0.5,
+        "waveform": 0,
+        "phase_offset": 0.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "ambient_filter",
+      "type": "filter",
+      "name": "Ambient Filter",
+      "position": { "x": 350, "y": 200 },
+      "parameters": {
+        "cutoff_frequency": 800.0,
+        "resonance": 0.4,
+        "filter_type": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "filter_lfo",
+      "type": "lfo",
+      "name": "Filter LFO",
+      "position": { "x": 350, "y": 350 },
+      "parameters": {
+        "frequency": 0.1,
+        "amplitude": 0.8,
+        "waveform": 1,
+        "phase_offset": 0.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "ambient_delay",
+      "type": "delay",
+      "name": "Ambient Delay",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "delay_time": 500.0,
+        "feedback": 0.3,
+        "mix": 0.4,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 850, "y": 200 },
+      "parameters": {
+        "master_volume": 0.6,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "pink_noise",
+      "source_port": "audio_out",
+      "target_node": "ambient_filter",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "amplitude_lfo",
+      "source_port": "cv_out",
+      "target_node": "pink_noise",
+      "target_port": "amplitude_cv"
+    },
+    {
+      "source_node": "ambient_filter",
+      "source_port": "audio_out",
+      "target_node": "ambient_delay",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "filter_lfo",
+      "source_port": "cv_out",
+      "target_node": "ambient_filter",
+      "target_port": "cutoff_cv"
+    },
+    {
+      "source_node": "ambient_delay",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "ambient_delay",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "notes": [
+    "Ambient Noise Texture Patch:",
+    "- Pink noise provides natural 1/f frequency spectrum",
+    "- Slow amplitude LFO (0.3Hz) creates breathing effect",
+    "- Low-pass filter at 800Hz removes harsh frequencies",
+    "- Very slow filter LFO (0.1Hz) creates subtle movement",
+    "- Long delay (500ms) with moderate feedback adds space",
+    "- 40% wet delay mix for ambient atmosphere",
+    "- Perfect for background textures and soundscapes",
+    "- Adjust LFO rates for different ambient feels"
+  ]
+}

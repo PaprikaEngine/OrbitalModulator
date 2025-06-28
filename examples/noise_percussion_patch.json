@@ -1,0 +1,136 @@
+{
+  "patch_name": "Noise Percussion",
+  "description": "Using different noise types for percussion sounds",
+  "nodes": [
+    {
+      "id": "white_noise",
+      "type": "noise",
+      "name": "White Noise",
+      "position": { "x": 100, "y": 100 },
+      "parameters": {
+        "noise_type": 0,
+        "amplitude": 0.8,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "brown_noise",
+      "type": "noise",
+      "name": "Brown Noise",
+      "position": { "x": 100, "y": 250 },
+      "parameters": {
+        "noise_type": 2,
+        "amplitude": 0.6,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "perc_envelope",
+      "type": "adsr",
+      "name": "Percussion Envelope",
+      "position": { "x": 350, "y": 100 },
+      "parameters": {
+        "attack": 0.001,
+        "decay": 0.1,
+        "sustain": 0.0,
+        "release": 0.05,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "perc_filter",
+      "type": "filter",
+      "name": "Percussion Filter",
+      "position": { "x": 350, "y": 250 },
+      "parameters": {
+        "cutoff_frequency": 2000.0,
+        "resonance": 0.3,
+        "filter_type": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "perc_mixer",
+      "type": "mixer",
+      "name": "Percussion Mixer",
+      "position": { "x": 600, "y": 175 },
+      "parameters": {
+        "gain_1": 0.7,
+        "gain_2": 0.8,
+        "gain_3": 0.0,
+        "gain_4": 0.0,
+        "pan_1": -0.2,
+        "pan_2": 0.2,
+        "pan_3": 0.0,
+        "pan_4": 0.0,
+        "master_gain": 0.8,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 850, "y": 175 },
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "white_noise",
+      "source_port": "audio_out",
+      "target_node": "perc_filter",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "perc_filter",
+      "source_port": "audio_out",
+      "target_node": "perc_mixer",
+      "target_port": "audio_in_1"
+    },
+    {
+      "source_node": "brown_noise",
+      "source_port": "audio_out",
+      "target_node": "perc_mixer",
+      "target_port": "audio_in_2"
+    },
+    {
+      "source_node": "perc_envelope",
+      "source_port": "cv_out",
+      "target_node": "white_noise",
+      "target_port": "amplitude_cv"
+    },
+    {
+      "source_node": "perc_envelope",
+      "source_port": "cv_out",
+      "target_node": "brown_noise",
+      "target_port": "amplitude_cv"
+    },
+    {
+      "source_node": "perc_mixer",
+      "source_port": "audio_out_l",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "perc_mixer",
+      "source_port": "audio_out_r",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "notes": [
+    "Noise Percussion Patch:",
+    "- White noise for snare-like sound (filtered at 2kHz)",
+    "- Brown noise for kick-like low-end",
+    "- ADSR envelope shapes both noise sources",
+    "- Quick attack (1ms), short decay (100ms), no sustain",
+    "- Filter adds snap to white noise percussion",
+    "- Mixer balances and pans different percussion elements",
+    "- Adjust envelope parameters for different percussion feels",
+    "- Try different noise types for varied textures"
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "patch_name": "Layered Synth",
+  "description": "Multiple oscillators mixed together for rich layered sound",
+  "nodes": [
+    {
+      "id": "bass_osc",
+      "type": "oscillator",
+      "name": "Bass Oscillator",
+      "position": { "x": 100, "y": 100 },
+      "parameters": {
+        "frequency": 110.0,
+        "amplitude": 0.8,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "lead_osc",
+      "type": "oscillator",
+      "name": "Lead Oscillator",
+      "position": { "x": 100, "y": 250 },
+      "parameters": {
+        "frequency": 440.0,
+        "amplitude": 0.7,
+        "waveform": 1,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "pad_osc",
+      "type": "oscillator",
+      "name": "Pad Oscillator",
+      "position": { "x": 100, "y": 400 },
+      "parameters": {
+        "frequency": 880.0,
+        "amplitude": 0.5,
+        "waveform": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "main_mixer",
+      "type": "mixer",
+      "name": "Main Mixer",
+      "position": { "x": 400, "y": 250 },
+      "parameters": {
+        "gain_1": 0.8,
+        "gain_2": 0.6,
+        "gain_3": 0.4,
+        "gain_4": 0.0,
+        "pan_1": -0.3,
+        "pan_2": 0.0,
+        "pan_3": 0.3,
+        "pan_4": 0.0,
+        "master_gain": 0.7,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 700, "y": 250 },
+      "parameters": {
+        "master_volume": 0.8,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "bass_osc",
+      "source_port": "audio_out",
+      "target_node": "main_mixer",
+      "target_port": "audio_in_1"
+    },
+    {
+      "source_node": "lead_osc",
+      "source_port": "audio_out",
+      "target_node": "main_mixer",
+      "target_port": "audio_in_2"
+    },
+    {
+      "source_node": "pad_osc",
+      "source_port": "audio_out",
+      "target_node": "main_mixer",
+      "target_port": "audio_in_3"
+    },
+    {
+      "source_node": "main_mixer",
+      "source_port": "audio_out_l",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "main_mixer",
+      "source_port": "audio_out_r",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "notes": [
+    "Layered Synth Patch:",
+    "- Bass oscillator (110Hz sawtooth) panned left",
+    "- Lead oscillator (440Hz triangle) centered", 
+    "- Pad oscillator (880Hz sine) panned right",
+    "- Mixer balances levels and creates stereo image",
+    "- Adjust individual channel gains for different timbres",
+    "- Experiment with panning for wider soundstage"
+  ]
+}

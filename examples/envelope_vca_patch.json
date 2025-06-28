@@ -1,0 +1,88 @@
+{
+  "patch_name": "Envelope VCA Control",
+  "description": "Classic synthesis chain with envelope-controlled VCA",
+  "nodes": [
+    {
+      "id": "main_osc",
+      "type": "oscillator",
+      "name": "Main Oscillator",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "frequency": 440.0,
+        "amplitude": 0.8,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "env_adsr",
+      "type": "adsr",
+      "name": "Volume Envelope",
+      "position": { "x": 350, "y": 300 },
+      "parameters": {
+        "attack": 0.1,
+        "decay": 0.3,
+        "sustain": 0.7,
+        "release": 0.5,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "main_vca",
+      "type": "vca",
+      "name": "Main VCA",
+      "position": { "x": 350, "y": 200 },
+      "parameters": {
+        "gain": 1.0,
+        "cv_sensitivity": 1.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "master_volume": 0.8,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "main_osc",
+      "source_port": "audio_out",
+      "target_node": "main_vca",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "env_adsr",
+      "source_port": "cv_out",
+      "target_node": "main_vca",
+      "target_port": "gain_cv"
+    },
+    {
+      "source_node": "main_vca",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "main_vca",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "notes": [
+    "Envelope VCA Control Patch:",
+    "- Classic VCO → VCA → Output synthesis chain",
+    "- ADSR envelope controls VCA gain via CV",
+    "- 100ms attack, 300ms decay, 70% sustain, 500ms release",
+    "- VCA provides voltage-controlled amplitude shaping",
+    "- This is the fundamental building block of subtractive synthesis",
+    "- Trigger the ADSR to hear the classic synth envelope shape",
+    "- Adjust envelope parameters for different articulations"
+  ]
+}

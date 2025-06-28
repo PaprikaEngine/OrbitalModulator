@@ -1,0 +1,69 @@
+{
+  "patch_name": "Echo Delay",
+  "description": "Simple echo effect with delay feedback",
+  "nodes": [
+    {
+      "id": "main_osc",
+      "type": "oscillator",
+      "name": "Main Oscillator",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "frequency": 440.0,
+        "amplitude": 0.8,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "echo_delay",
+      "type": "delay",
+      "name": "Echo Delay",
+      "position": { "x": 350, "y": 200 },
+      "parameters": {
+        "delay_time": 375.0,
+        "feedback": 0.4,
+        "mix": 0.6,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "main_osc",
+      "source_port": "audio_out",
+      "target_node": "echo_delay",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "echo_delay",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "echo_delay",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "notes": [
+    "Echo Delay Patch:",
+    "- Single oscillator (440Hz sawtooth) as sound source",
+    "- Echo delay with 375ms delay time and 40% feedback",
+    "- 60% wet/dry mix for prominent echo effect",
+    "- Adjust delay time for different echo speeds",
+    "- Adjust feedback for more/fewer echo repeats",
+    "- Adjust mix for balance between dry and wet signal"
+  ]
+}

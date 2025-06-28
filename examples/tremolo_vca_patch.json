@@ -1,0 +1,89 @@
+{
+  "patch_name": "Tremolo VCA Effect",
+  "description": "LFO-controlled VCA for tremolo amplitude modulation",
+  "nodes": [
+    {
+      "id": "carrier_osc",
+      "type": "oscillator",
+      "name": "Carrier Oscillator",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "frequency": 330.0,
+        "amplitude": 0.7,
+        "waveform": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "tremolo_lfo",
+      "type": "lfo",
+      "name": "Tremolo LFO",
+      "position": { "x": 100, "y": 350 },
+      "parameters": {
+        "frequency": 4.0,
+        "amplitude": 0.6,
+        "waveform": 0,
+        "phase_offset": 0.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "tremolo_vca",
+      "type": "vca",
+      "name": "Tremolo VCA",
+      "position": { "x": 350, "y": 200 },
+      "parameters": {
+        "gain": 0.8,
+        "cv_sensitivity": 0.5,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "master_volume": 0.8,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "carrier_osc",
+      "source_port": "audio_out",
+      "target_node": "tremolo_vca",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "tremolo_lfo",
+      "source_port": "cv_out",
+      "target_node": "tremolo_vca",
+      "target_port": "gain_cv"
+    },
+    {
+      "source_node": "tremolo_vca",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "tremolo_vca",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "notes": [
+    "Tremolo VCA Effect Patch:",
+    "- Sine wave carrier (330Hz) for clean tone",
+    "- LFO at 4Hz provides tremolo modulation",
+    "- VCA CV sensitivity at 50% for moderate tremolo depth",
+    "- Base gain at 80% with 60% LFO amplitude",
+    "- Creates classic tremolo effect (amplitude modulation)",
+    "- Adjust LFO frequency for faster/slower tremolo",
+    "- Adjust CV sensitivity for deeper/shallower effect",
+    "- Try different LFO waveforms for varied tremolo shapes"
+  ]
+}

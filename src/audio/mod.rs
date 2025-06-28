@@ -153,6 +153,18 @@ impl AudioEngine {
                         "active" => adsr_node.active = value != 0.0,
                         _ => return Err(format!("Unknown parameter: {}", param)),
                     }
+                } else if let Some(delay_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::DelayNode>() {
+                    if let Err(_) = delay_node.set_parameter(param, value) {
+                        // Parameter setting failed
+                    }
+                } else if let Some(noise_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::NoiseNode>() {
+                    if let Err(_) = noise_node.set_parameter(param, value) {
+                        // Parameter setting failed
+                    }
+                } else if let Some(vca_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::VCANode>() {
+                    if let Err(_) = vca_node.set_parameter(param, value) {
+                        // Parameter setting failed
+                    }
                 } else if let Some(output_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OutputNode>() {
                     match param {
                         "master_volume" => output_node.set_master_volume(value),
@@ -569,6 +581,34 @@ impl AudioEngine {
                     "lfo" => {
                         if let Some(lfo_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::LFONode>() {
                             if let Err(_) = lfo_node.set_parameter(param, *value) {
+                                // Parameter setting failed
+                            }
+                        }
+                    }
+                    "mixer" => {
+                        if let Some(mixer_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::MixerNode>() {
+                            if let Err(_) = mixer_node.set_parameter(param, *value) {
+                                // Parameter setting failed
+                            }
+                        }
+                    }
+                    "delay" => {
+                        if let Some(delay_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::DelayNode>() {
+                            if let Err(_) = delay_node.set_parameter(param, *value) {
+                                // Parameter setting failed
+                            }
+                        }
+                    }
+                    "noise" => {
+                        if let Some(noise_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::NoiseNode>() {
+                            if let Err(_) = noise_node.set_parameter(param, *value) {
+                                // Parameter setting failed
+                            }
+                        }
+                    }
+                    "vca" => {
+                        if let Some(vca_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::VCANode>() {
+                            if let Err(_) = vca_node.set_parameter(param, *value) {
                                 // Parameter setting failed
                             }
                         }

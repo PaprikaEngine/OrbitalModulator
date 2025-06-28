@@ -20,6 +20,10 @@ import OscilloscopeNode from './components/OscilloscopeNode';
 import FilterNode from './components/FilterNode';
 import ADSRNode from './components/ADSRNode';
 import LFONode from './components/LFONode';
+import MixerNode from './components/MixerNode';
+import DelayNode from './components/DelayNode';
+import NoiseNode from './components/NoiseNode';
+import VCANode from './components/VCANode';
 import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
@@ -30,6 +34,11 @@ const nodeTypes = {
   filter: FilterNode,
   adsr: ADSRNode,
   lfo: LFONode,
+  mixer: MixerNode,
+  mixer8: MixerNode,
+  delay: DelayNode,
+  noise: NoiseNode,
+  vca: VCANode,
   sine_oscillator: OscillatorNode,
   triangle_oscillator: OscillatorNode,
   sawtooth_oscillator: OscillatorNode,

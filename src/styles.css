@@ -420,3 +420,578 @@ button {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.8);
 }
+
+/* Mixer Node Specific Styles */
+.react-flow__node-mixer {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+}
+
+.mixer-node {
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 280px;
+  max-width: 400px;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mixer-content {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.channel-strips {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+
+.channel-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 6px 4px;
+}
+
+.channel-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #ecf0f1;
+  margin-bottom: 4px;
+}
+
+.vu-meter {
+  height: 60px;
+  width: 12px;
+  margin: 4px 0;
+}
+
+.vu-meter-bar {
+  width: 100%;
+  height: 100%;
+  background: #2c3e50;
+  border: 1px solid #7f8c8d;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vu-meter-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-radius: 1px;
+}
+
+.gain-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.vertical-slider {
+  writing-mode: bt-lr; /* IE */
+  -webkit-appearance: slider-vertical; /* WebKit */
+  width: 20px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 10px;
+}
+
+.master-slider {
+  height: 50px;
+}
+
+.gain-value {
+  font-size: 9px;
+  color: #bdc3c7;
+}
+
+.pan-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.pan-knob {
+  width: 30px;
+  height: 30px;
+  position: relative;
+}
+
+.pan-slider {
+  width: 30px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 4px;
+}
+
+.pan-value {
+  font-size: 8px;
+  color: #bdc3c7;
+  min-width: 20px;
+  text-align: center;
+}
+
+.master-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 6px 8px;
+  border-left: 2px solid #e74c3c;
+}
+
+.master-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #e74c3c;
+  margin-bottom: 4px;
+}
+
+.master-vu {
+  height: 70px;
+  width: 16px;
+  margin: 4px 0;
+}
+
+.master-gain-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Delay Node Specific Styles */
+.react-flow__node-delay {
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  color: white;
+}
+
+.delay-node {
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 200px;
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.delay-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.effect-visual {
+  width: 80px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.effect-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.delay-time-display {
+  font-size: 11px;
+  font-weight: bold;
+  color: #ecf0f1;
+}
+
+.delay-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.control-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #ecf0f1;
+  text-align: center;
+}
+
+.delay-time-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.delay-slider {
+  width: 120px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+.delay-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f39c12;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.knob-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.feedback-knob, .mix-knob {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  position: relative;
+}
+
+.feedback-knob::-webkit-slider-thumb, .mix-knob::-webkit-slider-thumb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e74c3c;
+  cursor: pointer;
+  -webkit-appearance: none;
+  position: relative;
+}
+
+.control-value {
+  font-size: 9px;
+  color: #bdc3c7;
+  text-align: center;
+  min-width: 30px;
+}
+
+.port-labels {
+  position: absolute;
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+.input-labels {
+  position: absolute;
+  left: -45px;
+  top: 0;
+  height: 100%;
+}
+
+.input-labels > div {
+  position: absolute;
+  white-space: nowrap;
+  text-align: right;
+  width: 40px;
+}
+
+.output-labels {
+  position: absolute;
+  right: -35px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.output-labels > div {
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* Noise Node Specific Styles */
+.react-flow__node-noise {
+  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+  color: white;
+}
+
+.noise-node {
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 180px;
+  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.noise-type-display {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.current-noise-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.noise-symbol {
+  font-size: 16px;
+}
+
+.noise-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ecf0f1;
+}
+
+.noise-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.noise-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 40px;
+  justify-content: center;
+}
+
+.noise-bar {
+  width: 4px;
+  min-height: 5px;
+  border-radius: 2px;
+  animation: noise-flicker 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes noise-flicker {
+  0% {
+    transform: scaleY(0.8);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scaleY(1.2);
+    opacity: 1;
+  }
+}
+
+.amplitude-display {
+  font-size: 10px;
+  color: #bdc3c7;
+  font-weight: bold;
+}
+
+.noise-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.noise-type-select {
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 11px;
+}
+
+.amplitude-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.amplitude-slider {
+  width: 100px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+.amplitude-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e67e22;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* VCA Node Specific Styles */
+.react-flow__node-vca {
+  background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+  color: white;
+}
+
+.vca-node {
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 160px;
+  background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.vca-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.gain-meter {
+  width: 20px;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.gain-bar {
+  width: 16px;
+  min-height: 3px;
+  border-radius: 2px;
+  transition: height 0.3s ease, background-color 0.3s ease;
+}
+
+.unity-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%);
+}
+
+.gain-display {
+  font-size: 11px;
+  font-weight: bold;
+  color: #ecf0f1;
+  text-align: center;
+}
+
+.vca-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gain-control, .cv-sensitivity-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.gain-slider, .cv-sensitivity-slider {
+  width: 100px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+.gain-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e74c3c;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cv-sensitivity-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cv-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 8px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.cv-sensitivity-bar {
+  height: 4px;
+  min-width: 10px;
+  border-radius: 2px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.cv-label {
+  font-size: 9px;
+  color: #bdc3c7;
+  text-align: center;
+}
