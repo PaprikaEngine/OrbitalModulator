@@ -1192,6 +1192,12 @@ button {
   color: white;
 }
 
+/* Sample & Hold Node Specific Styles */
+.react-flow__node-sample_hold {
+  background: linear-gradient(135deg, #d35400 0%, #e67e22 100%);
+  color: white;
+}
+
 .spectrum-analyzer-node {
   padding: 12px;
   border-radius: 8px;
@@ -1409,4 +1415,178 @@ button {
   cursor: pointer;
   -webkit-appearance: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sample-hold-node {
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 220px;
+  background: linear-gradient(135deg, #d35400 0%, #e67e22 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.sample-hold-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.held-value-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.value-label {
+  font-size: 9px;
+  color: #ecf0f1;
+  text-transform: uppercase;
+}
+
+.value-main {
+  font-size: 16px;
+  font-weight: bold;
+  color: #f39c12;
+  font-family: monospace;
+}
+
+.value-voltage {
+  font-size: 10px;
+  color: #bdc3c7;
+  font-family: monospace;
+}
+
+.sample-hold-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.signal-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.input-signal, .output-signal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.signal-label {
+  font-size: 8px;
+  color: #ecf0f1;
+  text-align: center;
+}
+
+.signal-wave, .signal-flat {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  padding: 2px;
+}
+
+.sample-symbol {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #ecf0f1;
+}
+
+.trigger-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.trigger-label {
+  font-size: 10px;
+  color: #ecf0f1;
+}
+
+.trigger-led {
+  font-size: 16px;
+  color: #7f8c8d;
+  transition: color 0.2s ease;
+}
+
+.trigger-led.triggered {
+  color: #f39c12;
+  text-shadow: 0 0 6px #f39c12;
+}
+
+.sample-hold-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sample-hold-controls .control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.threshold-slider {
+  width: 80%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+.threshold-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.trigger-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.trigger-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.trigger-button.pressed {
+  background: #f39c12;
+  box-shadow: 0 0 8px rgba(243, 156, 18, 0.5);
+  transform: scale(0.95);
+}
+
+.trigger-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

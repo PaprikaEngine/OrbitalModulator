@@ -27,6 +27,7 @@ import VCANode from './components/VCANode';
 import SequencerNode from './components/SequencerNode';
 import SpectrumAnalyzerNode from './components/SpectrumAnalyzerNode';
 import RingModulatorNode from './components/RingModulatorNode';
+import SampleHoldNode from './components/SampleHoldNode';
 import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
@@ -45,6 +46,7 @@ const nodeTypes = {
   sequencer: SequencerNode,
   spectrum_analyzer: SpectrumAnalyzerNode,
   ring_modulator: RingModulatorNode,
+  sample_hold: SampleHoldNode,
   sine_oscillator: OscillatorNode,
   triangle_oscillator: OscillatorNode,
   sawtooth_oscillator: OscillatorNode,
