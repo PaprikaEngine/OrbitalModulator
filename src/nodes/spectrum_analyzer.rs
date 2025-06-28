@@ -119,7 +119,7 @@ impl SpectrumAnalyzerNode {
     }
     
     // Simple FFT implementation (Cooley-Tukey algorithm)
-    fn fft_inplace(&self, data: &mut [f32], n: usize, inverse: bool) {
+    fn fft_inplace_static(data: &mut [f32], n: usize, inverse: bool) {
         // Bit-reversal permutation
         let mut j = 0;
         for i in 1..n {
@@ -191,7 +191,8 @@ impl SpectrumAnalyzerNode {
         }
         
         // Perform FFT
-        self.fft_inplace(&mut self.fft_buffer, self.fft_size, false);
+        let fft_size = self.fft_size;
+        Self::fft_inplace_static(&mut self.fft_buffer, fft_size, false);
         
         // Calculate magnitude spectrum
         for i in 0..self.fft_size / 2 {
@@ -299,11 +300,9 @@ impl AudioNode for SpectrumAnalyzerNode {
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
-}
-
-// Add as_any method for downcast access
-impl SpectrumAnalyzerNode {
-    pub fn as_any(&self) -> &dyn Any {
+    
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
+

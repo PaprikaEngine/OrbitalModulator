@@ -30,6 +30,10 @@ impl AudioNode for OutputNode {
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }
+    
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 
     fn process(&mut self, inputs: &HashMap<String, &[f32]>, outputs: &mut HashMap<String, &mut [f32]>) {
         // Get input signals

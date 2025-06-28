@@ -168,6 +168,10 @@ impl AudioNode for ADSRNode {
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }
+    
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 
     fn process(&mut self, inputs: &HashMap<String, &[f32]>, outputs: &mut HashMap<String, &mut [f32]>) {
         let gate_input = inputs.get("gate_in").copied().unwrap_or(&[]);

@@ -193,11 +193,9 @@ impl AudioNode for SampleHoldNode {
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
-}
-
-// Add as_any method for downcast access
-impl SampleHoldNode {
-    pub fn as_any(&self) -> &dyn Any {
+    
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
+

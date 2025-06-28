@@ -154,11 +154,9 @@ impl AudioNode for MultipleNode {
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
-}
-
-// Add as_any method for downcast access
-impl MultipleNode {
-    pub fn as_any(&self) -> &dyn Any {
+    
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
+
