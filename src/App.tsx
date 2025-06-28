@@ -28,6 +28,7 @@ import SequencerNode from './components/SequencerNode';
 import SpectrumAnalyzerNode from './components/SpectrumAnalyzerNode';
 import RingModulatorNode from './components/RingModulatorNode';
 import SampleHoldNode from './components/SampleHoldNode';
+import AttenuverterNode from './components/AttenuverterNode';
 import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
@@ -47,6 +48,7 @@ const nodeTypes = {
   spectrum_analyzer: SpectrumAnalyzerNode,
   ring_modulator: RingModulatorNode,
   sample_hold: SampleHoldNode,
+  attenuverter: AttenuverterNode,
   sine_oscillator: OscillatorNode,
   triangle_oscillator: OscillatorNode,
   sawtooth_oscillator: OscillatorNode,

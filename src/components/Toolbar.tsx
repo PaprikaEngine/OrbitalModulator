@@ -47,6 +47,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
     { value: 'spectrum_analyzer', label: 'FFT Spectrum Analyzer' },
     { value: 'ring_modulator', label: 'Ring Modulator' },
     { value: 'sample_hold', label: 'Sample & Hold' },
+    { value: 'attenuverter', label: 'Attenuverter' },
     { value: 'oscilloscope', label: 'Oscilloscope' },
     { value: 'output', label: 'Audio Output' },
   ];
