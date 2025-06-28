@@ -165,6 +165,10 @@ impl AudioEngine {
                     if let Err(_) = vca_node.set_parameter(param, value) {
                         // Parameter setting failed
                     }
+                } else if let Some(sequencer_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::SequencerNode>() {
+                    if let Err(_) = sequencer_node.set_parameter(param, value) {
+                        // Parameter setting failed
+                    }
                 } else if let Some(output_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OutputNode>() {
                     match param {
                         "master_volume" => output_node.set_master_volume(value),
@@ -609,6 +613,13 @@ impl AudioEngine {
                     "vca" => {
                         if let Some(vca_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::VCANode>() {
                             if let Err(_) = vca_node.set_parameter(param, *value) {
+                                // Parameter setting failed
+                            }
+                        }
+                    }
+                    "sequencer" => {
+                        if let Some(sequencer_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::SequencerNode>() {
+                            if let Err(_) = sequencer_node.set_parameter(param, *value) {
                                 // Parameter setting failed
                             }
                         }

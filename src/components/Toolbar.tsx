@@ -43,6 +43,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
     { value: 'delay', label: 'Delay Effect' },
     { value: 'noise', label: 'Noise Generator' },
     { value: 'vca', label: 'VCA (Amplifier)' },
+    { value: 'sequencer', label: 'Sequencer' },
     { value: 'oscilloscope', label: 'Oscilloscope' },
     { value: 'output', label: 'Audio Output' },
   ];

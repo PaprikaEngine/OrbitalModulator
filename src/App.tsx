@@ -24,6 +24,7 @@ import MixerNode from './components/MixerNode';
 import DelayNode from './components/DelayNode';
 import NoiseNode from './components/NoiseNode';
 import VCANode from './components/VCANode';
+import SequencerNode from './components/SequencerNode';
 import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
@@ -39,6 +40,7 @@ const nodeTypes = {
   delay: DelayNode,
   noise: NoiseNode,
   vca: VCANode,
+  sequencer: SequencerNode,
   sine_oscillator: OscillatorNode,
   triangle_oscillator: OscillatorNode,
   sawtooth_oscillator: OscillatorNode,

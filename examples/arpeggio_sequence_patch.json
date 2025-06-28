@@ -1,0 +1,156 @@
+{
+  "patch_name": "Arpeggio Sequence",
+  "description": "Fast arpeggiated sequence with filter modulation",
+  "nodes": [
+    {
+      "id": "arp_seq",
+      "type": "sequencer",
+      "name": "Arpeggio Sequencer",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "bpm": 140.0,
+        "step_count": 16.0,
+        "running": 1.0,
+        "active": 1.0,
+        "step_0_note": 261.63,
+        "step_0_gate": 1.0,
+        "step_0_velocity": 0.8,
+        "step_1_note": 329.63,
+        "step_1_gate": 1.0,
+        "step_1_velocity": 0.7,
+        "step_2_note": 392.00,
+        "step_2_gate": 1.0,
+        "step_2_velocity": 0.6,
+        "step_3_note": 523.25,
+        "step_3_gate": 1.0,
+        "step_3_velocity": 0.9,
+        "step_4_note": 392.00,
+        "step_4_gate": 1.0,
+        "step_4_velocity": 0.7,
+        "step_5_note": 329.63,
+        "step_5_gate": 1.0,
+        "step_5_velocity": 0.6,
+        "step_6_note": 261.63,
+        "step_6_gate": 1.0,
+        "step_6_velocity": 0.8,
+        "step_7_note": 329.63,
+        "step_7_gate": 1.0,
+        "step_7_velocity": 0.7,
+        "step_8_note": 293.66,
+        "step_8_gate": 1.0,
+        "step_8_velocity": 0.8,
+        "step_9_note": 369.99,
+        "step_9_gate": 1.0,
+        "step_9_velocity": 0.7,
+        "step_10_note": 440.00,
+        "step_10_gate": 1.0,
+        "step_10_velocity": 0.6,
+        "step_11_note": 587.33,
+        "step_11_gate": 1.0,
+        "step_11_velocity": 0.9,
+        "step_12_note": 440.00,
+        "step_12_gate": 1.0,
+        "step_12_velocity": 0.7,
+        "step_13_note": 369.99,
+        "step_13_gate": 1.0,
+        "step_13_velocity": 0.6,
+        "step_14_note": 293.66,
+        "step_14_gate": 1.0,
+        "step_14_velocity": 0.8,
+        "step_15_note": 261.63,
+        "step_15_gate": 1.0,
+        "step_15_velocity": 0.7
+      }
+    },
+    {
+      "id": "arp_osc",
+      "type": "oscillator",
+      "name": "Arpeggio Oscillator",
+      "position": { "x": 350, "y": 150 },
+      "parameters": {
+        "frequency": 261.63,
+        "amplitude": 0.7,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "filter_lfo",
+      "type": "lfo",
+      "name": "Filter LFO",
+      "position": { "x": 350, "y": 350 },
+      "parameters": {
+        "frequency": 0.5,
+        "amplitude": 0.6,
+        "waveform": 0,
+        "phase_offset": 0.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "arp_filter",
+      "type": "filter",
+      "name": "Arpeggio Filter",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "cutoff_frequency": 1200.0,
+        "resonance": 0.4,
+        "filter_type": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 850, "y": 200 },
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "arp_seq",
+      "source_port": "note_cv",
+      "target_node": "arp_osc",
+      "target_port": "frequency_cv"
+    },
+    {
+      "source_node": "arp_osc",
+      "source_port": "audio_out",
+      "target_node": "arp_filter",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "filter_lfo",
+      "source_port": "cv_out",
+      "target_node": "arp_filter",
+      "target_port": "cutoff_cv"
+    },
+    {
+      "source_node": "arp_filter",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "arp_filter",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    }
+  ],
+  "notes": [
+    "Arpeggio Sequence Patch:",
+    "- 16-step sequencer plays fast arpeggiated patterns",
+    "- Two chord arpeggios: C major and D minor",
+    "- Sawtooth oscillator for bright arpeggio sound",
+    "- Low-pass filter adds movement and character",
+    "- LFO slowly modulates filter cutoff frequency",
+    "- 140 BPM for energetic arpeggio feel",
+    "- Pattern creates ascending/descending motion",
+    "- Adjust filter resonance for more/less character"
+  ]
+}
