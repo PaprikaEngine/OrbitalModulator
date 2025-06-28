@@ -1,0 +1,126 @@
+{
+  "patch_name": "Basic Synthesizer Chain",
+  "description": "Classic VCO -> VCF -> VCA chain with ADSR envelope control",
+  "nodes": [
+    {
+      "id": "osc1",
+      "type": "oscillator",
+      "name": "Main Oscillator",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "frequency": 440.0,
+        "amplitude": 0.8,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "filter1", 
+      "type": "filter",
+      "name": "Main Filter",
+      "position": { "x": 350, "y": 200 },
+      "parameters": {
+        "cutoff_frequency": 2000.0,
+        "resonance": 1.5,
+        "filter_type": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "adsr1",
+      "type": "adsr", 
+      "name": "Amplitude Envelope",
+      "position": { "x": 100, "y": 350 },
+      "parameters": {
+        "attack": 0.1,
+        "decay": 0.3,
+        "sustain": 0.7,
+        "release": 0.5,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "adsr2",
+      "type": "adsr",
+      "name": "Filter Envelope", 
+      "position": { "x": 100, "y": 500 },
+      "parameters": {
+        "attack": 0.05,
+        "decay": 0.8,
+        "sustain": 0.3,
+        "release": 1.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "scope1",
+      "type": "oscilloscope",
+      "name": "Waveform Monitor",
+      "position": { "x": 600, "y": 350 },
+      "parameters": {
+        "time_div": 0.01,
+        "volt_div": 1.0,
+        "position_h": 0.0,
+        "position_v": 0.0,
+        "trigger_level": 0.0
+      }
+    },
+    {
+      "id": "output1",
+      "type": "output", 
+      "name": "Main Output",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "master_volume": 0.7,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "osc1",
+      "source_port": "audio_out",
+      "target_node": "filter1", 
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "filter1",
+      "source_port": "audio_out", 
+      "target_node": "output1",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "filter1",
+      "source_port": "audio_out",
+      "target_node": "output1",
+      "target_port": "audio_in_r"
+    },
+    {
+      "source_node": "adsr2",
+      "source_port": "cv_out",
+      "target_node": "filter1",
+      "target_port": "cutoff_cv"
+    },
+    {
+      "source_node": "filter1", 
+      "source_port": "audio_out",
+      "target_node": "scope1",
+      "target_port": "audio_in"
+    }
+  ],
+  "notes": [
+    "This is a classic analog synthesizer signal chain:",
+    "1. Oscillator generates the basic waveform (sawtooth)",
+    "2. Filter shapes the timbre with cutoff and resonance",
+    "3. ADSR2 modulates the filter cutoff for dynamic brightness",
+    "4. Oscilloscope monitors the final filtered signal",
+    "5. Output sends to speakers",
+    "",
+    "To use:",
+    "1. Start the audio engine",
+    "2. Activate all nodes (press play buttons)",
+    "3. Connect a gate signal to ADSR nodes for triggering",
+    "4. Adjust filter cutoff and resonance to taste",
+    "5. Modify ADSR parameters for different sounds"
+  ]
+}

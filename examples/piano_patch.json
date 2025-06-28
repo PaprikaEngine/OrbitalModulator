@@ -1,0 +1,88 @@
+{
+  "patch_name": "Piano Sound",
+  "description": "Piano-like sound with quick attack and natural decay",
+  "nodes": [
+    {
+      "id": "piano_osc",
+      "type": "oscillator", 
+      "name": "Piano Oscillator",
+      "position": { "x": 100, "y": 200 },
+      "parameters": {
+        "frequency": 261.63,
+        "amplitude": 0.9,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "piano_filter",
+      "type": "filter",
+      "name": "Piano Filter", 
+      "position": { "x": 350, "y": 200 },
+      "parameters": {
+        "cutoff_frequency": 3000.0,
+        "resonance": 0.8,
+        "filter_type": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "piano_env",
+      "type": "adsr",
+      "name": "Piano Envelope",
+      "position": { "x": 100, "y": 350 },
+      "parameters": {
+        "attack": 0.01,
+        "decay": 0.8,
+        "sustain": 0.2,
+        "release": 1.2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output",
+      "position": { "x": 600, "y": 200 },
+      "parameters": {
+        "master_volume": 0.8,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "piano_osc",
+      "source_port": "audio_out",
+      "target_node": "piano_filter",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "piano_filter",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "piano_filter", 
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    },
+    {
+      "source_node": "piano_env",
+      "source_port": "cv_out",
+      "target_node": "piano_osc",
+      "target_port": "amplitude_cv"
+    }
+  ],
+  "notes": [
+    "Piano Sound Characteristics:",
+    "- Very fast attack (0.01s) for immediate key response",
+    "- Long decay (0.8s) for natural fade",
+    "- Low sustain (20%) - piano doesn't sustain like organ", 
+    "- Long release (1.2s) for natural trailing off",
+    "- Sawtooth wave for rich harmonics",
+    "- Moderate filter cutoff for brightness"
+  ]
+}

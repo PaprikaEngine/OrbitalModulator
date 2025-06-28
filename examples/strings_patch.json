@@ -1,0 +1,125 @@
+{
+  "patch_name": "String Pad",
+  "description": "Lush string pad sound with slow attack and filter sweep",
+  "nodes": [
+    {
+      "id": "strings_osc1",
+      "type": "oscillator",
+      "name": "Strings Osc 1", 
+      "position": { "x": 100, "y": 150 },
+      "parameters": {
+        "frequency": 220.0,
+        "amplitude": 0.6,
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "strings_osc2", 
+      "type": "oscillator",
+      "name": "Strings Osc 2",
+      "position": { "x": 100, "y": 300 },
+      "parameters": {
+        "frequency": 329.63,
+        "amplitude": 0.6, 
+        "waveform": 2,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "strings_filter",
+      "type": "filter",
+      "name": "Strings Filter",
+      "position": { "x": 400, "y": 200 },
+      "parameters": {
+        "cutoff_frequency": 800.0,
+        "resonance": 2.0,
+        "filter_type": 0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "amp_env",
+      "type": "adsr",
+      "name": "Amplitude Envelope",
+      "position": { "x": 100, "y": 450 },
+      "parameters": {
+        "attack": 1.5,
+        "decay": 0.2,
+        "sustain": 0.8,
+        "release": 2.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "filter_env", 
+      "type": "adsr",
+      "name": "Filter Envelope",
+      "position": { "x": 250, "y": 450 },
+      "parameters": {
+        "attack": 2.0,
+        "decay": 1.0,
+        "sustain": 0.4,
+        "release": 3.0,
+        "active": 1.0
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "name": "Output", 
+      "position": { "x": 650, "y": 200 },
+      "parameters": {
+        "master_volume": 0.6,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source_node": "strings_osc1",
+      "source_port": "audio_out",
+      "target_node": "strings_filter",
+      "target_port": "audio_in"
+    },
+    {
+      "source_node": "strings_filter",
+      "source_port": "audio_out",
+      "target_node": "output", 
+      "target_port": "audio_in_l"
+    },
+    {
+      "source_node": "strings_filter",
+      "source_port": "audio_out",
+      "target_node": "output",
+      "target_port": "audio_in_r"
+    },
+    {
+      "source_node": "amp_env",
+      "source_port": "cv_out",
+      "target_node": "strings_osc1",
+      "target_port": "amplitude_cv"
+    },
+    {
+      "source_node": "amp_env",
+      "source_port": "cv_out", 
+      "target_node": "strings_osc2",
+      "target_port": "amplitude_cv"
+    },
+    {
+      "source_node": "filter_env",
+      "source_port": "cv_out",
+      "target_node": "strings_filter",
+      "target_port": "cutoff_cv"
+    }
+  ],
+  "notes": [
+    "String Pad Characteristics:",
+    "- Very slow attack (1.5s) for gradual fade-in",
+    "- Short decay with high sustain for sustained notes",
+    "- Long release (2.0s) for smooth fade-out",
+    "- Filter envelope opens slowly for brightness sweep",
+    "- Multiple oscillators for richness (currently only one connected)",
+    "- Lower volume for background pad sound"
+  ]
+}
