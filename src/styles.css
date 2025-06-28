@@ -1186,6 +1186,12 @@ button {
   color: white;
 }
 
+/* Ring Modulator Node Specific Styles */
+.react-flow__node-ring_modulator {
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  color: white;
+}
+
 .spectrum-analyzer-node {
   padding: 12px;
   border-radius: 8px;
@@ -1255,6 +1261,149 @@ button {
 .smoothing-slider::-webkit-slider-thumb, .gain-slider::-webkit-slider-thumb {
   width: 10px;
   height: 10px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ring-modulator-node {
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 250px;
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.ring-mod-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.modulation-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.signal-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 60px;
+}
+
+.signal-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bar-label {
+  font-size: 9px;
+  color: #ecf0f1;
+  text-align: center;
+  min-width: 40px;
+}
+
+.level-bar {
+  width: 16px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.level-fill {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 1px;
+  transition: height 0.3s ease;
+}
+
+.multiplication-symbol, .equals-symbol {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ecf0f1;
+  align-self: center;
+  margin: 0 4px;
+}
+
+.modulation-formula {
+  font-size: 10px;
+  color: #bdc3c7;
+  text-align: center;
+  font-style: italic;
+}
+
+.ring-mod-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ring-mod-controls .control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ring-mod-controls .slider-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.mix-slider, .carrier-gain-slider, .modulator-gain-slider {
+  width: 80%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+.mix-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f39c12;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.carrier-gain-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e74c3c;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.modulator-gain-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #3498db;
   cursor: pointer;

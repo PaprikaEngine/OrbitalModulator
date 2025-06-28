@@ -45,6 +45,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
     { value: 'vca', label: 'VCA (Amplifier)' },
     { value: 'sequencer', label: 'Sequencer' },
     { value: 'spectrum_analyzer', label: 'FFT Spectrum Analyzer' },
+    { value: 'ring_modulator', label: 'Ring Modulator' },
     { value: 'oscilloscope', label: 'Oscilloscope' },
     { value: 'output', label: 'Audio Output' },
   ];

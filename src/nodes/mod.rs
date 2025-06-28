@@ -10,6 +10,7 @@ pub mod noise;
 pub mod vca;
 pub mod sequencer;
 pub mod spectrum_analyzer;
+pub mod ring_modulator;
 
 pub use output::OutputNode;
 pub use oscillator::{SineOscillatorNode, OscillatorNode, WaveformType};
@@ -23,6 +24,7 @@ pub use noise::{NoiseNode, NoiseType};
 pub use vca::VCANode;
 pub use sequencer::{SequencerNode, SequenceStep};
 pub use spectrum_analyzer::{SpectrumAnalyzerNode, WindowType};
+pub use ring_modulator::RingModulatorNode;
 
 use crate::graph::Node;
 use std::collections::HashMap;
@@ -52,6 +54,7 @@ pub fn create_node(node_type: &str, name: String) -> Result<Box<dyn AudioNode>, 
         "vca" => Ok(Box::new(VCANode::new(name))),
         "sequencer" => Ok(Box::new(SequencerNode::new(name))),
         "spectrum_analyzer" => Ok(Box::new(SpectrumAnalyzerNode::new(name))),
+        "ring_modulator" => Ok(Box::new(RingModulatorNode::new(name))),
         _ => Err(format!("Unknown node type: {}", node_type)),
     }
 }
