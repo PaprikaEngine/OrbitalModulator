@@ -224,10 +224,40 @@ function App() {
   // Save/Load project
   const saveProject = useCallback(async () => {
     try {
-      await invoke('save_project', {
-        filename: 'project.json',
+      // Open file dialog to select save location
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      
+      const filePath = await save({
+        title: 'Save Patch File',
+        defaultPath: 'my_patch.json',
+        filters: [
+          {
+            name: 'JSON Patch Files',
+            extensions: ['json']
+          }
+        ]
       });
-      setStatusMessage('Project saved');
+
+      if (filePath) {
+        // Prepare node positions from ReactFlow
+        const nodePositions: Record<string, {x: number, y: number}> = {};
+        nodes.forEach(node => {
+          nodePositions[node.data?.label || node.id] = {
+            x: node.position.x,
+            y: node.position.y
+          };
+        });
+
+        // Save the current patch configuration
+        await invoke('save_patch_file', {
+          filePath: filePath,
+          patchName: 'My Patch',
+          description: 'Patch created with Orbital Modulator',
+          nodePositions: nodePositions
+        });
+        
+        setStatusMessage(`Patch saved: ${filePath.split('/').pop() || 'file'}`);
+      }
     } catch (error) {
       console.error('Save failed:', error);
       setStatusMessage(`Save failed: ${error}`);

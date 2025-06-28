@@ -606,6 +606,11 @@ impl AudioEngine {
         graph.find_node_by_name(name)
     }
 
+    pub fn find_node_name_by_id(&self, id: Uuid) -> Option<String> {
+        let graph = self.graph.lock().unwrap();
+        graph.get_node(id).map(|node| node.name.clone())
+    }
+
     fn audio_callback(
         output: &mut [f32],
         graph: &Arc<Mutex<AudioGraph>>,

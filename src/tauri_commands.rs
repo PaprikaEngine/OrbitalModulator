@@ -248,6 +248,82 @@ pub async fn load_project(
 }
 
 #[tauri::command]
+pub async fn save_patch_file(
+    engine: State<'_, AudioEngineState>,
+    file_path: String,
+    patch_name: Option<String>,
+    description: Option<String>,
+    node_positions: Option<std::collections::HashMap<String, PatchPosition>>,
+) -> Result<(), String> {
+    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    
+    // Get current nodes
+    let nodes = engine.list_nodes();
+    let mut patch_nodes = Vec::new();
+    
+    for (node_id, name, node_type) in nodes {
+        if let Some(node_info) = engine.get_node_info(node_id) {
+            // Get position from provided positions or use default
+            let position = node_positions.as_ref()
+                .and_then(|positions| positions.get(&name))
+                .cloned()
+                .unwrap_or(PatchPosition { x: 100.0, y: 100.0 });
+                
+            let patch_node = PatchNode {
+                id: name.clone(),
+                node_type: node_type.clone(),
+                name: name.clone(),
+                position,
+                parameters: node_info.parameters,
+            };
+            patch_nodes.push(patch_node);
+        }
+    }
+    
+    // Get current connections
+    let graph = engine.graph.lock().map_err(|e| format!("Failed to lock graph: {}", e))?;
+    let mut patch_connections = Vec::new();
+    
+    for conn in &graph.connections {
+        // Find node names by ID
+        let source_name = engine.find_node_name_by_id(conn.source_node);
+        let target_name = engine.find_node_name_by_id(conn.target_node);
+        
+        if let (Some(src_name), Some(tgt_name)) = (source_name, target_name) {
+            let patch_conn = PatchConnection {
+                source_node: src_name,
+                source_port: conn.source_port.clone(),
+                target_node: tgt_name,
+                target_port: conn.target_port.clone(),
+            };
+            patch_connections.push(patch_conn);
+        }
+    }
+    
+    // Create patch file structure
+    let patch = PatchFile {
+        patch_name,
+        description,
+        nodes: patch_nodes,
+        connections: patch_connections,
+        notes: Some(vec![
+            "Generated patch file".to_string(),
+            format!("Created with {} nodes and {} connections", 
+                   patch_nodes.len(), patch_connections.len())
+        ]),
+    };
+    
+    // Write to file
+    let json_content = serde_json::to_string_pretty(&patch)
+        .map_err(|e| format!("Failed to serialize patch: {}", e))?;
+        
+    fs::write(&file_path, json_content)
+        .map_err(|e| format!("Failed to write file {}: {}", file_path, e))?;
+    
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn load_patch_file(
     engine: State<'_, AudioEngineState>,
     file_path: String,
