@@ -14,6 +14,10 @@ pub mod ring_modulator;
 pub mod sample_hold;
 pub mod attenuverter;
 pub mod multiple;
+pub mod clock_divider;
+pub mod quantizer;
+pub mod compressor;
+pub mod waveshaper;
 
 pub use output::OutputNode;
 pub use oscillator::{SineOscillatorNode, OscillatorNode, WaveformType};
@@ -31,6 +35,10 @@ pub use ring_modulator::RingModulatorNode;
 pub use sample_hold::SampleHoldNode;
 pub use attenuverter::AttenuverterNode;
 pub use multiple::MultipleNode;
+pub use clock_divider::ClockDividerNode;
+pub use quantizer::{QuantizerNode, Scale};
+pub use compressor::CompressorNode;
+pub use waveshaper::{WaveshaperNode, WaveshaperType};
 
 use crate::graph::Node;
 use std::collections::HashMap;
@@ -39,6 +47,7 @@ pub trait AudioNode: Send {
     fn process(&mut self, inputs: &HashMap<String, &[f32]>, outputs: &mut HashMap<String, &mut [f32]>);
     fn create_node_info(&self, name: String) -> Node;
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
+    fn as_any(&self) -> &dyn std::any::Any;
 }
 
 pub fn create_node(node_type: &str, name: String) -> Result<Box<dyn AudioNode>, String> {
@@ -65,6 +74,10 @@ pub fn create_node(node_type: &str, name: String) -> Result<Box<dyn AudioNode>, 
         "attenuverter" => Ok(Box::new(AttenuverterNode::new(name))),
         "multiple" => Ok(Box::new(MultipleNode::new(name, 4))), // 4-channel multiple by default
         "multiple8" => Ok(Box::new(MultipleNode::new(name, 8))), // 8-channel multiple option
+        "clock_divider" => Ok(Box::new(ClockDividerNode::new(name))),
+        "quantizer" => Ok(Box::new(QuantizerNode::new(name))),
+        "compressor" => Ok(Box::new(CompressorNode::new(name))),
+        "waveshaper" => Ok(Box::new(WaveshaperNode::new(name))),
         _ => Err(format!("Unknown node type: {}", node_type)),
     }
 }
