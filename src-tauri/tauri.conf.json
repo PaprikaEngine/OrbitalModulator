@@ -39,10 +39,7 @@
     "shell": {
       "open": true
     },
-    "dialog": {
-      "open": true,
-      "save": true
-    },
+    "dialog": null,
     "fs": {
       "readFile": true,
       "writeFile": true,

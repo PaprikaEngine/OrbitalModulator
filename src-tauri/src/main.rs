@@ -24,6 +24,7 @@ fn main() {
             
             Ok(())
         })
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             create_node,
             remove_node,
@@ -38,7 +39,8 @@ fn main() {
             is_audio_running,
             save_project,
             load_project,
-            get_oscilloscope_data
+            get_oscilloscope_data,
+            load_patch_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

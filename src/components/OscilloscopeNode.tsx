@@ -2,17 +2,6 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { invoke } from '@tauri-apps/api/core';
 
-interface OscilloscopeData {
-  nodeId: string;
-  parameters: {
-    time_div: number;
-    volt_div: number;
-    position_h: number;
-    position_v: number;
-    trigger_level: number;
-  };
-}
-
 interface Measurements {
   vpp: number;
   vrms: number;

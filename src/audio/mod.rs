@@ -585,6 +585,27 @@ impl AudioEngine {
         Ok(())
     }
 
+    pub fn clear_graph(&mut self) -> Result<(), String> {
+        // Clear all nodes and connections
+        {
+            let mut graph = self.graph.lock().unwrap();
+            graph.clear();
+        }
+        
+        // Clear node instances
+        {
+            let mut instances = self.node_instances.lock().unwrap();
+            instances.clear();
+        }
+        
+        Ok(())
+    }
+
+    pub fn find_node_by_name(&self, name: &str) -> Option<Uuid> {
+        let graph = self.graph.lock().unwrap();
+        graph.find_node_by_name(name)
+    }
+
     fn audio_callback(
         output: &mut [f32],
         graph: &Arc<Mutex<AudioGraph>>,

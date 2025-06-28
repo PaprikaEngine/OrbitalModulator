@@ -236,11 +236,33 @@ function App() {
 
   const loadProject = useCallback(async () => {
     try {
-      await invoke('load_project', {
-        filename: 'project.json',
+      // Open file dialog to select patch file
+      const { open } = await import('@tauri-apps/plugin-dialog');
+      
+      const selected = await open({
+        title: 'Load Patch File',
+        filters: [
+          {
+            name: 'JSON Patch Files',
+            extensions: ['json']
+          },
+          {
+            name: 'All Files',
+            extensions: ['*']
+          }
+        ],
+        multiple: false,
       });
-      await loadGraph();
-      setStatusMessage('Project loaded');
+
+      if (selected) {
+        // Load the selected patch file
+        await invoke('load_patch_file', {
+          filePath: selected,
+        });
+        
+        await loadGraph(); // Refresh the graph view
+        setStatusMessage(`Patch loaded: ${selected.split('/').pop() || 'file'}`);
+      }
     } catch (error) {
       console.error('Load failed:', error);
       setStatusMessage(`Load failed: ${error}`);

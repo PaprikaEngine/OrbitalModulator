@@ -270,4 +270,18 @@ impl AudioGraph {
         visited.insert(node_id);
         true
     }
+
+    pub fn clear(&mut self) {
+        self.nodes.clear();
+        self.connections.clear();
+    }
+
+    pub fn find_node_by_name(&self, name: &str) -> Option<Uuid> {
+        for (id, node) in &self.nodes {
+            if node.name == name {
+                return Some(*id);
+            }
+        }
+        None
+    }
 }

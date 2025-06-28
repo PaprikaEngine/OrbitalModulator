@@ -3,6 +3,7 @@ use std::sync::{Arc, Mutex};
 use tauri::State;
 use uuid::Uuid;
 use serde::{Deserialize, Serialize};
+use std::fs;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NodeInfo {
@@ -26,6 +27,39 @@ pub struct ConnectionInfo {
     pub source_port: String,
     pub target_node: String,
     pub target_port: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PatchNode {
+    pub id: String,
+    #[serde(rename = "type")]
+    pub node_type: String,
+    pub name: String,
+    pub position: PatchPosition,
+    pub parameters: std::collections::HashMap<String, f32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PatchPosition {
+    pub x: f32,
+    pub y: f32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PatchConnection {
+    pub source_node: String,
+    pub source_port: String,
+    pub target_node: String,
+    pub target_port: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PatchFile {
+    pub patch_name: Option<String>,
+    pub description: Option<String>,
+    pub nodes: Vec<PatchNode>,
+    pub connections: Vec<PatchConnection>,
+    pub notes: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -211,6 +245,57 @@ pub async fn load_project(
 ) -> Result<(), String> {
     let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     engine.load_from_file(&filename)
+}
+
+#[tauri::command]
+pub async fn load_patch_file(
+    engine: State<'_, AudioEngineState>,
+    file_path: String,
+) -> Result<(), String> {
+    // Read the JSON file
+    let json_content = fs::read_to_string(&file_path)
+        .map_err(|e| format!("Failed to read file {}: {}", file_path, e))?;
+    
+    // Parse the JSON
+    let patch: PatchFile = serde_json::from_str(&json_content)
+        .map_err(|e| format!("Failed to parse JSON: {}", e))?;
+    
+    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    
+    // Clear current graph
+    engine.clear_graph().map_err(|e| format!("Failed to clear graph: {}", e))?;
+    
+    // Create nodes from patch
+    for patch_node in &patch.nodes {
+        // Create node (engine will assign new UUID)
+        let node_id = engine.create_node(&patch_node.node_type, patch_node.name.clone())
+            .map_err(|e| format!("Failed to create node {}: {}", patch_node.name, e))?;
+        
+        // Set parameters
+        for (param_name, param_value) in &patch_node.parameters {
+            let _ = engine.set_node_parameter(node_id, param_name, *param_value);
+            // Ignore parameter errors to allow partial loading
+        }
+    }
+    
+    // Create connections
+    for connection in &patch.connections {
+        // Find node IDs by name
+        let source_id = engine.find_node_by_name(&connection.source_node);
+        let target_id = engine.find_node_by_name(&connection.target_node);
+        
+        if let (Some(src_id), Some(tgt_id)) = (source_id, target_id) {
+            let _ = engine.connect_nodes(
+                src_id, 
+                &connection.source_port, 
+                tgt_id, 
+                &connection.target_port
+            );
+            // Ignore connection errors to allow partial loading
+        }
+    }
+    
+    Ok(())
 }
 
 #[tauri::command]
