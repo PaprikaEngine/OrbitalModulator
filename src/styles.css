@@ -1179,3 +1179,85 @@ button {
   color: #ecf0f1;
   text-align: center;
 }
+
+/* Spectrum Analyzer Node Specific Styles */
+.react-flow__node-spectrum_analyzer {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+}
+
+.spectrum-analyzer-node {
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 320px;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.spectrum-display {
+  margin: 8px 0;
+  padding: 4px;
+  background: #000;
+  border-radius: 4px;
+  border: 1px solid #555;
+}
+
+.spectrum-canvas {
+  display: block;
+  border-radius: 2px;
+  cursor: crosshair;
+}
+
+.spectrum-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.spectrum-controls .control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.window-select {
+  width: 100%;
+  padding: 2px 4px;
+  border: 1px solid #555;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 10px;
+}
+
+.slider-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.smoothing-slider, .gain-slider {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+.smoothing-slider::-webkit-slider-thumb, .gain-slider::-webkit-slider-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

@@ -248,6 +248,48 @@ pub async fn load_project(
 }
 
 #[tauri::command]
+pub async fn get_spectrum_data(
+    engine: State<'_, AudioEngineState>,
+    node_id: String,
+) -> Result<Vec<f32>, String> {
+    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let node_id = Uuid::parse_str(&node_id)
+        .map_err(|_| "Invalid UUID format".to_string())?;
+    
+    let node_instances = engine.node_instances.lock()
+        .map_err(|e| format!("Failed to lock node instances: {}", e))?;
+    
+    if let Some(node_instance) = node_instances.get(&node_id) {
+        if let Some(spectrum_node) = node_instance.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNode>() {
+            return Ok(spectrum_node.get_magnitude_spectrum().to_vec());
+        }
+    }
+    
+    Err("Spectrum analyzer node not found".to_string())
+}
+
+#[tauri::command]
+pub async fn get_spectrum_frequencies(
+    engine: State<'_, AudioEngineState>,
+    node_id: String,
+) -> Result<Vec<f32>, String> {
+    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let node_id = Uuid::parse_str(&node_id)
+        .map_err(|_| "Invalid UUID format".to_string())?;
+    
+    let node_instances = engine.node_instances.lock()
+        .map_err(|e| format!("Failed to lock node instances: {}", e))?;
+    
+    if let Some(node_instance) = node_instances.get(&node_id) {
+        if let Some(spectrum_node) = node_instance.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNode>() {
+            return Ok(spectrum_node.get_frequency_bins());
+        }
+    }
+    
+    Err("Spectrum analyzer node not found".to_string())
+}
+
+#[tauri::command]
 pub async fn save_patch_file(
     engine: State<'_, AudioEngineState>,
     file_path: String,
