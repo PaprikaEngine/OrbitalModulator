@@ -17,6 +17,7 @@ import { invoke } from '@tauri-apps/api/core';
 import OscillatorNode from './components/OscillatorNode';
 import OutputNode from './components/OutputNode';
 import OscilloscopeNode from './components/OscilloscopeNode';
+import FilterNode from './components/FilterNode';
 import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
@@ -24,6 +25,7 @@ const nodeTypes = {
   oscillator: OscillatorNode,
   output: OutputNode,
   oscilloscope: OscilloscopeNode,
+  filter: FilterNode,
   sine_oscillator: OscillatorNode,
   triangle_oscillator: OscillatorNode,
   sawtooth_oscillator: OscillatorNode,

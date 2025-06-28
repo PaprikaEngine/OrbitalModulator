@@ -128,6 +128,22 @@ impl AudioEngine {
                         "active" => osc.active = value != 0.0,
                         _ => return Err(format!("Unknown parameter: {}", param)),
                     }
+                } else if let Some(filter_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::VCFNode>() {
+                    match param {
+                        "cutoff_frequency" => filter_node.set_cutoff_frequency(value),
+                        "resonance" => filter_node.set_resonance(value),
+                        "filter_type" => {
+                            let filter_type = match value as u8 {
+                                0 => crate::nodes::FilterType::Lowpass,
+                                1 => crate::nodes::FilterType::Highpass,
+                                2 => crate::nodes::FilterType::Bandpass,
+                                _ => return Err(format!("Invalid filter type value: {}", value)),
+                            };
+                            filter_node.set_filter_type(filter_type);
+                        },
+                        "active" => filter_node.active = value != 0.0,
+                        _ => return Err(format!("Unknown parameter: {}", param)),
+                    }
                 } else if let Some(output_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OutputNode>() {
                     match param {
                         "master_volume" => output_node.set_master_volume(value),
@@ -506,6 +522,25 @@ impl AudioEngine {
                                 },
                                 "pulse_width" => osc.set_pulse_width(*value),
                                 "active" => osc.active = *value != 0.0,
+                                _ => {}
+                            }
+                        }
+                    }
+                    "filter" => {
+                        if let Some(filter_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::VCFNode>() {
+                            match param.as_str() {
+                                "cutoff_frequency" => filter_node.set_cutoff_frequency(*value),
+                                "resonance" => filter_node.set_resonance(*value),
+                                "filter_type" => {
+                                    let filter_type = match *value as u8 {
+                                        0 => crate::nodes::FilterType::Lowpass,
+                                        1 => crate::nodes::FilterType::Highpass,
+                                        2 => crate::nodes::FilterType::Bandpass,
+                                        _ => crate::nodes::FilterType::Lowpass, // Default
+                                    };
+                                    filter_node.set_filter_type(filter_type);
+                                },
+                                "active" => filter_node.active = *value != 0.0,
                                 _ => {}
                             }
                         }

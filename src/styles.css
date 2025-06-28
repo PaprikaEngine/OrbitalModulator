@@ -198,6 +198,11 @@ button {
   color: white;
 }
 
+.react-flow__node-filter {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: white;
+}
+
 .react-flow__handle {
   width: 8px;
   height: 8px;

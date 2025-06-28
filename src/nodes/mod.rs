@@ -1,10 +1,12 @@
 pub mod output;
 pub mod oscillator;
 pub mod oscilloscope;
+pub mod filter;
 
 pub use output::OutputNode;
 pub use oscillator::{SineOscillatorNode, OscillatorNode, WaveformType};
 pub use oscilloscope::{OscilloscopeNode, TriggerMode, TriggerSlope, Measurements};
+pub use filter::{VCFNode, FilterType};
 
 use crate::graph::Node;
 use std::collections::HashMap;
@@ -24,6 +26,7 @@ pub fn create_node(node_type: &str, name: String) -> Result<Box<dyn AudioNode>, 
         "pulse_oscillator" => Ok(Box::new(OscillatorNode::new(44100.0, WaveformType::Pulse))),
         "oscillator" => Ok(Box::new(OscillatorNode::new(44100.0, WaveformType::Sine))), // Default to sine
         "oscilloscope" => Ok(Box::new(OscilloscopeNode::new(uuid::Uuid::new_v4().to_string(), name))),
+        "filter" => Ok(Box::new(VCFNode::new(44100.0))),
         _ => Err(format!("Unknown node type: {}", node_type)),
     }
 }
