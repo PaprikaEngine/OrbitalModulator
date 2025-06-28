@@ -203,6 +203,11 @@ button {
   color: white;
 }
 
+.react-flow__node-adsr {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: white;
+}
+
 .react-flow__handle {
   width: 8px;
   height: 8px;

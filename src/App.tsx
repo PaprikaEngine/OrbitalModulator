@@ -18,6 +18,7 @@ import OscillatorNode from './components/OscillatorNode';
 import OutputNode from './components/OutputNode';
 import OscilloscopeNode from './components/OscilloscopeNode';
 import FilterNode from './components/FilterNode';
+import ADSRNode from './components/ADSRNode';
 import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
@@ -26,6 +27,7 @@ const nodeTypes = {
   output: OutputNode,
   oscilloscope: OscilloscopeNode,
   filter: FilterNode,
+  adsr: ADSRNode,
   sine_oscillator: OscillatorNode,
   triangle_oscillator: OscillatorNode,
   sawtooth_oscillator: OscillatorNode,
