@@ -48,6 +48,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
     { value: 'ring_modulator', label: 'Ring Modulator' },
     { value: 'sample_hold', label: 'Sample & Hold' },
     { value: 'attenuverter', label: 'Attenuverter' },
+    { value: 'multiple', label: 'Multiple (4ch)' },
+    { value: 'multiple8', label: 'Multiple (8ch)' },
     { value: 'oscilloscope', label: 'Oscilloscope' },
     { value: 'output', label: 'Audio Output' },
   ];
