@@ -39,7 +39,7 @@ pub struct PatchNode {
     pub parameters: std::collections::HashMap<String, f32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PatchPosition {
     pub x: f32,
     pub y: f32,
@@ -300,6 +300,10 @@ pub async fn save_patch_file(
         }
     }
     
+    // Save lengths before moving values
+    let nodes_count = patch_nodes.len();
+    let connections_count = patch_connections.len();
+    
     // Create patch file structure
     let patch = PatchFile {
         patch_name,
@@ -309,7 +313,7 @@ pub async fn save_patch_file(
         notes: Some(vec![
             "Generated patch file".to_string(),
             format!("Created with {} nodes and {} connections", 
-                   patch_nodes.len(), patch_connections.len())
+                   nodes_count, connections_count)
         ]),
     };
     

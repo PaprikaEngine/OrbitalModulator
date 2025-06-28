@@ -42,10 +42,6 @@
       "open": true
     },
     "dialog": null,
-    "fs": {
-      "readFile": true,
-      "writeFile": true,
-      "scope": ["**"]
-    }
+    "fs": null
   }
 }
