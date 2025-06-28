@@ -107,6 +107,7 @@ impl AudioEngine {
                     match param {
                         "frequency" => sine_osc.set_frequency(value),
                         "amplitude" => sine_osc.set_amplitude(value),
+                        "active" => sine_osc.active = value != 0.0,
                         _ => return Err(format!("Unknown parameter: {}", param)),
                     }
                 } else if let Some(osc) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OscillatorNode>() {
@@ -124,6 +125,7 @@ impl AudioEngine {
                             osc.set_waveform(waveform);
                         },
                         "pulse_width" => osc.set_pulse_width(value),
+                        "active" => osc.active = value != 0.0,
                         _ => return Err(format!("Unknown parameter: {}", param)),
                     }
                 } else if let Some(output_node) = node_instance.as_any_mut().downcast_mut::<crate::nodes::OutputNode>() {
@@ -482,6 +484,7 @@ impl AudioEngine {
                             match param.as_str() {
                                 "frequency" => sine_osc.set_frequency(*value),
                                 "amplitude" => sine_osc.set_amplitude(*value),
+                                "active" => sine_osc.active = *value != 0.0,
                                 _ => {}
                             }
                         }
@@ -502,6 +505,7 @@ impl AudioEngine {
                                     osc.set_waveform(waveform);
                                 },
                                 "pulse_width" => osc.set_pulse_width(*value),
+                                "active" => osc.active = *value != 0.0,
                                 _ => {}
                             }
                         }

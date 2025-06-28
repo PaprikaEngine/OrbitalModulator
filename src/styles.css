@@ -35,6 +35,49 @@ body {
   text-align: center;
 }
 
+/* オシレーターノードのスタイル */
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.node-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.active-button {
+  padding: 4px 8px;
+  border: 1px solid;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  min-width: 32px;
+  transition: all 0.2s ease;
+}
+
+.active-button.active {
+  background: #ff4444;
+  border-color: #ff4444;
+  color: white;
+}
+
+.active-button.inactive {
+  background: #44ff44;
+  border-color: #44ff44;
+  color: white;
+}
+
+.active-button:hover {
+  opacity: 0.8;
+}
+
 .container {
   margin: 0;
   padding-top: 10vh;

@@ -1,7 +1,8 @@
-import React from 'react';
-import { Handle, Position } from 'reactflow';
+import React, { useState, useCallback } from 'react';
+import { Handle, Position, NodeProps } from 'reactflow';
+import { invoke } from '@tauri-apps/api/core';
 
-interface OscillatorNodeProps {
+interface OscillatorNodeProps extends NodeProps {
   data: {
     label: string;
     nodeType: string;
@@ -11,7 +12,9 @@ interface OscillatorNodeProps {
   };
 }
 
-const OscillatorNode: React.FC<OscillatorNodeProps> = ({ data }) => {
+const OscillatorNode: React.FC<OscillatorNodeProps> = ({ id, data }) => {
+  const [isActive, setIsActive] = useState(false);
+  
   const getWaveformName = (value: number) => {
     const waveforms = ['Sine', 'Triangle', 'Sawtooth', 'Pulse'];
     return waveforms[Math.floor(value)] || 'Unknown';
@@ -23,6 +26,23 @@ const OscillatorNode: React.FC<OscillatorNodeProps> = ({ data }) => {
     }
     return `${freq.toFixed(0)}Hz`;
   };
+
+  const toggleActive = useCallback(async () => {
+    try {
+      const newActiveState = !isActive;
+      
+      // Tauriコマンドでノードのアクティブ状態を設定
+      await invoke('set_node_parameter', {
+        nodeId: id,
+        param: 'active',
+        value: newActiveState ? 1.0 : 0.0,
+      });
+      
+      setIsActive(newActiveState);
+    } catch (error) {
+      console.error('Failed to toggle oscillator active state:', error);
+    }
+  }, [id, isActive]);
 
   return (
     <div className={`react-flow__node react-flow__node-${data.nodeType}`}>
@@ -51,7 +71,14 @@ const OscillatorNode: React.FC<OscillatorNodeProps> = ({ data }) => {
       ))}
 
       <div className="node-header">
-        {data.label}
+        <div className="node-title">{data.label}</div>
+        <button 
+          className={`active-button ${isActive ? 'active' : 'inactive'}`}
+          onClick={toggleActive}
+          title={isActive ? 'Deactivate oscillator' : 'Activate oscillator'}
+        >
+          {isActive ? '⏹' : '▶'}
+        </button>
       </div>
       
       <div className="node-params">

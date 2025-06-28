@@ -119,7 +119,9 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
     }
 
     // 波形描画
-    if (waveformData.length > 1) {
+    const hasSignal = waveformData.some(sample => Math.abs(sample) > 0.001);
+    
+    if (hasSignal && waveformData.length > 1) {
       ctx.strokeStyle = '#00ff00';
       ctx.lineWidth = 2;
       ctx.shadowColor = '#66ff66';
@@ -143,6 +145,12 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
       
       ctx.stroke();
       ctx.shadowBlur = 0;
+    } else {
+      // 信号がない場合のメッセージ表示
+      ctx.fillStyle = '#666666';
+      ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No Signal - Connect audio input', width / 2, height / 2);
     }
 
   }, [waveformData, parameters]);
@@ -162,27 +170,30 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
         };
       };
       
-      setWaveformData(new Float32Array(data.waveform));
-      setMeasurements(data.measurements);
-    } catch (error) {
-      // エラー時は仮のデータを表示（オシロスコープノードが存在しない場合など）
-      console.warn('Failed to fetch real waveform data, using fake data:', error);
-      
-      const fakeData = new Float32Array(512);
-      const freq = 440; // Hz
-      const time = Date.now() / 1000;
-      for (let i = 0; i < fakeData.length; i++) {
-        fakeData[i] = Math.sin(2 * Math.PI * freq * (time + i / 44100)) * 0.8;
+      // 実際のデータがある場合のみ使用
+      if (data.waveform && data.waveform.length > 0) {
+        setWaveformData(new Float32Array(data.waveform));
+        setMeasurements(data.measurements);
+      } else {
+        // データがない場合は空の波形を表示
+        setWaveformData(new Float32Array(512)); // 全て0の配列
+        setMeasurements({
+          vpp: 0,
+          vrms: 0,
+          frequency: 0,
+          period: 0,
+          duty_cycle: 0,
+        });
       }
-      setWaveformData(fakeData);
-      
-      // 仮の測定値
+    } catch (error) {
+      // API呼び出しが失敗した場合は空の波形を表示
+      setWaveformData(new Float32Array(512)); // 全て0の配列
       setMeasurements({
-        vpp: 1.6,
-        vrms: 0.56,
-        frequency: 440,
-        period: 0.0023,
-        duty_cycle: 50,
+        vpp: 0,
+        vrms: 0,
+        frequency: 0,
+        period: 0,
+        duty_cycle: 0,
       });
     }
   }, [id]);

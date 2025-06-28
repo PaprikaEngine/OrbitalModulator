@@ -36,6 +36,7 @@ impl WaveformType {
 pub struct SineOscillatorNode {
     pub frequency: f32,
     pub amplitude: f32,
+    pub active: bool,
     phase: f32,
     sample_rate: f32,
 }
@@ -46,6 +47,7 @@ pub struct OscillatorNode {
     pub amplitude: f32,
     pub waveform: WaveformType,
     pub pulse_width: f32, // For pulse wave
+    pub active: bool,
     phase: f32,
     sample_rate: f32,
 }
@@ -55,6 +57,7 @@ impl SineOscillatorNode {
         Self {
             frequency: 440.0,  // A4 default
             amplitude: 0.5,
+            active: false,
             phase: 0.0,
             sample_rate,
         }
@@ -93,31 +96,38 @@ impl AudioNode for SineOscillatorNode {
         if let Some(output_buffer) = outputs.get_mut("audio_out") {
             let buffer_size = output_buffer.len();
             
-            for (i, sample) in output_buffer.iter_mut().enumerate() {
-                // Calculate effective frequency (base + CV modulation)
-                let effective_frequency = if frequency_cv.is_empty() {
-                    self.frequency
-                } else {
-                    // CV modulation: 1V/Oct standard (CV * 1000Hz per volt)
-                    let cv_value = if i < frequency_cv.len() { frequency_cv[i] } else { 0.0 };
-                    self.frequency + (cv_value * 1000.0)
-                };
+            if self.active {
+                for (i, sample) in output_buffer.iter_mut().enumerate() {
+                    // Calculate effective frequency (base + CV modulation)
+                    let effective_frequency = if frequency_cv.is_empty() {
+                        self.frequency
+                    } else {
+                        // CV modulation: 1V/Oct standard (CV * 1000Hz per volt)
+                        let cv_value = if i < frequency_cv.len() { frequency_cv[i] } else { 0.0 };
+                        self.frequency + (cv_value * 1000.0)
+                    };
 
-                // Calculate effective amplitude (base + CV modulation)
-                let effective_amplitude = if amplitude_cv.is_empty() {
-                    self.amplitude
-                } else {
-                    let cv_value = if i < amplitude_cv.len() { amplitude_cv[i] } else { 0.0 };
-                    (self.amplitude + cv_value * 0.1).clamp(0.0, 1.0)
-                };
+                    // Calculate effective amplitude (base + CV modulation)
+                    let effective_amplitude = if amplitude_cv.is_empty() {
+                        self.amplitude
+                    } else {
+                        let cv_value = if i < amplitude_cv.len() { amplitude_cv[i] } else { 0.0 };
+                        (self.amplitude + cv_value * 0.1).clamp(0.0, 1.0)
+                    };
 
-                // Generate sine wave sample
-                let phase_increment = 2.0 * std::f32::consts::PI * effective_frequency / self.sample_rate;
-                *sample = (self.phase + phase_increment * i as f32).sin() * effective_amplitude;
+                    // Generate sine wave sample
+                    let phase_increment = 2.0 * std::f32::consts::PI * effective_frequency / self.sample_rate;
+                    *sample = (self.phase + phase_increment * i as f32).sin() * effective_amplitude;
+                }
+
+                // Advance phase for next buffer
+                self.advance_phase(buffer_size);
+            } else {
+                // If not active, output silence
+                for sample in output_buffer.iter_mut() {
+                    *sample = 0.0;
+                }
             }
-
-            // Advance phase for next buffer
-            self.advance_phase(buffer_size);
         }
     }
 
@@ -125,6 +135,7 @@ impl AudioNode for SineOscillatorNode {
         let mut parameters = HashMap::new();
         parameters.insert("frequency".to_string(), self.frequency);
         parameters.insert("amplitude".to_string(), self.amplitude);
+        parameters.insert("active".to_string(), if self.active { 1.0 } else { 0.0 });
 
         Node {
             id: Uuid::new_v4(),
@@ -158,6 +169,7 @@ impl OscillatorNode {
             amplitude: 0.5,
             waveform,
             pulse_width: 0.5,  // 50% duty cycle default
+            active: false,
             phase: 0.0,
             sample_rate,
         }
@@ -232,49 +244,56 @@ impl AudioNode for OscillatorNode {
         if let Some(output_buffer) = outputs.get_mut("audio_out") {
             let buffer_size = output_buffer.len();
             
-            for (i, sample) in output_buffer.iter_mut().enumerate() {
-                // Calculate effective frequency (base + CV modulation)
-                let effective_frequency = if frequency_cv.is_empty() {
-                    self.frequency
-                } else {
-                    // CV modulation: 1V/Oct standard (CV * 1000Hz per volt)
-                    let cv_value = if i < frequency_cv.len() { frequency_cv[i] } else { 0.0 };
-                    self.frequency + (cv_value * 1000.0)
-                };
+            if self.active {
+                for (i, sample) in output_buffer.iter_mut().enumerate() {
+                    // Calculate effective frequency (base + CV modulation)
+                    let effective_frequency = if frequency_cv.is_empty() {
+                        self.frequency
+                    } else {
+                        // CV modulation: 1V/Oct standard (CV * 1000Hz per volt)
+                        let cv_value = if i < frequency_cv.len() { frequency_cv[i] } else { 0.0 };
+                        self.frequency + (cv_value * 1000.0)
+                    };
 
-                // Calculate effective amplitude (base + CV modulation)
-                let effective_amplitude = if amplitude_cv.is_empty() {
-                    self.amplitude
-                } else {
-                    let cv_value = if i < amplitude_cv.len() { amplitude_cv[i] } else { 0.0 };
-                    (self.amplitude + cv_value * 0.1).clamp(0.0, 1.0)
-                };
+                    // Calculate effective amplitude (base + CV modulation)
+                    let effective_amplitude = if amplitude_cv.is_empty() {
+                        self.amplitude
+                    } else {
+                        let cv_value = if i < amplitude_cv.len() { amplitude_cv[i] } else { 0.0 };
+                        (self.amplitude + cv_value * 0.1).clamp(0.0, 1.0)
+                    };
 
-                // Update waveform from CV if available
-                if !waveform_cv.is_empty() && i < waveform_cv.len() {
-                    let waveform_value = (waveform_cv[i] * 4.0).floor() as i32;
-                    match waveform_value {
-                        0 => self.waveform = WaveformType::Sine,
-                        1 => self.waveform = WaveformType::Triangle,
-                        2 => self.waveform = WaveformType::Sawtooth,
-                        3 => self.waveform = WaveformType::Pulse,
-                        _ => {}, // Keep current waveform
+                    // Update waveform from CV if available
+                    if !waveform_cv.is_empty() && i < waveform_cv.len() {
+                        let waveform_value = (waveform_cv[i] * 4.0).floor() as i32;
+                        match waveform_value {
+                            0 => self.waveform = WaveformType::Sine,
+                            1 => self.waveform = WaveformType::Triangle,
+                            2 => self.waveform = WaveformType::Sawtooth,
+                            3 => self.waveform = WaveformType::Pulse,
+                            _ => {}, // Keep current waveform
+                        }
                     }
+
+                    // Update pulse width from CV if available
+                    if !pulse_width_cv.is_empty() && i < pulse_width_cv.len() {
+                        self.pulse_width = (0.1 + pulse_width_cv[i] * 0.8).clamp(0.1, 0.9);
+                    }
+
+                    // Generate sample
+                    let phase_increment = 2.0 * std::f32::consts::PI * effective_frequency / self.sample_rate;
+                    let current_phase = self.phase + phase_increment * i as f32;
+                    *sample = self.generate_sample(current_phase) * effective_amplitude;
                 }
 
-                // Update pulse width from CV if available
-                if !pulse_width_cv.is_empty() && i < pulse_width_cv.len() {
-                    self.pulse_width = (0.1 + pulse_width_cv[i] * 0.8).clamp(0.1, 0.9);
+                // Advance phase for next buffer
+                self.advance_phase(buffer_size);
+            } else {
+                // If not active, output silence
+                for sample in output_buffer.iter_mut() {
+                    *sample = 0.0;
                 }
-
-                // Generate sample
-                let phase_increment = 2.0 * std::f32::consts::PI * effective_frequency / self.sample_rate;
-                let current_phase = self.phase + phase_increment * i as f32;
-                *sample = self.generate_sample(current_phase) * effective_amplitude;
             }
-
-            // Advance phase for next buffer
-            self.advance_phase(buffer_size);
         }
     }
 
@@ -284,6 +303,7 @@ impl AudioNode for OscillatorNode {
         parameters.insert("amplitude".to_string(), self.amplitude);
         parameters.insert("waveform".to_string(), self.waveform as u8 as f32);
         parameters.insert("pulse_width".to_string(), self.pulse_width);
+        parameters.insert("active".to_string(), if self.active { 1.0 } else { 0.0 });
 
         Node {
             id: Uuid::new_v4(),

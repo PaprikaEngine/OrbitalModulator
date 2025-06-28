@@ -50,7 +50,7 @@ function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-  const [isAudioRunning, setIsAudioRunning] = useState(false);
+  const [isAudioEngineRunning, setIsAudioEngineRunning] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Initializing...');
   const [tauriReady, setTauriReady] = useState(false);
 
@@ -199,23 +199,23 @@ function App() {
     }
   }, [setNodes]);
 
-  // Audio control
-  const toggleAudio = useCallback(async () => {
+  // Audio engine control
+  const toggleAudioEngine = useCallback(async () => {
     try {
-      if (isAudioRunning) {
+      if (isAudioEngineRunning) {
         await invoke('stop_audio');
-        setIsAudioRunning(false);
-        setStatusMessage('Audio stopped');
+        setIsAudioEngineRunning(false);
+        setStatusMessage('Audio engine stopped');
       } else {
         await invoke('start_audio');
-        setIsAudioRunning(true);
-        setStatusMessage('Audio started');
+        setIsAudioEngineRunning(true);
+        setStatusMessage('Audio engine started');
       }
     } catch (error) {
-      console.error('Audio control failed:', error);
-      setStatusMessage(`Audio error: ${error}`);
+      console.error('Audio engine control failed:', error);
+      setStatusMessage(`Audio engine error: ${error}`);
     }
-  }, [isAudioRunning]);
+  }, [isAudioEngineRunning]);
 
   // Save/Load project
   const saveProject = useCallback(async () => {
@@ -261,12 +261,12 @@ function App() {
     initApp();
   }, [loadGraph]);
 
-  // Check audio status periodically
+  // Check audio engine status periodically
   useEffect(() => {
     const checkAudioStatus = async () => {
       try {
         const running: boolean = await invoke('is_audio_running');
-        setIsAudioRunning(running);
+        setIsAudioEngineRunning(running);
       } catch (error) {
         console.error('Failed to check audio status:', error);
       }
@@ -314,10 +314,10 @@ function App() {
       <Toolbar
         onCreateNode={createNode}
         onRemoveNode={removeNode}
-        onToggleAudio={toggleAudio}
+        onToggleAudioEngine={toggleAudioEngine}
         onSave={saveProject}
         onLoad={loadProject}
-        isAudioRunning={isAudioRunning}
+        isAudioEngineRunning={isAudioEngineRunning}
         hasSelectedNode={!!selectedNode}
       />
 
@@ -330,8 +330,7 @@ function App() {
       )}
 
       <div className="status-bar">
-        {statusMessage} | Audio: {isAudioRunning ? 'Running' : 'Stopped'} | 
-        Nodes: {nodes.length} | Connections: {edges.length}
+        {statusMessage} | Engine: {isAudioEngineRunning ? 'Running' : 'Stopped'} | Nodes: {nodes.length} | Connections: {edges.length}
       </div>
     </div>
   );

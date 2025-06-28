@@ -3,20 +3,20 @@ import React, { useState } from 'react';
 interface ToolbarProps {
   onCreateNode: (nodeType: string, name: string) => void;
   onRemoveNode: () => void;
-  onToggleAudio: () => void;
+  onToggleAudioEngine: () => void;
   onSave: () => void;
   onLoad: () => void;
-  isAudioRunning: boolean;
+  isAudioEngineRunning: boolean;
   hasSelectedNode: boolean;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
   onCreateNode,
   onRemoveNode,
-  onToggleAudio,
+  onToggleAudioEngine,
   onSave,
   onLoad,
-  isAudioRunning,
+  isAudioEngineRunning,
   hasSelectedNode,
 }) => {
   const [nodeName, setNodeName] = useState('');
@@ -81,14 +81,14 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </button>
 
         <button 
-          onClick={onToggleAudio}
+          onClick={onToggleAudioEngine}
           style={{ 
-            backgroundColor: isAudioRunning ? '#ff4444' : '#44ff44',
+            backgroundColor: isAudioEngineRunning ? '#ff4444' : '#44aa44',
             color: 'white',
             fontWeight: 'bold'
           }}
         >
-          {isAudioRunning ? '⏹ Stop Audio' : '▶ Start Audio'}
+          {isAudioEngineRunning ? '🔇 Stop Engine' : '🔊 Start Engine'}
         </button>
 
         <button onClick={onSave}>
