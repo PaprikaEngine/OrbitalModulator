@@ -179,6 +179,7 @@ pub enum NodeCategory {
     Processor,
     Controller,
     Utility,
+    Mixing,
     Analyzer,
 }
 

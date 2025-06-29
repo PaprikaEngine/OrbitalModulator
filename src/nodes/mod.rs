@@ -35,6 +35,15 @@ pub mod quantizer_refactored;
 pub mod attenuverter_refactored;
 pub mod multiple_refactored;
 pub mod clock_divider_refactored;
+
+// === Mixing/Routing Nodes (Refactored) ===
+pub mod mixer_refactored;
+pub mod output_refactored;
+
+// === Analyzer Nodes (Refactored) ===
+pub mod oscilloscope_refactored;
+pub mod spectrum_analyzer_refactored;
+
 pub mod oscilloscope;
 pub mod filter;
 pub mod envelope;
@@ -73,6 +82,10 @@ pub use quantizer_refactored::{QuantizerNodeRefactored, ScaleType as RefactoredS
 pub use attenuverter_refactored::AttenuverterNodeRefactored;
 pub use multiple_refactored::MultipleNodeRefactored;
 pub use clock_divider_refactored::ClockDividerNodeRefactored;
+pub use mixer_refactored::MixerNodeRefactored;
+pub use output_refactored::OutputNodeRefactored;
+pub use oscilloscope_refactored::OscilloscopeNodeRefactored;
+pub use spectrum_analyzer_refactored::SpectrumAnalyzerNodeRefactored;
 pub use oscilloscope::{OscilloscopeNode, TriggerMode, TriggerSlope, Measurements};
 pub use filter::{VCFNode, FilterType};
 pub use envelope::{ADSRNode, EnvelopeState};
