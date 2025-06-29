@@ -24,8 +24,14 @@ use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo, No
 use crate::graph::PortType;
 use crate::define_parameters;
 
-// Re-export types from the original spectrum analyzer module
-pub use crate::nodes::spectrum_analyzer::WindowType;
+/// Window function types for FFT analysis
+#[derive(Debug, Clone, Copy)]
+pub enum WindowType {
+    Hanning,
+    Hamming,
+    Blackman,
+    Rectangular,
+}
 
 /// リファクタリング済みSpectrumAnalyzerNode - プロ仕様FFTスペクトラムアナライザー
 /// 

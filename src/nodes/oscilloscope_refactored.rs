@@ -24,8 +24,42 @@ use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo, No
 use crate::graph::PortType;
 use crate::define_parameters;
 
-// Re-export types from the original oscilloscope module
-pub use crate::nodes::oscilloscope::{TriggerMode, TriggerSlope, Measurements};
+/// Trigger mode for oscilloscope
+#[derive(Debug, Clone)]
+pub enum TriggerMode {
+    Auto,    // 自動トリガー（信号なしでも表示）
+    Normal,  // 条件満たした時のみ表示
+    Single,  // 1回のみトリガー
+}
+
+/// Trigger slope for edge detection
+#[derive(Debug, Clone)]
+pub enum TriggerSlope {
+    Rising,  // 立ち上がりエッジ
+    Falling, // 立ち下がりエッジ
+}
+
+/// Automatic measurements from oscilloscope
+#[derive(Debug, Clone)]
+pub struct Measurements {
+    pub vpp: f32,        // Peak-to-Peak電圧
+    pub vrms: f32,       // RMS電圧  
+    pub frequency: f32,  // 周波数
+    pub period: f32,     // 周期
+    pub duty_cycle: f32, // デューティサイクル
+}
+
+impl Default for Measurements {
+    fn default() -> Self {
+        Self {
+            vpp: 0.0,
+            vrms: 0.0,
+            frequency: 0.0,
+            period: 0.0,
+            duty_cycle: 0.0,
+        }
+    }
+}
 
 /// リファクタリング済みOscilloscopeNode - プロ仕様デジタルオシロスコープ
 /// 
