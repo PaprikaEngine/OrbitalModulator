@@ -1,5 +1,6 @@
 pub mod output;
 pub mod oscillator;
+pub mod oscillator_refactored;
 pub mod oscilloscope;
 pub mod filter;
 pub mod envelope;
@@ -21,6 +22,7 @@ pub mod waveshaper;
 
 pub use output::OutputNode;
 pub use oscillator::{SineOscillatorNode, OscillatorNode, WaveformType};
+pub use oscillator_refactored::OscillatorNodeRefactored;
 pub use oscilloscope::{OscilloscopeNode, TriggerMode, TriggerSlope, Measurements};
 pub use filter::{VCFNode, FilterType};
 pub use envelope::{ADSRNode, EnvelopeState};
