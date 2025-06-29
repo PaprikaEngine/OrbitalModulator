@@ -187,6 +187,19 @@ impl ModulatableParameter {
         
         modulated.clamp(self.base.min, self.base.max)
     }
+    
+    /// Set the base value (used by set_parameter)
+    pub fn set_base_value(&mut self, value: f32) -> Result<(), ParameterError> {
+        self.base.validate(value)?;
+        // Note: We don't actually store the base value in ModulatableParameter
+        // This method exists for API compatibility but the base value is stored in the node
+        Ok(())
+    }
+    
+    /// Get the base value (for API compatibility)
+    pub fn get_base_value(&self) -> f32 {
+        self.base.default_value()
+    }
 }
 
 impl ParameterDescriptor for ModulatableParameter {
