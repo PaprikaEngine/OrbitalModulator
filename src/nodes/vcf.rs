@@ -58,7 +58,7 @@ impl FilterType {
 }
 
 /// リファクタリング済みVCFNode - プロ品質の電圧制御フィルター
-pub struct VCFNodeRefactored {
+pub struct VCFNode {
     // Node identification
     node_info: NodeInfo,
     
@@ -89,12 +89,12 @@ pub struct VCFNodeRefactored {
     coefficients_dirty: bool,
 }
 
-impl VCFNodeRefactored {
+impl VCFNode {
     pub fn new(sample_rate: f32, name: String) -> Self {
         let node_info = NodeInfo {
             id: Uuid::new_v4(),
             name: name.clone(),
-            node_type: "vcf_refactored".to_string(),
+            node_type: "vcf".to_string(),
             category: NodeCategory::Processor,
             description: "Professional voltage controlled filter with Biquad implementation".to_string(),
             input_ports: vec![
@@ -234,7 +234,7 @@ impl VCFNodeRefactored {
     }
 }
 
-impl Parameterizable for VCFNodeRefactored {
+impl Parameterizable for VCFNode {
     define_parameters! {
         cutoff_frequency: BasicParameter::new("cutoff_frequency", 20.0, 20000.0, 1000.0).with_unit("Hz"),
         resonance: BasicParameter::new("resonance", 0.1, 10.0, 1.0),
@@ -243,7 +243,7 @@ impl Parameterizable for VCFNodeRefactored {
     }
 }
 
-impl AudioNode for VCFNodeRefactored {
+impl AudioNode for VCFNode {
     fn process(&mut self, ctx: &mut ProcessContext) -> Result<(), ProcessingError> {
         if !self.is_active() {
             // Inactive - output silence
@@ -343,7 +343,7 @@ mod tests {
 
     #[test]
     fn test_vcf_parameters() {
-        let mut vcf = VCFNodeRefactored::new(44100.0, "test".to_string());
+        let mut vcf = VCFNode::new(44100.0, "test".to_string());
         
         // Test cutoff frequency setting
         assert!(vcf.set_parameter("cutoff_frequency", 2000.0).is_ok());
@@ -360,7 +360,7 @@ mod tests {
 
     #[test]
     fn test_vcf_processing() {
-        let mut vcf = VCFNodeRefactored::new(44100.0, "test".to_string());
+        let mut vcf = VCFNode::new(44100.0, "test".to_string());
         
         let mut inputs = InputBuffers::new();
         inputs.add_audio("audio_in".to_string(), vec![1.0; 512]);
@@ -388,7 +388,7 @@ mod tests {
 
     #[test]
     fn test_filter_types() {
-        let mut vcf = VCFNodeRefactored::new(44100.0, "test".to_string());
+        let mut vcf = VCFNode::new(44100.0, "test".to_string());
         
         // Test each filter type
         for filter_type in 0..3 {
@@ -419,7 +419,7 @@ mod tests {
 
     #[test]
     fn test_cutoff_cv_modulation() {
-        let mut vcf = VCFNodeRefactored::new(44100.0, "test".to_string());
+        let mut vcf = VCFNode::new(44100.0, "test".to_string());
         vcf.set_parameter("cutoff_frequency", 1000.0).unwrap();
         
         let mut inputs = InputBuffers::new();
@@ -448,7 +448,7 @@ mod tests {
 
     #[test]
     fn test_resonance_cv_modulation() {
-        let mut vcf = VCFNodeRefactored::new(44100.0, "test".to_string());
+        let mut vcf = VCFNode::new(44100.0, "test".to_string());
         
         let mut inputs = InputBuffers::new();
         inputs.add_audio("audio_in".to_string(), vec![1.0; 64]);
@@ -475,7 +475,7 @@ mod tests {
 
     #[test]
     fn test_filter_stability() {
-        let mut vcf = VCFNodeRefactored::new(44100.0, "test".to_string());
+        let mut vcf = VCFNode::new(44100.0, "test".to_string());
         vcf.set_parameter("resonance", 9.0).unwrap(); // High resonance
         
         let mut inputs = InputBuffers::new();
@@ -507,7 +507,7 @@ mod tests {
 
     #[test]
     fn test_inactive_state() {
-        let mut vcf = VCFNodeRefactored::new(44100.0, "test".to_string());
+        let mut vcf = VCFNode::new(44100.0, "test".to_string());
         vcf.set_parameter("active", 0.0).unwrap(); // Disable
         
         let mut inputs = InputBuffers::new();

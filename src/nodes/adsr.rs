@@ -33,7 +33,7 @@ pub enum EnvelopeState {
 }
 
 /// リファクタリング済みADSRNode - プロ品質のエンベロープジェネレーター
-pub struct ADSRNodeRefactored {
+pub struct ADSRNode {
     // Node identification
     node_info: NodeInfo,
     
@@ -63,12 +63,12 @@ pub struct ADSRNodeRefactored {
     sample_rate: f32,
 }
 
-impl ADSRNodeRefactored {
+impl ADSRNode {
     pub fn new(sample_rate: f32, name: String) -> Self {
         let node_info = NodeInfo {
             id: Uuid::new_v4(),
             name: name.clone(),
-            node_type: "adsr_refactored".to_string(),
+            node_type: "adsr".to_string(),
             category: NodeCategory::Controller,
             description: "Professional ADSR envelope generator with CV modulation and velocity sensitivity".to_string(),
             input_ports: vec![
@@ -299,7 +299,7 @@ impl ADSRNodeRefactored {
     }
 }
 
-impl Parameterizable for ADSRNodeRefactored {
+impl Parameterizable for ADSRNode {
     define_parameters! {
         attack: BasicParameter::new("attack", 0.001, 10.0, 0.1),
         decay: BasicParameter::new("decay", 0.001, 10.0, 0.3),
@@ -311,7 +311,7 @@ impl Parameterizable for ADSRNodeRefactored {
     }
 }
 
-impl AudioNode for ADSRNodeRefactored {
+impl AudioNode for ADSRNode {
     fn process(&mut self, ctx: &mut ProcessContext) -> Result<(), ProcessingError> {
         if !self.is_active() {
             // Inactive - output zero
@@ -468,7 +468,7 @@ mod tests {
 
     #[test]
     fn test_adsr_parameters() {
-        let mut adsr = ADSRNodeRefactored::new(44100.0, "test".to_string());
+        let mut adsr = ADSRNode::new(44100.0, "test".to_string());
         
         // Test attack setting
         assert!(adsr.set_parameter("attack", 0.5).is_ok());
@@ -493,7 +493,7 @@ mod tests {
 
     #[test]
     fn test_adsr_gate_processing() {
-        let mut adsr = ADSRNodeRefactored::new(44100.0, "test".to_string());
+        let mut adsr = ADSRNode::new(44100.0, "test".to_string());
         adsr.set_parameter("attack", 0.1).unwrap(); // 100ms attack (longer for this test)
         adsr.set_parameter("sustain", 0.5).unwrap();
         
@@ -526,7 +526,7 @@ mod tests {
 
     #[test]
     fn test_adsr_full_cycle() {
-        let mut adsr = ADSRNodeRefactored::new(44100.0, "test".to_string());
+        let mut adsr = ADSRNode::new(44100.0, "test".to_string());
         adsr.set_parameter("attack", 0.01).unwrap();  // 10ms
         adsr.set_parameter("decay", 0.01).unwrap();   // 10ms  
         adsr.set_parameter("sustain", 0.5).unwrap();  // 50%
@@ -579,7 +579,7 @@ mod tests {
 
     #[test]
     fn test_velocity_sensitivity() {
-        let mut adsr = ADSRNodeRefactored::new(44100.0, "test".to_string());
+        let mut adsr = ADSRNode::new(44100.0, "test".to_string());
         adsr.set_parameter("attack", 0.01).unwrap();
         adsr.set_parameter("velocity_sensitivity", 1.0).unwrap(); // Full sensitivity
         
@@ -609,7 +609,7 @@ mod tests {
 
     #[test]
     fn test_cv_modulation() {
-        let mut adsr = ADSRNodeRefactored::new(44100.0, "test".to_string());
+        let mut adsr = ADSRNode::new(44100.0, "test".to_string());
         
         let mut inputs = InputBuffers::new();
         inputs.add_audio("gate_in".to_string(), vec![5.0; 256]);
@@ -637,7 +637,7 @@ mod tests {
 
     #[test]
     fn test_gate_edges() {
-        let mut adsr = ADSRNodeRefactored::new(44100.0, "test".to_string());
+        let mut adsr = ADSRNode::new(44100.0, "test".to_string());
         
         // Test gate rising edge
         let mut inputs = InputBuffers::new();
@@ -679,7 +679,7 @@ mod tests {
 
     #[test]
     fn test_inactive_state() {
-        let mut adsr = ADSRNodeRefactored::new(44100.0, "test".to_string());
+        let mut adsr = ADSRNode::new(44100.0, "test".to_string());
         adsr.set_parameter("active", 0.0).unwrap(); // Disable
         
         let mut inputs = InputBuffers::new();

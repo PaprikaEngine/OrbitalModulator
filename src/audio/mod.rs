@@ -93,37 +93,37 @@ impl AudioEngine {
 
         let node: Box<dyn AudioNode> = match node_type {
             // Generator Nodes
-            "sine_oscillator" => Box::new(crate::nodes::SineOscillatorNodeRefactored::new(self.sample_rate, name.clone())),
-            "oscillator" => Box::new(crate::nodes::OscillatorNodeRefactored::new(self.sample_rate, name.clone())),
-            "noise" => Box::new(crate::nodes::NoiseNodeRefactored::new(self.sample_rate, name.clone())),
+            "sine_oscillator" => Box::new(crate::nodes::SineOscillatorNode::new(self.sample_rate, name.clone())),
+            "oscillator" => Box::new(crate::nodes::OscillatorNode::new(self.sample_rate, name.clone())),
+            "noise" => Box::new(crate::nodes::NoiseNode::new(self.sample_rate, name.clone())),
 
             // Processor Nodes
-            "vcf" => Box::new(crate::nodes::VCFNodeRefactored::new(self.sample_rate, name.clone())),
-            "vca" => Box::new(crate::nodes::VCANodeRefactored::new(self.sample_rate, name.clone())),
-            "delay" => Box::new(crate::nodes::DelayNodeRefactored::new(self.sample_rate, name.clone())),
-            "compressor" => Box::new(crate::nodes::CompressorNodeRefactored::new(self.sample_rate, name.clone())),
-            "waveshaper" => Box::new(crate::nodes::WaveshaperNodeRefactored::new(self.sample_rate, name.clone())),
-            "ring_modulator" => Box::new(crate::nodes::RingModulatorNodeRefactored::new(self.sample_rate, name.clone())),
+            "vcf" => Box::new(crate::nodes::VCFNode::new(self.sample_rate, name.clone())),
+            "vca" => Box::new(crate::nodes::VCANode::new(self.sample_rate, name.clone())),
+            "delay" => Box::new(crate::nodes::DelayNode::new(self.sample_rate, name.clone())),
+            "compressor" => Box::new(crate::nodes::CompressorNode::new(self.sample_rate, name.clone())),
+            "waveshaper" => Box::new(crate::nodes::WaveshaperNode::new(self.sample_rate, name.clone())),
+            "ring_modulator" => Box::new(crate::nodes::RingModulatorNode::new(self.sample_rate, name.clone())),
 
             // Controller Nodes
-            "adsr" => Box::new(crate::nodes::ADSRNodeRefactored::new(self.sample_rate, name.clone())),
-            "lfo" => Box::new(crate::nodes::LFONodeRefactored::new(self.sample_rate, name.clone())),
-            "sequencer" => Box::new(crate::nodes::SequencerNodeRefactored::new(self.sample_rate, name.clone())),
+            "adsr" => Box::new(crate::nodes::ADSRNode::new(self.sample_rate, name.clone())),
+            "lfo" => Box::new(crate::nodes::LFONode::new(self.sample_rate, name.clone())),
+            "sequencer" => Box::new(crate::nodes::SequencerNode::new(self.sample_rate, name.clone())),
 
             // Utility Nodes
-            "sample_hold" => Box::new(crate::nodes::SampleHoldNodeRefactored::new(self.sample_rate, name.clone())),
-            "quantizer" => Box::new(crate::nodes::QuantizerNodeRefactored::new(self.sample_rate, name.clone())),
-            "attenuverter" => Box::new(crate::nodes::AttenuverterNodeRefactored::new(self.sample_rate, name.clone())),
-            "multiple" => Box::new(crate::nodes::MultipleNodeRefactored::new(self.sample_rate, name.clone(), 4)),
-            "clock_divider" => Box::new(crate::nodes::ClockDividerNodeRefactored::new(self.sample_rate, name.clone())),
+            "sample_hold" => Box::new(crate::nodes::SampleHoldNode::new(self.sample_rate, name.clone())),
+            "quantizer" => Box::new(crate::nodes::QuantizerNode::new(self.sample_rate, name.clone())),
+            "attenuverter" => Box::new(crate::nodes::AttenuverterNode::new(self.sample_rate, name.clone())),
+            "multiple" => Box::new(crate::nodes::MultipleNode::new(self.sample_rate, name.clone(), 4)),
+            "clock_divider" => Box::new(crate::nodes::ClockDividerNode::new(self.sample_rate, name.clone())),
 
             // Mixing/Routing Nodes
-            "mixer" => Box::new(crate::nodes::MixerNodeRefactored::new(self.sample_rate, name.clone())),
-            "output" => Box::new(crate::nodes::OutputNodeRefactored::new(self.sample_rate, name.clone())),
+            "mixer" => Box::new(crate::nodes::MixerNode::new(self.sample_rate, name.clone())),
+            "output" => Box::new(crate::nodes::OutputNode::new(self.sample_rate, name.clone())),
 
             // Analysis Nodes
-            "oscilloscope" => Box::new(crate::nodes::OscilloscopeNodeRefactored::new(self.sample_rate, name.clone())),
-            "spectrum_analyzer" => Box::new(crate::nodes::SpectrumAnalyzerNodeRefactored::new(self.sample_rate, name.clone())),
+            "oscilloscope" => Box::new(crate::nodes::OscilloscopeNode::new(self.sample_rate, name.clone())),
+            "spectrum_analyzer" => Box::new(crate::nodes::SpectrumAnalyzerNode::new(self.sample_rate, name.clone())),
 
             _ => return Err(format!("Unknown built-in node type: {}", node_type)),
         };

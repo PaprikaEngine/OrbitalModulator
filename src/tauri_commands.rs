@@ -260,7 +260,7 @@ pub async fn get_spectrum_data(
         .map_err(|e| format!("Failed to lock graph: {}", e))?;
     
     if let Some(node) = graph.get_node(&node_id.to_string()) {
-        if let Some(spectrum_node) = node.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNodeRefactored>() {
+        if let Some(spectrum_node) = node.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNode>() {
             return Ok(spectrum_node.get_display_spectrum().to_vec());
         }
     }
@@ -281,7 +281,7 @@ pub async fn get_spectrum_frequencies(
         .map_err(|e| format!("Failed to lock graph: {}", e))?;
     
     if let Some(node) = graph.get_node(&node_id.to_string()) {
-        if let Some(spectrum_node) = node.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNodeRefactored>() {
+        if let Some(spectrum_node) = node.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNode>() {
             // Return frequency bins - we need to implement this or use a placeholder
             let sample_rate = 44100.0; // TODO: get from engine
             let fft_size = 1024; // TODO: get from spectrum analyzer
@@ -442,7 +442,7 @@ pub async fn get_oscilloscope_data(
     let mut graph = engine.graph.lock().map_err(|e| format!("Failed to lock graph: {}", e))?;
     
     if let Some(node) = graph.get_node_mut(&uuid.to_string()) {
-        if let Some(osc_node) = node.as_any_mut().downcast_mut::<crate::nodes::OscilloscopeNodeRefactored>() {
+        if let Some(osc_node) = node.as_any_mut().downcast_mut::<crate::nodes::OscilloscopeNode>() {
             // 波形データ取得
             let waveform_data = osc_node.get_display_data();
             let measurements_data = osc_node.get_measurements();
