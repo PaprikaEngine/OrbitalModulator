@@ -191,6 +191,14 @@ impl AudioNode for BaseOscillator {
     fn reset(&mut self) {
         self.phase = 0.0;
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 impl Parameterizable for BaseOscillator {
@@ -210,7 +218,6 @@ impl Parameterizable for BaseOscillator {
                     Ok(())
                 } else {
                     Err(ParameterError::OutOfRange { 
-                        name: name.to_string(), 
                         value, 
                         min: 20.0, 
                         max: 20000.0 
@@ -330,6 +337,7 @@ macro_rules! create_oscillator_plugin {
 }
 
 /// Factory implementation helper
+#[derive(Debug)]
 pub struct SimplePluginFactory {
     metadata: PluginMetadata,
     stats: PluginStats,
@@ -361,7 +369,7 @@ impl PluginNodeFactory for SimplePluginFactory {
     
     fn validate_compatibility(&self, host_version: &str) -> PluginResult<()> {
         // Simple version check
-        if host_version >= &self.metadata.min_orbital_version {
+        if host_version >= self.metadata.min_orbital_version.as_str() {
             Ok(())
         } else {
             Err(PluginError::VersionMismatch {

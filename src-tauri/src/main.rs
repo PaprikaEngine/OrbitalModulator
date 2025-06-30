@@ -13,10 +13,7 @@ fn main() {
     tauri::Builder::default()
         .setup(|app| {
             // Initialize audio engine
-            let sample_rate = 44100.0;
-            let buffer_size = 512;
-            
-            let audio_engine = AudioEngine::new(sample_rate, buffer_size)
+            let audio_engine = AudioEngine::new()
                 .map_err(|e| format!("Failed to create audio engine: {}", e))?;
             
             let engine_state = Arc::new(Mutex::new(audio_engine));

@@ -14,6 +14,10 @@ interface OscillatorNodeProps extends NodeProps {
 
 const OscillatorNode: React.FC<OscillatorNodeProps> = ({ id, data }) => {
   const [isActive, setIsActive] = useState(false);
+  const [frequency, setFrequency] = useState(data.parameters.frequency || 440);
+  const [amplitude, setAmplitude] = useState(data.parameters.amplitude || 0.5);
+  const [waveform, setWaveform] = useState(data.parameters.waveform || 0);
+  const [pulseWidth, setPulseWidth] = useState(data.parameters.pulse_width || 0.5);
   
   const getWaveformName = (value: number) => {
     const waveforms = ['Sine', 'Triangle', 'Sawtooth', 'Pulse'];
@@ -27,100 +31,180 @@ const OscillatorNode: React.FC<OscillatorNodeProps> = ({ id, data }) => {
     return `${freq.toFixed(0)}Hz`;
   };
 
+  const updateParameter = useCallback(async (param: string, value: number) => {
+    try {
+      await invoke('set_node_parameter', {
+        nodeId: id,
+        param,
+        value,
+      });
+    } catch (error) {
+      console.error(`Failed to update ${param}:`, error);
+    }
+  }, [id]);
+
   const toggleActive = useCallback(async () => {
     try {
       const newActiveState = !isActive;
-      
-      // Tauriコマンドでノードのアクティブ状態を設定
-      await invoke('set_node_parameter', {
-        nodeId: id,
-        param: 'active',
-        value: newActiveState ? 1.0 : 0.0,
-      });
-      
+      await updateParameter('active', newActiveState ? 1.0 : 0.0);
       setIsActive(newActiveState);
     } catch (error) {
       console.error('Failed to toggle oscillator active state:', error);
     }
-  }, [id, isActive]);
+  }, [isActive, updateParameter]);
+
+  const handleFrequencyChange = useCallback(async (value: number) => {
+    setFrequency(value);
+    await updateParameter('frequency', value);
+  }, [updateParameter]);
+
+  const handleAmplitudeChange = useCallback(async (value: number) => {
+    setAmplitude(value);
+    await updateParameter('amplitude', value);
+  }, [updateParameter]);
+
+  const handleWaveformChange = useCallback(async (value: number) => {
+    setWaveform(value);
+    await updateParameter('waveform', value);
+  }, [updateParameter]);
+
+  const handlePulseWidthChange = useCallback(async (value: number) => {
+    setPulseWidth(value);
+    await updateParameter('pulse_width', value);
+  }, [updateParameter]);
 
   return (
-    <div className={`react-flow__node react-flow__node-${data.nodeType}`}>
-      {/* Input handles */}
+    <div className="node-container oscillator-node">
+      {/* Input handles - 左側 */}
       {data.inputPorts.map((port, index) => (
         <Handle
           key={`input-${port.name}`}
           type="target"
           position={Position.Left}
           id={port.name}
-          style={{ top: 30 + index * 20 }}
+          style={{ 
+            top: `${40 + (index * 30)}px`,
+            left: '-8px',
+            width: '16px',
+            height: '16px',
+            borderRadius: '50%',
+            backgroundColor: port.port_type.includes('cv') ? '#4444ff' : '#ff4444',
+            border: '2px solid #fff'
+          }}
           title={`${port.name} (${port.port_type})`}
         />
       ))}
 
-      {/* Output handles */}
+      {/* Output handles - 右側 */}
       {data.outputPorts.map((port, index) => (
         <Handle
           key={`output-${port.name}`}
           type="source"
           position={Position.Right}
           id={port.name}
-          style={{ top: 30 + index * 20 }}
+          style={{ 
+            top: `${40 + (index * 30)}px`,
+            right: '-8px',
+            width: '16px',
+            height: '16px',
+            borderRadius: '50%',
+            backgroundColor: port.port_type.includes('cv') ? '#4444ff' : '#ff4444',
+            border: '2px solid #fff'
+          }}
           title={`${port.name} (${port.port_type})`}
         />
       ))}
 
+      {/* ヘッダー */}
       <div className="node-header">
         <div className="node-title">{data.label}</div>
         <button 
-          className={`active-button ${isActive ? 'active' : 'inactive'}`}
+          className={`power-button ${isActive ? 'active' : 'inactive'}`}
           onClick={toggleActive}
-          title={isActive ? 'Deactivate oscillator' : 'Activate oscillator'}
+          title={isActive ? 'Deactivate' : 'Activate'}
         >
-          {isActive ? '⏹' : '▶'}
+          {isActive ? '●' : '○'}
         </button>
       </div>
       
-      <div className="node-params">
-        {data.parameters.frequency !== undefined && (
-          <div className="param-row">
-            <span className="param-label">Freq:</span>
-            <span className="param-value">{formatFrequency(data.parameters.frequency)}</span>
-          </div>
-        )}
-        
-        {data.parameters.amplitude !== undefined && (
-          <div className="param-row">
-            <span className="param-label">Amp:</span>
-            <span className="param-value">{(data.parameters.amplitude * 100).toFixed(0)}%</span>
-          </div>
-        )}
-        
-        {data.parameters.waveform !== undefined && (
-          <div className="param-row">
-            <span className="param-label">Wave:</span>
-            <span className="param-value">{getWaveformName(data.parameters.waveform)}</span>
-          </div>
-        )}
-        
-        {data.parameters.pulse_width !== undefined && data.parameters.waveform === 3 && (
-          <div className="param-row">
-            <span className="param-label">PWM:</span>
-            <span className="param-value">{(data.parameters.pulse_width * 100).toFixed(0)}%</span>
+      {/* パラメーター調整UI */}
+      <div className="node-controls">
+        {/* 周波数 */}
+        <div className="control-group">
+          <label className="control-label">Frequency</label>
+          <input
+            type="range"
+            min="20"
+            max="20000"
+            step="1"
+            value={frequency}
+            onChange={(e) => handleFrequencyChange(Number(e.target.value))}
+            className="control-slider"
+          />
+          <span className="control-value">{formatFrequency(frequency)}</span>
+        </div>
+
+        {/* 振幅 */}
+        <div className="control-group">
+          <label className="control-label">Amplitude</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={amplitude}
+            onChange={(e) => handleAmplitudeChange(Number(e.target.value))}
+            className="control-slider"
+          />
+          <span className="control-value">{(amplitude * 100).toFixed(0)}%</span>
+        </div>
+
+        {/* 波形選択 */}
+        <div className="control-group">
+          <label className="control-label">Waveform</label>
+          <select
+            value={Math.floor(waveform)}
+            onChange={(e) => handleWaveformChange(Number(e.target.value))}
+            className="control-select"
+          >
+            <option value={0}>Sine</option>
+            <option value={1}>Triangle</option>
+            <option value={2}>Sawtooth</option>
+            <option value={3}>Pulse</option>
+          </select>
+        </div>
+
+        {/* パルス幅（パルス波選択時のみ） */}
+        {Math.floor(waveform) === 3 && (
+          <div className="control-group">
+            <label className="control-label">Pulse Width</label>
+            <input
+              type="range"
+              min="0.1"
+              max="0.9"
+              step="0.01"
+              value={pulseWidth}
+              onChange={(e) => handlePulseWidthChange(Number(e.target.value))}
+              className="control-slider"
+            />
+            <span className="control-value">{(pulseWidth * 100).toFixed(0)}%</span>
           </div>
         )}
       </div>
 
+      {/* ポート表示 */}
       <div className="node-ports">
-        <div className="port-list">
+        <div className="ports-left">
           {data.inputPorts.map((port) => (
-            <div key={port.name} className="port-item">
-              ◀ {port.name}
+            <div key={port.name} className="port-label">
+              {port.name}
             </div>
           ))}
+        </div>
+        <div className="ports-right">
           {data.outputPorts.map((port) => (
-            <div key={port.name} className="port-item">
-              {port.name} ▶
+            <div key={port.name} className="port-label">
+              {port.name}
             </div>
           ))}
         </div>

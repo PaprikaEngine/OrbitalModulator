@@ -89,7 +89,7 @@ pub async fn create_node(
     node_type: String,
     name: String,
 ) -> Result<String, String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     match engine.create_node(&node_type, name) {
         Ok(node_id) => Ok(node_id.to_string()),
         Err(e) => Err(e),
@@ -101,7 +101,7 @@ pub async fn remove_node(
     engine: State<'_, AudioEngineState>,
     node_id: String,
 ) -> Result<(), String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     let uuid = Uuid::parse_str(&node_id).map_err(|_| "Invalid UUID format".to_string())?;
     engine.remove_node(uuid)
 }
@@ -114,10 +114,8 @@ pub async fn connect_nodes(
     target_node: String,
     target_port: String,
 ) -> Result<(), String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    let source_uuid = Uuid::parse_str(&source_node).map_err(|_| "Invalid source UUID format".to_string())?;
-    let target_uuid = Uuid::parse_str(&target_node).map_err(|_| "Invalid target UUID format".to_string())?;
-    engine.connect_nodes(source_uuid, &source_port, target_uuid, &target_port)
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    engine.connect_nodes(&source_node, &source_port, &target_node, &target_port)
 }
 
 #[tauri::command]
@@ -128,10 +126,8 @@ pub async fn disconnect_nodes(
     target_node: String,
     target_port: String,
 ) -> Result<(), String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    let source_uuid = Uuid::parse_str(&source_node).map_err(|_| "Invalid source UUID format".to_string())?;
-    let target_uuid = Uuid::parse_str(&target_node).map_err(|_| "Invalid target UUID format".to_string())?;
-    engine.disconnect_nodes(source_uuid, &source_port, target_uuid, &target_port)
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    engine.disconnect_nodes(&source_node, &source_port, &target_node, &target_port)
 }
 
 #[tauri::command]
@@ -141,9 +137,8 @@ pub async fn set_node_parameter(
     param: String,
     value: f32,
 ) -> Result<(), String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    let uuid = Uuid::parse_str(&node_id).map_err(|_| "Invalid UUID format".to_string())?;
-    engine.set_node_parameter(uuid, &param, value)
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    engine.set_node_parameter(&node_id, &param, value)
 }
 
 #[tauri::command]
@@ -152,21 +147,20 @@ pub async fn get_node_parameter(
     node_id: String,
     param: String,
 ) -> Result<f32, String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    let uuid = Uuid::parse_str(&node_id).map_err(|_| "Invalid UUID format".to_string())?;
-    engine.get_node_parameter(uuid, &param)
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    engine.get_node_parameter(&node_id, &param)
 }
 
 #[tauri::command]
 pub async fn list_nodes(
     engine: State<'_, AudioEngineState>,
 ) -> Result<Vec<NodeInfo>, String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     let nodes = engine.list_nodes();
     
     let mut node_infos = Vec::new();
-    for (node_id, name, node_type) in nodes {
-        if let Some(node_info) = engine.get_node_info(node_id) {
+    for node_id in nodes {
+        if let Some(node_info) = engine.get_node_info(&node_id) {
             let input_ports = node_info.input_ports.iter().map(|p| PortInfo {
                 name: p.name.clone(),
                 port_type: format!("{:?}", p.port_type),
@@ -177,11 +171,13 @@ pub async fn list_nodes(
                 port_type: format!("{:?}", p.port_type),
             }).collect();
             
+            let parameters = engine.get_node_parameters(&node_id).unwrap_or_default();
+            
             node_infos.push(NodeInfo {
-                id: node_id.to_string(),
-                name,
-                node_type,
-                parameters: node_info.parameters,
+                id: node_id,
+                name: node_info.name.clone(),
+                node_type: node_info.node_type.clone(),
+                parameters,
                 input_ports,
                 output_ports,
             });
@@ -195,7 +191,7 @@ pub async fn list_nodes(
 pub async fn get_connections(
     engine: State<'_, AudioEngineState>,
 ) -> Result<Vec<ConnectionInfo>, String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     let graph = engine.graph.lock().map_err(|e| format!("Failed to lock graph: {}", e))?;
     
     let connections = graph.connections.iter().map(|conn| ConnectionInfo {
@@ -212,7 +208,7 @@ pub async fn get_connections(
 pub async fn start_audio(
     engine: State<'_, AudioEngineState>,
 ) -> Result<(), String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     engine.start().map_err(|e| format!("Failed to start audio: {}", e))
 }
 
@@ -220,7 +216,7 @@ pub async fn start_audio(
 pub async fn stop_audio(
     engine: State<'_, AudioEngineState>,
 ) -> Result<(), String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     engine.stop();
     Ok(())
 }
@@ -229,7 +225,7 @@ pub async fn stop_audio(
 pub async fn is_audio_running(
     engine: State<'_, AudioEngineState>,
 ) -> Result<bool, String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     Ok(engine.is_running())
 }
 
@@ -238,7 +234,7 @@ pub async fn save_project(
     engine: State<'_, AudioEngineState>,
     filename: String,
 ) -> Result<(), String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     engine.save_to_file(&filename)
 }
 
@@ -247,7 +243,7 @@ pub async fn load_project(
     engine: State<'_, AudioEngineState>,
     filename: String,
 ) -> Result<(), String> {
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     engine.load_from_file(&filename)
 }
 
@@ -256,16 +252,16 @@ pub async fn get_spectrum_data(
     engine: State<'_, AudioEngineState>,
     node_id: String,
 ) -> Result<Vec<f32>, String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     let node_id = Uuid::parse_str(&node_id)
         .map_err(|_| "Invalid UUID format".to_string())?;
     
-    let node_instances = engine.node_instances.lock()
-        .map_err(|e| format!("Failed to lock node instances: {}", e))?;
+    let graph = engine.graph.lock()
+        .map_err(|e| format!("Failed to lock graph: {}", e))?;
     
-    if let Some(node_instance) = node_instances.get(&node_id) {
-        if let Some(spectrum_node) = node_instance.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNode>() {
-            return Ok(spectrum_node.get_magnitude_spectrum().to_vec());
+    if let Some(node) = graph.get_node(&node_id.to_string()) {
+        if let Some(spectrum_node) = node.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNodeRefactored>() {
+            return Ok(spectrum_node.get_display_spectrum().to_vec());
         }
     }
     
@@ -277,16 +273,22 @@ pub async fn get_spectrum_frequencies(
     engine: State<'_, AudioEngineState>,
     node_id: String,
 ) -> Result<Vec<f32>, String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     let node_id = Uuid::parse_str(&node_id)
         .map_err(|_| "Invalid UUID format".to_string())?;
     
-    let node_instances = engine.node_instances.lock()
-        .map_err(|e| format!("Failed to lock node instances: {}", e))?;
+    let graph = engine.graph.lock()
+        .map_err(|e| format!("Failed to lock graph: {}", e))?;
     
-    if let Some(node_instance) = node_instances.get(&node_id) {
-        if let Some(spectrum_node) = node_instance.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNode>() {
-            return Ok(spectrum_node.get_frequency_bins());
+    if let Some(node) = graph.get_node(&node_id.to_string()) {
+        if let Some(spectrum_node) = node.as_any().downcast_ref::<crate::nodes::SpectrumAnalyzerNodeRefactored>() {
+            // Return frequency bins - we need to implement this or use a placeholder
+            let sample_rate = 44100.0; // TODO: get from engine
+            let fft_size = 1024; // TODO: get from spectrum analyzer
+            let frequency_bins: Vec<f32> = (0..fft_size/2)
+                .map(|i| i as f32 * sample_rate / fft_size as f32)
+                .collect();
+            return Ok(frequency_bins);
         }
     }
     
@@ -301,26 +303,28 @@ pub async fn save_patch_file(
     description: Option<String>,
     node_positions: Option<std::collections::HashMap<String, PatchPosition>>,
 ) -> Result<(), String> {
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     
     // Get current nodes
     let nodes = engine.list_nodes();
     let mut patch_nodes = Vec::new();
     
-    for (node_id, name, node_type) in nodes {
-        if let Some(node_info) = engine.get_node_info(node_id) {
+    for node_id in nodes {
+        if let Some(node_info) = engine.get_node_info(&node_id) {
             // Get position from provided positions or use default
             let position = node_positions.as_ref()
-                .and_then(|positions| positions.get(&name))
+                .and_then(|positions| positions.get(&node_info.name))
                 .cloned()
                 .unwrap_or(PatchPosition { x: 100.0, y: 100.0 });
                 
+            let parameters = engine.get_node_parameters(&node_id).unwrap_or_default();
+            
             let patch_node = PatchNode {
-                id: name.clone(),
-                node_type: node_type.clone(),
-                name: name.clone(),
+                id: node_info.name.clone(),
+                node_type: node_info.node_type.clone(),
+                name: node_info.name.clone(),
                 position,
-                parameters: node_info.parameters,
+                parameters,
             };
             patch_nodes.push(patch_node);
         }
@@ -386,7 +390,7 @@ pub async fn load_patch_file(
     let patch: PatchFile = serde_json::from_str(&json_content)
         .map_err(|e| format!("Failed to parse JSON: {}", e))?;
     
-    let mut engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let mut engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     
     // Clear current graph
     engine.clear_graph().map_err(|e| format!("Failed to clear graph: {}", e))?;
@@ -399,7 +403,7 @@ pub async fn load_patch_file(
         
         // Set parameters
         for (param_name, param_value) in &patch_node.parameters {
-            let _ = engine.set_node_parameter(node_id, param_name, *param_value);
+            let _ = engine.set_node_parameter(&node_id, param_name, *param_value);
             // Ignore parameter errors to allow partial loading
         }
     }
@@ -412,9 +416,9 @@ pub async fn load_patch_file(
         
         if let (Some(src_id), Some(tgt_id)) = (source_id, target_id) {
             let _ = engine.connect_nodes(
-                src_id, 
+                &src_id.to_string(), 
                 &connection.source_port, 
-                tgt_id, 
+                &tgt_id.to_string(), 
                 &connection.target_port
             );
             // Ignore connection errors to allow partial loading
@@ -431,40 +435,26 @@ pub async fn get_oscilloscope_data(
 ) -> Result<OscilloscopeData, String> {
     use crate::nodes::OscilloscopeNode;
     
-    let engine = engine.lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
     let uuid = Uuid::parse_str(&node_id).map_err(|_| "Invalid UUID format".to_string())?;
     
     // ノードインスタンスを取得
-    let mut node_instances = engine.node_instances.lock().map_err(|e| format!("Failed to lock node instances: {}", e))?;
+    let mut graph = engine.graph.lock().map_err(|e| format!("Failed to lock graph: {}", e))?;
     
-    if let Some(node_instance) = node_instances.get_mut(&uuid) {
-        if let Some(osc_node) = node_instance.as_any_mut().downcast_mut::<OscilloscopeNode>() {
+    if let Some(node) = graph.get_node_mut(&uuid.to_string()) {
+        if let Some(osc_node) = node.as_any_mut().downcast_mut::<crate::nodes::OscilloscopeNodeRefactored>() {
             // 波形データ取得
-            let waveform_data = osc_node.get_waveform_data();
+            let waveform_data = osc_node.get_display_data();
             let measurements_data = osc_node.get_measurements();
             
-            let waveform = if let Ok(data) = waveform_data.lock() {
-                data.clone()
-            } else {
-                Vec::new()
-            };
+            let waveform = waveform_data.to_vec();
             
-            let measurements = if let Ok(data) = measurements_data.lock() {
-                MeasurementData {
-                    vpp: data.vpp,
-                    vrms: data.vrms,
-                    frequency: data.frequency,
-                    period: data.period,
-                    duty_cycle: data.duty_cycle,
-                }
-            } else {
-                MeasurementData {
-                    vpp: 0.0,
-                    vrms: 0.0,
-                    frequency: 0.0,
-                    period: 0.0,
-                    duty_cycle: 0.0,
-                }
+            let measurements = MeasurementData {
+                vpp: measurements_data.vpp,
+                vrms: measurements_data.vrms,
+                frequency: measurements_data.frequency,
+                period: measurements_data.period,
+                duty_cycle: measurements_data.duty_cycle,
             };
             
             Ok(OscilloscopeData {

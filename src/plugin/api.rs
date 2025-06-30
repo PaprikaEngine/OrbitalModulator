@@ -85,7 +85,7 @@ pub struct PluginMetadata {
 /// Plugin node factory trait
 /// 
 /// Each plugin must implement this trait to create node instances.
-pub trait PluginNodeFactory: Send + Sync {
+pub trait PluginNodeFactory: Send + Sync + std::fmt::Debug {
     /// Get plugin metadata
     fn metadata(&self) -> &PluginMetadata;
     
@@ -265,6 +265,14 @@ impl AudioNode for PluginNodeWrapper {
     
     fn reset(&mut self) {
         self.inner.reset();
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
     }
 }
 

@@ -34,6 +34,7 @@ pub struct CPluginFactory {
 }
 
 /// C-compatible factory wrapper that implements our trait
+#[derive(Debug)]
 pub struct CFactoryWrapper {
     c_factory: *mut CPluginFactory,
     metadata_cache: Arc<Mutex<Option<PluginMetadata>>>,
@@ -277,7 +278,7 @@ impl CNodeWrapper {
             id: uuid::Uuid::new_v4(),
             name: "C Plugin Node".to_string(),
             node_type: "c_plugin_node".to_string(),
-            category: crate::processing::NodeCategory::Custom("C Plugin".to_string()),
+            category: crate::processing::NodeCategory::Processor,
             input_ports: Vec::new(),
             output_ports: Vec::new(),
             description: "Node loaded from C plugin".to_string(),
@@ -306,6 +307,14 @@ impl crate::processing::AudioNode for CNodeWrapper {
     
     fn reset(&mut self) {
         // This would call the C node's reset function
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
     }
 }
 
@@ -409,3 +418,13 @@ extern "C" fn c_configure_stub(_factory: *mut c_void, _config: *const c_void) ->
 extern "C" fn c_destroy_stub(_factory: *mut c_void) {
     // Stub implementation
 }
+
+// SAFETY: These wrappers are thread-safe because:
+// 1. The C pointers are only accessed through the wrapper methods
+// 2. The actual C plugin implementations are assumed to be thread-safe
+// 3. All accesses are synchronized through the AudioNode and Parameterizable traits
+// 4. The metadata cache is protected by Mutex
+unsafe impl Send for CFactoryWrapper {}
+unsafe impl Sync for CFactoryWrapper {}
+unsafe impl Send for CNodeWrapper {}
+unsafe impl Sync for CNodeWrapper {}

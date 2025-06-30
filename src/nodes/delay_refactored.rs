@@ -293,6 +293,14 @@ impl AudioNode for DelayNodeRefactored {
         // Delay has inherent latency equal to delay time
         (self.delay_time / 1000.0 * self.sample_rate) as u32
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 #[cfg(test)]

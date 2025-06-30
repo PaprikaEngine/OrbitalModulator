@@ -160,6 +160,14 @@ impl AudioNode for SineOscillatorNodeRefactored {
     fn latency(&self) -> u32 {
         0 // No latency for oscillator
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 #[cfg(test)]

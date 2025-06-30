@@ -309,8 +309,8 @@ impl AudioGraph {
 
 /// Extended AudioGraph for modern ProcessContext integration
 pub struct ProcessingGraph {
-    audio_nodes: HashMap<Uuid, Box<dyn AudioNode>>,
-    connections: Vec<Connection>,
+    pub audio_nodes: HashMap<Uuid, Box<dyn AudioNode>>,
+    pub connections: Vec<Connection>,
     processing_order: Vec<Uuid>,
 }
 
@@ -418,7 +418,11 @@ impl ProcessingGraph {
     /// Get a mutable node by ID
     pub fn get_node_mut(&mut self, node_id: &str) -> Option<&mut dyn AudioNode> {
         let uuid = Uuid::parse_str(node_id).ok()?;
-        self.audio_nodes.get_mut(&uuid).map(|n| n.as_mut())
+        if let Some(boxed_node) = self.audio_nodes.get_mut(&uuid) {
+            Some(boxed_node.as_mut())
+        } else {
+            None
+        }
     }
 
     /// Process audio through the entire graph
@@ -427,41 +431,41 @@ impl ProcessingGraph {
         
         // Process nodes in dependency order
         for &node_id in &self.processing_order {
+            // First, prepare the context without holding any borrows
+            let mut node_inputs = InputPorts::new();
+            let mut node_outputs = OutputPorts::new();
+
+            // Get node info for output buffer initialization
+            let node_info = if let Some(node) = self.audio_nodes.get(&node_id) {
+                node.node_info().clone()
+            } else {
+                continue;
+            };
+
+            // Initialize output buffers based on node's output ports
+            for output_port in &node_info.output_ports {
+                match output_port.port_type {
+                    crate::graph::PortType::AudioMono => {
+                        node_outputs.allocate_audio(output_port.name.clone(), buffer_size);
+                    }
+                    crate::graph::PortType::AudioStereo => {
+                        node_outputs.allocate_audio(format!("{}_left", output_port.name), buffer_size);
+                        node_outputs.allocate_audio(format!("{}_right", output_port.name), buffer_size);
+                    }
+                    crate::graph::PortType::CV => {
+                        node_outputs.allocate_cv(output_port.name.clone(), buffer_size);
+                    }
+                }
+            }
+
+            // Route inputs from connected nodes (simplified)
+            // TODO: Implement proper signal routing between nodes
+
+            // Create process context
+            let mut ctx = ProcessContext::new(node_inputs, node_outputs, sample_rate, buffer_size);
+
+            // Now process the node
             if let Some(node) = self.audio_nodes.get_mut(&node_id) {
-                // Create process context for this node
-                let mut node_inputs = InputPorts::new();
-                let mut node_outputs = OutputPorts::new();
-
-                // Initialize output buffers based on node's output ports
-                let node_info = node.node_info();
-                for output_port in &node_info.output_ports {
-                    match output_port.port_type {
-                        crate::graph::PortType::AudioMono => {
-                            node_outputs.add_audio(&output_port.name, vec![0.0; buffer_size]);
-                        }
-                        crate::graph::PortType::AudioStereo => {
-                            node_outputs.add_audio(&format!("{}_left", output_port.name), vec![0.0; buffer_size]);
-                            node_outputs.add_audio(&format!("{}_right", output_port.name), vec![0.0; buffer_size]);
-                        }
-                        crate::graph::PortType::CV => {
-                            node_outputs.add_cv(&output_port.name, 0.0);
-                        }
-                    }
-                }
-
-                // Route inputs from connected nodes
-                for connection in &self.connections {
-                    if connection.target_node == node_id {
-                        // This connection feeds into this node
-                        if let Some(source_node) = self.audio_nodes.get(&connection.source_node) {
-                            // Get the output from the source node (this is simplified)
-                            // In a full implementation, we'd need to track node outputs
-                        }
-                    }
-                }
-
-                // Create process context
-                let mut ctx = ProcessContext::new(node_inputs, node_outputs, sample_rate, buffer_size);
                 
                 // Process the node
                 node.process(&mut ctx)?;
@@ -549,6 +553,59 @@ impl ProcessingGraph {
         visited.insert(node_id);
         self.processing_order.push(node_id);
         true
+    }
+
+    /// Remove a node by UUID (wrapper for remove_node_instance)
+    pub fn remove_node(&mut self, node_id: Uuid) -> Result<(), String> {
+        self.remove_node_instance(&node_id.to_string())
+    }
+
+    /// List all node IDs as strings
+    pub fn list_nodes(&self) -> Vec<String> {
+        self.audio_nodes.keys().map(|id| id.to_string()).collect()
+    }
+
+    /// Get node information by string ID
+    pub fn get_node_info(&self, node_id: &str) -> Option<crate::processing::NodeInfo> {
+        if let Ok(uuid) = Uuid::parse_str(node_id) {
+            self.audio_nodes.get(&uuid).map(|node| node.node_info().clone())
+        } else {
+            None
+        }
+    }
+
+    /// Find node by name
+    pub fn find_node_by_name(&self, name: &str) -> Option<Uuid> {
+        for (id, node) in &self.audio_nodes {
+            if node.node_info().name == name {
+                return Some(*id);
+            }
+        }
+        None
+    }
+
+    /// Find node name by ID
+    pub fn find_node_name_by_id(&self, node_id: Uuid) -> Option<String> {
+        self.audio_nodes.get(&node_id).map(|node| node.node_info().name.clone())
+    }
+
+    /// Clear all nodes and connections
+    pub fn clear(&mut self) {
+        self.audio_nodes.clear();
+        self.connections.clear();
+        self.processing_order.clear();
+    }
+
+    /// Save graph to file (placeholder implementation)
+    pub fn save_to_file(&self, _filename: &str) -> Result<(), String> {
+        // TODO: Implement actual save functionality
+        Ok(())
+    }
+
+    /// Load graph from file (placeholder implementation)
+    pub fn load_from_file(&mut self, _filename: &str, _sample_rate: f32) -> Result<(), String> {
+        // TODO: Implement actual load functionality
+        Ok(())
     }
 }
 

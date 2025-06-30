@@ -308,6 +308,18 @@ impl AudioNode for OutputNodeRefactored {
         self.rms_level_r = 0.0;
         self.envelope_follower = 0.0;
     }
+
+    fn latency(&self) -> u32 {
+        0 // No latency for output
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 #[cfg(test)]

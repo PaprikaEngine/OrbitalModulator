@@ -7,6 +7,7 @@
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use uuid::Uuid;
 
 use cpal::{Device, Stream, StreamConfig, StreamError};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -18,7 +19,7 @@ use crate::plugin::{PluginManager, PluginError};
 
 /// Modern Audio Engine with plugin support
 pub struct AudioEngine {
-    graph: Arc<Mutex<ProcessingGraph>>,
+    pub graph: Arc<Mutex<ProcessingGraph>>,
     plugin_manager: Arc<Mutex<PluginManager>>,
     sample_rate: f32,
     buffer_size: usize,
@@ -92,37 +93,37 @@ impl AudioEngine {
 
         let node: Box<dyn AudioNode> = match node_type {
             // Generator Nodes
-            "sine_oscillator" => Box::new(crate::nodes::SineOscillatorNode::new(name.clone(), self.sample_rate)),
-            "oscillator" => Box::new(crate::nodes::OscillatorNode::new(name.clone(), self.sample_rate)),
-            "noise" => Box::new(crate::nodes::NoiseNode::new(name.clone(), self.sample_rate)),
+            "sine_oscillator" => Box::new(crate::nodes::SineOscillatorNodeRefactored::new(self.sample_rate, name.clone())),
+            "oscillator" => Box::new(crate::nodes::OscillatorNodeRefactored::new(self.sample_rate, name.clone())),
+            "noise" => Box::new(crate::nodes::NoiseNodeRefactored::new(self.sample_rate, name.clone())),
 
             // Processor Nodes
-            "vcf" => Box::new(crate::nodes::VCFNode::new(name.clone(), self.sample_rate)),
-            "vca" => Box::new(crate::nodes::VCANode::new(name.clone(), self.sample_rate)),
-            "delay" => Box::new(crate::nodes::DelayNode::new(name.clone(), self.sample_rate)),
-            "compressor" => Box::new(crate::nodes::CompressorNode::new(name.clone(), self.sample_rate)),
-            "waveshaper" => Box::new(crate::nodes::WaveshaperNode::new(name.clone(), self.sample_rate)),
-            "ring_modulator" => Box::new(crate::nodes::RingModulatorNode::new(name.clone(), self.sample_rate)),
+            "vcf" => Box::new(crate::nodes::VCFNodeRefactored::new(self.sample_rate, name.clone())),
+            "vca" => Box::new(crate::nodes::VCANodeRefactored::new(self.sample_rate, name.clone())),
+            "delay" => Box::new(crate::nodes::DelayNodeRefactored::new(self.sample_rate, name.clone())),
+            "compressor" => Box::new(crate::nodes::CompressorNodeRefactored::new(self.sample_rate, name.clone())),
+            "waveshaper" => Box::new(crate::nodes::WaveshaperNodeRefactored::new(self.sample_rate, name.clone())),
+            "ring_modulator" => Box::new(crate::nodes::RingModulatorNodeRefactored::new(self.sample_rate, name.clone())),
 
             // Controller Nodes
-            "adsr" => Box::new(crate::nodes::ADSRNode::new(name.clone(), self.sample_rate)),
-            "lfo" => Box::new(crate::nodes::LFONode::new(name.clone(), self.sample_rate)),
-            "sequencer" => Box::new(crate::nodes::SequencerNode::new(name.clone(), self.sample_rate)),
+            "adsr" => Box::new(crate::nodes::ADSRNodeRefactored::new(self.sample_rate, name.clone())),
+            "lfo" => Box::new(crate::nodes::LFONodeRefactored::new(self.sample_rate, name.clone())),
+            "sequencer" => Box::new(crate::nodes::SequencerNodeRefactored::new(self.sample_rate, name.clone())),
 
             // Utility Nodes
-            "sample_hold" => Box::new(crate::nodes::SampleHoldNode::new(name.clone(), self.sample_rate)),
-            "quantizer" => Box::new(crate::nodes::QuantizerNode::new(name.clone(), self.sample_rate)),
-            "attenuverter" => Box::new(crate::nodes::AttenuverterNode::new(name.clone(), self.sample_rate)),
-            "multiple" => Box::new(crate::nodes::MultipleNode::new(name.clone(), self.sample_rate)),
-            "clock_divider" => Box::new(crate::nodes::ClockDividerNode::new(name.clone(), self.sample_rate)),
+            "sample_hold" => Box::new(crate::nodes::SampleHoldNodeRefactored::new(self.sample_rate, name.clone())),
+            "quantizer" => Box::new(crate::nodes::QuantizerNodeRefactored::new(self.sample_rate, name.clone())),
+            "attenuverter" => Box::new(crate::nodes::AttenuverterNodeRefactored::new(self.sample_rate, name.clone())),
+            "multiple" => Box::new(crate::nodes::MultipleNodeRefactored::new(self.sample_rate, name.clone(), 4)),
+            "clock_divider" => Box::new(crate::nodes::ClockDividerNodeRefactored::new(self.sample_rate, name.clone())),
 
             // Mixing/Routing Nodes
-            "mixer" => Box::new(crate::nodes::MixerNode::new(name.clone(), self.sample_rate)),
-            "output" => Box::new(crate::nodes::OutputNode::new(name.clone(), self.sample_rate)),
+            "mixer" => Box::new(crate::nodes::MixerNodeRefactored::new(self.sample_rate, name.clone())),
+            "output" => Box::new(crate::nodes::OutputNodeRefactored::new(self.sample_rate, name.clone())),
 
             // Analysis Nodes
-            "oscilloscope" => Box::new(crate::nodes::OscilloscopeNode::new(name.clone(), self.sample_rate)),
-            "spectrum_analyzer" => Box::new(crate::nodes::SpectrumAnalyzerNode::new(name.clone(), self.sample_rate)),
+            "oscilloscope" => Box::new(crate::nodes::OscilloscopeNodeRefactored::new(self.sample_rate, name.clone())),
+            "spectrum_analyzer" => Box::new(crate::nodes::SpectrumAnalyzerNodeRefactored::new(self.sample_rate, name.clone())),
 
             _ => return Err(format!("Unknown built-in node type: {}", node_type)),
         };
@@ -159,6 +160,15 @@ impl AudioEngine {
 
         println!("Created plugin node: {} ({}) from plugin: {}", name, node_type, plugin_id);
         Ok(node_id)
+    }
+
+    /// Remove a node from the graph
+    pub fn remove_node(&self, node_id: Uuid) -> Result<(), String> {
+        let mut graph = self.graph.lock()
+            .map_err(|e| format!("Failed to lock graph: {}", e))?;
+        
+        graph.remove_node(node_id)
+            .map_err(|e| format!("Failed to remove node: {}", e))
     }
 
     /// Set node parameter using the modern parameter system
@@ -252,6 +262,86 @@ impl AudioEngine {
         self.is_playing = false;
         println!("Audio engine stopped");
         Ok(())
+    }
+
+    /// Check if audio engine is running
+    pub fn is_running(&self) -> bool {
+        self.is_playing
+    }
+
+    /// List all nodes in the graph
+    pub fn list_nodes(&self) -> Vec<String> {
+        if let Ok(graph) = self.graph.lock() {
+            graph.list_nodes()
+        } else {
+            Vec::new()
+        }
+    }
+
+    /// Get node information by ID
+    pub fn get_node_info(&self, node_id: &str) -> Option<crate::processing::NodeInfo> {
+        if let Ok(graph) = self.graph.lock() {
+            graph.get_node_info(node_id)
+        } else {
+            None
+        }
+    }
+
+    /// Get node parameters by ID
+    pub fn get_node_parameters(&self, node_id: &str) -> Option<std::collections::HashMap<String, f32>> {
+        if let Ok(graph) = self.graph.lock() {
+            if let Some(node) = graph.get_node(node_id) {
+                Some(node.get_all_parameters())
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    /// Find node by name
+    pub fn find_node_by_name(&self, name: &str) -> Option<Uuid> {
+        if let Ok(graph) = self.graph.lock() {
+            graph.find_node_by_name(name)
+        } else {
+            None
+        }
+    }
+
+    /// Find node name by ID
+    pub fn find_node_name_by_id(&self, node_id: Uuid) -> Option<String> {
+        if let Ok(graph) = self.graph.lock() {
+            graph.find_node_name_by_id(node_id)
+        } else {
+            None
+        }
+    }
+
+    /// Clear the entire graph
+    pub fn clear_graph(&self) -> Result<(), String> {
+        let mut graph = self.graph.lock()
+            .map_err(|e| format!("Failed to lock graph: {}", e))?;
+        
+        graph.clear();
+        Ok(())
+    }
+
+    /// Save graph to file
+    pub fn save_to_file(&self, filename: &str) -> Result<(), String> {
+        if let Ok(graph) = self.graph.lock() {
+            graph.save_to_file(filename)
+        } else {
+            Err("Failed to lock graph".to_string())
+        }
+    }
+
+    /// Load graph from file
+    pub fn load_from_file(&self, filename: &str) -> Result<(), String> {
+        let mut graph = self.graph.lock()
+            .map_err(|e| format!("Failed to lock graph: {}", e))?;
+        
+        graph.load_from_file(filename, self.sample_rate)
     }
 
     /// Audio callback function
@@ -382,3 +472,11 @@ impl Drop for AudioEngine {
         let _ = self.stop();
     }
 }
+
+// SAFETY: AudioEngine is thread-safe because:
+// 1. The stream is only accessed from the main thread during creation/destruction
+// 2. The graph and plugin_manager are protected by Mutex
+// 3. The stream callbacks only read from shared data, never modify AudioEngine itself
+// 4. Primitive types (sample_rate, buffer_size, is_playing) are atomic or only modified under mutex
+unsafe impl Send for AudioEngine {}
+unsafe impl Sync for AudioEngine {}
