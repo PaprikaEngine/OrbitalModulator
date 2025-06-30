@@ -36,52 +36,44 @@ import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
 const nodeTypes = {
-  // Original node types
+  // Generator Nodes
   oscillator: GenericNode,
-  output: GenericNode,
-  oscilloscope: GenericNode,
-  filter: GenericNode,
-  adsr: GenericNode,
-  lfo: GenericNode,
-  mixer: GenericNode,
-  mixer8: GenericNode,
-  delay: GenericNode,
-  noise: GenericNode,
-  vca: GenericNode,
-  sequencer: GenericNode,
-  spectrum_analyzer: GenericNode,
-  ring_modulator: GenericNode,
-  sample_hold: GenericNode,
-  attenuverter: GenericNode,
-  multiple: GenericNode,
-  multiple8: GenericNode,
   sine_oscillator: GenericNode,
   triangle_oscillator: GenericNode,
   sawtooth_oscillator: GenericNode,
   pulse_oscillator: GenericNode,
+  noise: GenericNode,
   
-  // Refactored node types
-  oscillator_refactored: GenericNode,
-  output_refactored: GenericNode,
-  oscilloscope_refactored: GenericNode,
-  vcf_refactored: GenericNode,
-  adsr_refactored: GenericNode,
-  lfo_refactored: GenericNode,
-  mixer_refactored: GenericNode,
-  delay_refactored: GenericNode,
-  noise_refactored: GenericNode,
-  vca_refactored: GenericNode,
-  sequencer_refactored: GenericNode,
-  spectrum_analyzer_refactored: GenericNode,
-  ring_modulator_refactored: GenericNode,
-  sample_hold_refactored: GenericNode,
-  attenuverter_refactored: GenericNode,
-  multiple_refactored: GenericNode,
-  sine_oscillator_refactored: GenericNode,
-  quantizer_refactored: GenericNode,
-  compressor_refactored: GenericNode,
-  waveshaper_refactored: GenericNode,
-  clock_divider_refactored: GenericNode,
+  // Processor Nodes
+  vcf: GenericNode,
+  filter: GenericNode, // Alias for vcf
+  vca: GenericNode,
+  delay: GenericNode,
+  compressor: GenericNode,
+  waveshaper: GenericNode,
+  ring_modulator: GenericNode,
+  
+  // Controller Nodes
+  adsr: GenericNode,
+  lfo: GenericNode,
+  sequencer: GenericNode,
+  
+  // Utility Nodes
+  sample_hold: GenericNode,
+  quantizer: GenericNode,
+  attenuverter: GenericNode,
+  multiple: GenericNode,
+  multiple8: GenericNode,
+  clock_divider: GenericNode,
+  
+  // Mixing/Routing Nodes
+  mixer: GenericNode,
+  mixer8: GenericNode,
+  output: GenericNode,
+  
+  // Analysis Nodes
+  oscilloscope: GenericNode,
+  spectrum_analyzer: GenericNode,
 };
 
 interface NodeInfo {
