@@ -74,6 +74,48 @@ interface ConnectionInfo {
   target_port: string;
 }
 
+// Cable color mapping based on port types
+const getCableColor = (sourcePort: string, targetPort: string): string => {
+  // Audio connections (red spectrum)
+  if (sourcePort.includes('audio') || targetPort.includes('audio') ||
+      sourcePort.includes('out') || targetPort.includes('in')) {
+    return '#ff4444'; // Red for audio
+  }
+  
+  // CV connections (blue spectrum)
+  if (sourcePort.includes('cv') || targetPort.includes('cv') ||
+      sourcePort.includes('control') || targetPort.includes('control')) {
+    return '#4444ff'; // Blue for CV
+  }
+  
+  // Gate/Trigger connections (green spectrum)
+  if (sourcePort.includes('gate') || targetPort.includes('gate') ||
+      sourcePort.includes('trigger') || targetPort.includes('trigger')) {
+    return '#44ff44'; // Green for gates/triggers
+  }
+  
+  // Clock connections (orange spectrum)
+  if (sourcePort.includes('clock') || targetPort.includes('clock')) {
+    return '#ff8844'; // Orange for clock
+  }
+  
+  // Frequency/Pitch connections (purple spectrum)
+  if (sourcePort.includes('frequency') || targetPort.includes('frequency') ||
+      sourcePort.includes('pitch') || targetPort.includes('pitch')) {
+    return '#8844ff'; // Purple for frequency/pitch
+  }
+  
+  // Default color (gray)
+  return '#888888';
+};
+
+// Cable styling based on connection type
+const getCableStyle = (sourcePort: string, targetPort: string) => ({
+  stroke: getCableColor(sourcePort, targetPort),
+  strokeWidth: 3,
+  strokeDasharray: sourcePort.includes('cv') || targetPort.includes('cv') ? '5,5' : undefined,
+});
+
 function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -109,6 +151,8 @@ function App() {
         target: conn.target_node,
         sourceHandle: conn.source_port,
         targetHandle: conn.target_port,
+        style: getCableStyle(conn.source_port, conn.target_port),
+        animated: conn.source_port.includes('clock') || conn.target_port.includes('clock'),
       }));
 
       setNodes(flowNodes);
@@ -138,6 +182,8 @@ function App() {
         setEdges((eds) => addEdge({
           ...params,
           id: `${params.source}:${params.sourceHandle}->${params.target}:${params.targetHandle}`,
+          style: getCableStyle(params.sourceHandle || '', params.targetHandle || ''),
+          animated: (params.sourceHandle?.includes('clock') || params.targetHandle?.includes('clock')) || false,
         }, eds));
         
         setStatusMessage('Connection created');
@@ -466,6 +512,33 @@ function App() {
 
       <div className="status-bar">
         {statusMessage} | Engine: {isAudioEngineRunning ? 'Running' : 'Stopped'} | Nodes: {nodes.length} | Connections: {edges.length} | Tip: Double-click connection to disconnect
+      </div>
+
+      {/* Cable Color Legend */}
+      <div className="cable-legend">
+        <div className="legend-title">Cable Colors:</div>
+        <div className="legend-items">
+          <div className="legend-item">
+            <div className="legend-color" style={{ backgroundColor: '#ff4444' }}></div>
+            <span>Audio</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-color" style={{ backgroundColor: '#4444ff' }}></div>
+            <span>CV</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-color" style={{ backgroundColor: '#44ff44' }}></div>
+            <span>Gate/Trigger</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-color" style={{ backgroundColor: '#ff8844' }}></div>
+            <span>Clock</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-color" style={{ backgroundColor: '#8844ff' }}></div>
+            <span>Frequency</span>
+          </div>
+        </div>
       </div>
     </div>
   );
