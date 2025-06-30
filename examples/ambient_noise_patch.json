@@ -79,37 +79,75 @@
       "source_node": "pink_noise",
       "source_port": "audio_out",
       "target_node": "ambient_filter",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "pink_noise:audio_out->ambient_filter:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "amplitude_lfo",
       "source_port": "cv_out",
       "target_node": "pink_noise",
-      "target_port": "amplitude_cv"
+      "target_port": "amplitude_cv",
+      "id": "amplitude_lfo:cv_out->pink_noise:amplitude_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "ambient_filter",
       "source_port": "audio_out",
       "target_node": "ambient_delay",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "ambient_filter:audio_out->ambient_delay:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "filter_lfo",
       "source_port": "cv_out",
       "target_node": "ambient_filter",
-      "target_port": "cutoff_cv"
+      "target_port": "cutoff_cv",
+      "id": "filter_lfo:cv_out->ambient_filter:cutoff_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "ambient_delay",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "ambient_delay:audio_out->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "ambient_delay",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "ambient_delay:audio_out->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [

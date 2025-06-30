@@ -55,25 +55,50 @@
       "source_node": "piano_osc",
       "source_port": "audio_out",
       "target_node": "piano_filter",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "piano_osc:audio_out->piano_filter:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "piano_filter",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "piano_filter:audio_out->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "piano_filter", 
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "piano_filter:audio_out->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "piano_env",
       "source_port": "cv_out",
       "target_node": "piano_osc",
-      "target_port": "amplitude_cv"
+      "target_port": "amplitude_cv",
+      "id": "piano_env:cv_out->piano_osc:amplitude_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     }
   ],
   "notes": [

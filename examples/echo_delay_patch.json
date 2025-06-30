@@ -42,19 +42,37 @@
       "source_node": "main_osc",
       "source_port": "audio_out",
       "target_node": "echo_delay",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "main_osc:audio_out->echo_delay:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "echo_delay",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "echo_delay:audio_out->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "echo_delay",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "echo_delay:audio_out->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [

@@ -36,6 +36,7 @@ import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
 const nodeTypes = {
+  // Original node types
   oscillator: GenericNode,
   output: GenericNode,
   oscilloscope: GenericNode,
@@ -58,6 +59,29 @@ const nodeTypes = {
   triangle_oscillator: GenericNode,
   sawtooth_oscillator: GenericNode,
   pulse_oscillator: GenericNode,
+  
+  // Refactored node types
+  oscillator_refactored: GenericNode,
+  output_refactored: GenericNode,
+  oscilloscope_refactored: GenericNode,
+  vcf_refactored: GenericNode,
+  adsr_refactored: GenericNode,
+  lfo_refactored: GenericNode,
+  mixer_refactored: GenericNode,
+  delay_refactored: GenericNode,
+  noise_refactored: GenericNode,
+  vca_refactored: GenericNode,
+  sequencer_refactored: GenericNode,
+  spectrum_analyzer_refactored: GenericNode,
+  ring_modulator_refactored: GenericNode,
+  sample_hold_refactored: GenericNode,
+  attenuverter_refactored: GenericNode,
+  multiple_refactored: GenericNode,
+  sine_oscillator_refactored: GenericNode,
+  quantizer_refactored: GenericNode,
+  compressor_refactored: GenericNode,
+  waveshaper_refactored: GenericNode,
+  clock_divider_refactored: GenericNode,
 };
 
 interface NodeInfo {
@@ -375,12 +399,24 @@ function App() {
           };
         });
 
+        // Prepare connection states from ReactFlow edges
+        const connectionStates = edges.map(edge => ({
+          source_node: edge.source,
+          source_port: edge.sourceHandle,
+          target_node: edge.target,
+          target_port: edge.targetHandle,
+          id: edge.id,
+          style: edge.style || {},
+          animated: edge.animated || false
+        }));
+
         // Save the current patch configuration
         await invoke('save_patch_file', {
           filePath: filePath,
           patchName: 'My Patch',
           description: 'Patch created with Orbital Modulator',
-          nodePositions: nodePositions
+          nodePositions: nodePositions,
+          connectionStates: connectionStates
         });
         
         setStatusMessage(`Patch saved: ${filePath.split('/').pop() || 'file'}`);
@@ -389,7 +425,7 @@ function App() {
       console.error('Save failed:', error);
       setStatusMessage(`Save failed: ${error}`);
     }
-  }, []);
+  }, [nodes, edges]);
 
   const loadProject = useCallback(async () => {
     try {

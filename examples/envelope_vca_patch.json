@@ -54,25 +54,50 @@
       "source_node": "main_osc",
       "source_port": "audio_out",
       "target_node": "main_vca",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "main_osc:audio_out->main_vca:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "env_adsr",
       "source_port": "cv_out",
       "target_node": "main_vca",
-      "target_port": "gain_cv"
+      "target_port": "gain_cv",
+      "id": "env_adsr:cv_out->main_vca:gain_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "main_vca",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "main_vca:audio_out->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "main_vca",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "main_vca:audio_out->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [

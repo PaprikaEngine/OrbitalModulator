@@ -115,31 +115,62 @@
       "source_node": "arp_seq",
       "source_port": "note_cv",
       "target_node": "arp_osc",
-      "target_port": "frequency_cv"
+      "target_port": "frequency_cv",
+      "id": "arp_seq:note_cv->arp_osc:frequency_cv",
+      "style": {
+        "stroke": "#8844ff",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "arp_osc",
       "source_port": "audio_out",
       "target_node": "arp_filter",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "arp_osc:audio_out->arp_filter:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "filter_lfo",
       "source_port": "cv_out",
       "target_node": "arp_filter",
-      "target_port": "cutoff_cv"
+      "target_port": "cutoff_cv",
+      "id": "filter_lfo:cv_out->arp_filter:cutoff_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "arp_filter",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "arp_filter:audio_out->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "arp_filter",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "arp_filter:audio_out->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [

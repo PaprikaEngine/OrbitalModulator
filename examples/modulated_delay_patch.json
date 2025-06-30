@@ -55,25 +55,50 @@
       "source_node": "lead_osc",
       "source_port": "audio_out",
       "target_node": "mod_delay",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "lead_osc:audio_out->mod_delay:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "delay_lfo",
       "source_port": "cv_out",
       "target_node": "mod_delay",
-      "target_port": "delay_time_cv"
+      "target_port": "delay_time_cv",
+      "id": "delay_lfo:cv_out->mod_delay:delay_time_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "mod_delay",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "mod_delay:audio_out->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "mod_delay",
       "source_port": "audio_out",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "mod_delay:audio_out->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [

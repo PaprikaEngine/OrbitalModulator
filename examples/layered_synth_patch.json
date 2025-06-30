@@ -72,31 +72,61 @@
       "source_node": "bass_osc",
       "source_port": "audio_out",
       "target_node": "main_mixer",
-      "target_port": "audio_in_1"
+      "target_port": "audio_in_1",
+      "id": "bass_osc:audio_out->main_mixer:audio_in_1",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "lead_osc",
       "source_port": "audio_out",
       "target_node": "main_mixer",
-      "target_port": "audio_in_2"
+      "target_port": "audio_in_2",
+      "id": "lead_osc:audio_out->main_mixer:audio_in_2",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "pad_osc",
       "source_port": "audio_out",
       "target_node": "main_mixer",
-      "target_port": "audio_in_3"
+      "target_port": "audio_in_3",
+      "id": "pad_osc:audio_out->main_mixer:audio_in_3",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "main_mixer",
       "source_port": "audio_out_l",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "main_mixer:audio_out_l->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "main_mixer",
       "source_port": "audio_out_r",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "main_mixer:audio_out_r->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [

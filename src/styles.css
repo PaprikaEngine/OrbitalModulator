@@ -93,6 +93,27 @@ body {
   min-height: 0 !important;
 }
 
+/* Orbital Node - カスタムノードデザイン - 最高優先度 */
+.react-flow__node .orbital-node,
+.orbital-node {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%) !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1) !important;
+  padding: 12px !important;
+  min-width: 280px !important;
+  width: 280px !important;
+  min-height: 120px !important;
+  position: relative !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  z-index: 10 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 14px !important;
+  color: #333 !important;
+}
+
 .react-flow__handle {
   background: #4285f4 !important;
   border: 2px solid #fff !important;
@@ -100,6 +121,32 @@ body {
   width: 16px !important;
   height: 16px !important;
   position: absolute !important;
+}
+
+/* カスタムポートハンドルのスタイル - 最強優先度 */
+.custom-port-handle,
+.custom-port-handle.react-flow__handle,
+.react-flow__handle.custom-port-handle,
+div.custom-port-handle,
+div.custom-port-handle.react-flow__handle,
+div.react-flow__handle.custom-port-handle {
+  background-color: var(--port-bg-color) !important;
+  background: var(--port-bg-color) !important;
+  border: 2px solid #fff !important;
+  border-radius: 50% !important;
+  width: 16px !important;
+  height: 16px !important;
+  position: absolute !important;
+}
+
+/* 元のReactFlowハンドルスタイルを無効化 */
+.react-flow__handle.custom-port-handle {
+  background: var(--port-bg-color) !important;
+}
+
+/* より強力なセレクター */
+.orbital-node .custom-port-handle {
+  background: var(--port-bg-color) !important;
 }
 
 .react-flow__handle.react-flow__handle-top,
@@ -123,7 +170,34 @@ body {
 .react-flow__node-sample_hold,
 .react-flow__node-attenuverter,
 .react-flow__node-multiple,
-.react-flow__node-oscilloscope {
+.react-flow__node-oscilloscope,
+.react-flow__node-mixer8,
+.react-flow__node-multiple8,
+.react-flow__node-sine_oscillator,
+.react-flow__node-triangle_oscillator,
+.react-flow__node-sawtooth_oscillator,
+.react-flow__node-pulse_oscillator,
+.react-flow__node-oscillator_refactored,
+.react-flow__node-output_refactored,
+.react-flow__node-oscilloscope_refactored,
+.react-flow__node-vcf_refactored,
+.react-flow__node-adsr_refactored,
+.react-flow__node-lfo_refactored,
+.react-flow__node-mixer_refactored,
+.react-flow__node-delay_refactored,
+.react-flow__node-noise_refactored,
+.react-flow__node-vca_refactored,
+.react-flow__node-sequencer_refactored,
+.react-flow__node-spectrum_analyzer_refactored,
+.react-flow__node-ring_modulator_refactored,
+.react-flow__node-sample_hold_refactored,
+.react-flow__node-attenuverter_refactored,
+.react-flow__node-multiple_refactored,
+.react-flow__node-sine_oscillator_refactored,
+.react-flow__node-quantizer_refactored,
+.react-flow__node-compressor_refactored,
+.react-flow__node-waveshaper_refactored,
+.react-flow__node-clock_divider_refactored {
   background: transparent !important;
   border: none !important;
   padding: 0 !important;
@@ -160,21 +234,23 @@ body {
   border-left: 4px solid #f59e0b;
 }
 
-/* Node Header */
+/* Node Header - 高優先度 */
+.orbital-node .node-header,
 .node-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e8eaed;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 16px !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid #e8eaed !important;
 }
 
+.orbital-node .node-title,
 .node-title {
-  font-weight: 600;
-  font-size: 14px;
-  color: #202124;
-  margin: 0;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #202124 !important;
+  margin: 0 !important;
 }
 
 .power-button {
@@ -208,9 +284,10 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Node Controls */
+/* Node Controls - 高優先度 */
+.orbital-node .node-controls,
 .node-controls {
-  margin-bottom: 16px;
+  margin-bottom: 16px !important;
 }
 
 .control-group {
@@ -311,30 +388,9 @@ body {
   font-weight: 600;
 }
 
-/* Node Ports */
+/* 従来のポート表示（下部）は非表示 */
 .node-ports {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: #5f6368;
-}
-
-.ports-left,
-.ports-right {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ports-right {
-  text-align: right;
-}
-
-.port-label {
-  font-weight: 500;
-  padding: 2px 4px;
-  border-radius: 2px;
-  background: rgba(66, 133, 244, 0.1);
+  display: none;
 }
 
 /* Output Node Specific */

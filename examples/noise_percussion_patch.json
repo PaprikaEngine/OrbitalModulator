@@ -83,43 +83,87 @@
       "source_node": "white_noise",
       "source_port": "audio_out",
       "target_node": "perc_filter",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "white_noise:audio_out->perc_filter:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "perc_filter",
       "source_port": "audio_out",
       "target_node": "perc_mixer",
-      "target_port": "audio_in_1"
+      "target_port": "audio_in_1",
+      "id": "perc_filter:audio_out->perc_mixer:audio_in_1",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "brown_noise",
       "source_port": "audio_out",
       "target_node": "perc_mixer",
-      "target_port": "audio_in_2"
+      "target_port": "audio_in_2",
+      "id": "brown_noise:audio_out->perc_mixer:audio_in_2",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "perc_envelope",
       "source_port": "cv_out",
       "target_node": "white_noise",
-      "target_port": "amplitude_cv"
+      "target_port": "amplitude_cv",
+      "id": "perc_envelope:cv_out->white_noise:amplitude_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "perc_envelope",
       "source_port": "cv_out",
       "target_node": "brown_noise",
-      "target_port": "amplitude_cv"
+      "target_port": "amplitude_cv",
+      "id": "perc_envelope:cv_out->brown_noise:amplitude_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "perc_mixer",
       "source_port": "audio_out_l",
       "target_node": "output",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "perc_mixer:audio_out_l->output:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "perc_mixer",
       "source_port": "audio_out_r",
       "target_node": "output",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "perc_mixer:audio_out_r->output:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [

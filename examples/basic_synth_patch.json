@@ -81,31 +81,62 @@
       "source_node": "osc1",
       "source_port": "audio_out",
       "target_node": "filter1", 
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "osc1:audio_out->filter1:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "filter1",
       "source_port": "audio_out", 
       "target_node": "output1",
-      "target_port": "audio_in_l"
+      "target_port": "audio_in_l",
+      "id": "filter1:audio_out->output1:audio_in_l",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "filter1",
       "source_port": "audio_out",
       "target_node": "output1",
-      "target_port": "audio_in_r"
+      "target_port": "audio_in_r",
+      "id": "filter1:audio_out->output1:audio_in_r",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     },
     {
       "source_node": "adsr2",
       "source_port": "cv_out",
       "target_node": "filter1",
-      "target_port": "cutoff_cv"
+      "target_port": "cutoff_cv",
+      "id": "adsr2:cv_out->filter1:cutoff_cv",
+      "style": {
+        "stroke": "#4444ff",
+        "strokeWidth": 3,
+        "strokeDasharray": "5,5"
+      },
+      "animated": false
     },
     {
       "source_node": "filter1", 
       "source_port": "audio_out",
       "target_node": "scope1",
-      "target_port": "audio_in"
+      "target_port": "audio_in",
+      "id": "filter1:audio_out->scope1:audio_in",
+      "style": {
+        "stroke": "#ff4444",
+        "strokeWidth": 3
+      },
+      "animated": false
     }
   ],
   "notes": [
