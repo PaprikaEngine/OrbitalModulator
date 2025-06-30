@@ -64,9 +64,12 @@ const getNodeStyle = (nodeType: string) => {
   return styles[nodeType as keyof typeof styles] || styles.default;
 };
 
-const GenericNode: React.FC<GenericNodeProps> = ({ id, data }) => {
+const GenericNode: React.FC<GenericNodeProps> = ({ id, data, selected }) => {
   const [isActive, setIsActive] = useState(true);
   const nodeStyle = getNodeStyle(data.nodeType);
+  
+  // デバッグ用ログ
+  console.log('GenericNode rendering:', { id, nodeType: data.nodeType, label: data.label });
 
   const updateParameter = useCallback(async (param: string, value: number) => {
     try {
@@ -95,7 +98,11 @@ const GenericNode: React.FC<GenericNodeProps> = ({ id, data }) => {
       className="node-container" 
       style={{
         background: nodeStyle.gradient,
-        borderLeft: `4px solid ${nodeStyle.borderColor}`
+        borderLeft: `4px solid ${nodeStyle.borderColor}`,
+        width: '280px',
+        minHeight: '120px',
+        position: 'relative',
+        zIndex: 1
       }}
     >
       {/* Input handles - 左側 */}

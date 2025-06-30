@@ -12,6 +12,7 @@ import ReactFlow, {
   MiniMap,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import './styles.css';
 
 import { invoke } from '@tauri-apps/api/core';
 import OscillatorNode from './components/OscillatorNode';
@@ -35,8 +36,8 @@ import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
 const nodeTypes = {
-  oscillator: OscillatorNode,
-  output: OutputNode,
+  oscillator: GenericNode,
+  output: GenericNode,
   oscilloscope: GenericNode,
   filter: GenericNode,
   adsr: GenericNode,
@@ -53,10 +54,10 @@ const nodeTypes = {
   attenuverter: GenericNode,
   multiple: GenericNode,
   multiple8: GenericNode,
-  sine_oscillator: OscillatorNode,
-  triangle_oscillator: OscillatorNode,
-  sawtooth_oscillator: OscillatorNode,
-  pulse_oscillator: OscillatorNode,
+  sine_oscillator: GenericNode,
+  triangle_oscillator: GenericNode,
+  sawtooth_oscillator: GenericNode,
+  pulse_oscillator: GenericNode,
 };
 
 interface NodeInfo {
@@ -132,18 +133,21 @@ function App() {
       const connections: ConnectionInfo[] = await invoke('get_connections');
       
       // Convert Rust nodes to ReactFlow nodes
-      const flowNodes: Node[] = nodeInfos.map((nodeInfo, index) => ({
-        id: nodeInfo.id,
-        type: nodeInfo.node_type,
-        position: { x: 100 + (index % 3) * 200, y: 100 + Math.floor(index / 3) * 150 },
-        data: {
-          label: nodeInfo.name,
-          nodeType: nodeInfo.node_type,
-          parameters: nodeInfo.parameters,
-          inputPorts: nodeInfo.input_ports,
-          outputPorts: nodeInfo.output_ports,
-        },
-      }));
+      const flowNodes: Node[] = nodeInfos.map((nodeInfo, index) => {
+        console.log('Creating node:', nodeInfo);
+        return {
+          id: nodeInfo.id,
+          type: nodeInfo.node_type,
+          position: { x: 100 + (index % 3) * 200, y: 100 + Math.floor(index / 3) * 150 },
+          data: {
+            label: nodeInfo.name,
+            nodeType: nodeInfo.node_type,
+            parameters: nodeInfo.parameters,
+            inputPorts: nodeInfo.input_ports,
+            outputPorts: nodeInfo.output_ports,
+          },
+        };
+      });
 
       // Convert Rust connections to ReactFlow edges
       const flowEdges: Edge[] = connections.map((conn) => ({
