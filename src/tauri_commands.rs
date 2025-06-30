@@ -5,6 +5,10 @@ use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use std::fs;
 
+// Include plugin commands
+pub mod plugin;
+pub use plugin::*;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NodeInfo {
     pub id: String,

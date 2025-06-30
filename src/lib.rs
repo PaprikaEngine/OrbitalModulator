@@ -23,10 +23,12 @@ pub mod tauri_commands;
 pub mod parameters;
 pub mod processing;
 pub mod errors;
+pub mod plugin;
 
 pub use audio::AudioEngine;
-pub use graph::{AudioGraph, Node, Port, PortType, Connection};
+pub use graph::{AudioGraph, Node, Port, PortType, Connection, ProcessingGraph};
 pub use nodes::{AudioNode, create_node};
 pub use parameters::{Parameterizable, ParameterDescriptor, ParameterError};
-pub use processing::{ProcessContext, ProcessingError, NodeInfo, NodeCategory};
+pub use processing::{ProcessContext, ProcessingError, NodeInfo, NodeCategory, InputPorts, OutputPorts};
 pub use errors::{AudioEngineError, AudioEngineResult, Logger, ConsoleLogger, LogLevel};
+pub use plugin::{PluginManager, PluginError, PluginResult, PluginConfig, PluginStats};

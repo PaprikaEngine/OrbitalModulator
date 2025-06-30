@@ -109,8 +109,6 @@ function App() {
         target: conn.target_node,
         sourceHandle: conn.source_port,
         targetHandle: conn.target_port,
-        label: `${conn.source_port} → ${conn.target_port}`,
-        labelStyle: { fontSize: 10 },
       }));
 
       setNodes(flowNodes);
@@ -140,8 +138,6 @@ function App() {
         setEdges((eds) => addEdge({
           ...params,
           id: `${params.source}:${params.sourceHandle}->${params.target}:${params.targetHandle}`,
-          label: `${params.sourceHandle} → ${params.targetHandle}`,
-          labelStyle: { fontSize: 10 },
         }, eds));
         
         setStatusMessage('Connection created');
@@ -192,6 +188,33 @@ function App() {
       setStatusMessage(`Remove failed: ${error}`);
     }
   }, [selectedNode, setNodes, setEdges]);
+
+  // Handle edge double click (delete on double click)
+  const onEdgeDoubleClick = useCallback(async (_event: React.MouseEvent, edge: Edge) => {
+    try {
+      // Parse the edge ID to get source and target information
+      // Edge ID format: "sourceNodeId:sourcePort->targetNodeId:targetPort"
+      const [sourceInfo, targetInfo] = edge.id.split('->');
+      const [sourceNodeId, sourcePort] = sourceInfo.split(':');
+      const [targetNodeId, targetPort] = targetInfo.split(':');
+
+      // Call Tauri to disconnect the nodes
+      await invoke('disconnect_nodes', {
+        sourceNodeId,
+        sourcePort,
+        targetNodeId,
+        targetPort,
+      });
+
+      // Update local edges state
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+      
+      setStatusMessage(`Disconnected ${sourceNodeId}:${sourcePort} from ${targetNodeId}:${targetPort}`);
+    } catch (error) {
+      console.error('Failed to disconnect nodes:', error);
+      setStatusMessage(`Failed to disconnect: ${error}`);
+    }
+  }, [setEdges]);
 
   // Handle edge deletion
   const onEdgesDelete = useCallback(async (deletedEdges: Edge[]) => {
@@ -413,6 +436,7 @@ function App() {
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         onEdgesDelete={onEdgesDelete}
+        onEdgeDoubleClick={onEdgeDoubleClick}
         nodeTypes={nodeTypes}
         fitView
         deleteKeyCode="Delete"
@@ -441,7 +465,7 @@ function App() {
       )}
 
       <div className="status-bar">
-        {statusMessage} | Engine: {isAudioEngineRunning ? 'Running' : 'Stopped'} | Nodes: {nodes.length} | Connections: {edges.length} | Tip: Select connection and press Delete to disconnect
+        {statusMessage} | Engine: {isAudioEngineRunning ? 'Running' : 'Stopped'} | Nodes: {nodes.length} | Connections: {edges.length} | Tip: Double-click connection to disconnect
       </div>
     </div>
   );

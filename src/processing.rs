@@ -23,11 +23,11 @@ use uuid::Uuid;
 
 /// オーディオ処理のコンテキスト - すべての処理情報を統一
 #[derive(Debug)]
-pub struct ProcessContext<'a> {
+pub struct ProcessContext {
     /// 入力バッファ群
-    pub inputs: &'a InputBuffers,
+    pub inputs: InputBuffers,
     /// 出力バッファ群
-    pub outputs: &'a mut OutputBuffers,
+    pub outputs: OutputBuffers,
     /// サンプリングレート
     pub sample_rate: f32,
     /// バッファサイズ
@@ -37,6 +37,36 @@ pub struct ProcessContext<'a> {
     /// BPM（シーケンサー等で使用）
     pub bpm: f32,
 }
+
+impl ProcessContext {
+    /// Create a new processing context
+    pub fn new(inputs: InputBuffers, outputs: OutputBuffers, sample_rate: f32, buffer_size: usize) -> Self {
+        Self {
+            inputs,
+            outputs,
+            sample_rate,
+            buffer_size,
+            timestamp: 0,
+            bpm: 120.0,
+        }
+    }
+    
+    /// Get mutable reference to outputs
+    pub fn outputs_mut(&mut self) -> &mut OutputBuffers {
+        &mut self.outputs
+    }
+    
+    /// Get reference to inputs
+    pub fn inputs(&self) -> &InputBuffers {
+        &self.inputs
+    }
+}
+
+/// 入力ポート（バッファ）の管理
+pub type InputPorts = InputBuffers;
+
+/// 出力ポート（バッファ）の管理  
+pub type OutputPorts = OutputBuffers;
 
 /// 入力バッファの管理
 #[derive(Debug, Default)]
@@ -243,6 +273,10 @@ pub trait AudioNode: Send + Sync + Parameterizable {
     fn is_active(&self) -> bool {
         self.get_parameter("active").unwrap_or(1.0) > 0.5
     }
+    
+    /// ダウンキャスト用のas_anyメソッド
+    fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
     
     /// 互換性のための古いNodeを生成（Tauri統合用）
     fn create_legacy_node(&self, name: String) -> Node {

@@ -20,6 +20,9 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::processing::{AudioNode, ProcessContext, ProcessingError, InputPorts, OutputPorts};
+use crate::parameters::Parameterizable;
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum PortType {
     AudioMono,
@@ -301,5 +304,256 @@ impl AudioGraph {
             }
         }
         None
+    }
+}
+
+/// Extended AudioGraph for modern ProcessContext integration
+pub struct ProcessingGraph {
+    audio_nodes: HashMap<Uuid, Box<dyn AudioNode>>,
+    connections: Vec<Connection>,
+    processing_order: Vec<Uuid>,
+}
+
+impl ProcessingGraph {
+    pub fn new() -> Self {
+        Self {
+            audio_nodes: HashMap::new(),
+            connections: Vec::new(),
+            processing_order: Vec::new(),
+        }
+    }
+
+    /// Add a node instance to the processing graph
+    pub fn add_node_instance(&mut self, node: Box<dyn AudioNode>) -> Result<(), String> {
+        let node_id = node.node_info().id;
+        self.audio_nodes.insert(node_id, node);
+        self.update_processing_order()?;
+        Ok(())
+    }
+
+    /// Remove a node instance
+    pub fn remove_node_instance(&mut self, node_id: &str) -> Result<(), String> {
+        let uuid = Uuid::parse_str(node_id)
+            .map_err(|e| format!("Invalid UUID: {}", e))?;
+        
+        // Remove all connections involving this node
+        self.connections.retain(|conn| {
+            conn.source_node != uuid && conn.target_node != uuid
+        });
+        
+        self.audio_nodes.remove(&uuid);
+        self.update_processing_order()?;
+        Ok(())
+    }
+
+    /// Connect two nodes by ID
+    pub fn connect_by_id(&mut self, source_id: &str, source_port: &str, 
+                         target_id: &str, target_port: &str) -> Result<(), String> {
+        let source_uuid = Uuid::parse_str(source_id)
+            .map_err(|e| format!("Invalid source UUID: {}", e))?;
+        let target_uuid = Uuid::parse_str(target_id)
+            .map_err(|e| format!("Invalid target UUID: {}", e))?;
+
+        // Validate nodes exist
+        if !self.audio_nodes.contains_key(&source_uuid) {
+            return Err("Source node not found".to_string());
+        }
+        if !self.audio_nodes.contains_key(&target_uuid) {
+            return Err("Target node not found".to_string());
+        }
+
+        // Prevent self-connection
+        if source_uuid == target_uuid {
+            return Err("Cannot connect node to itself".to_string());
+        }
+
+        let connection = Connection {
+            source_node: source_uuid,
+            source_port: source_port.to_string(),
+            target_node: target_uuid,
+            target_port: target_port.to_string(),
+        };
+
+        // Check for cycles
+        let mut temp_connections = self.connections.clone();
+        temp_connections.push(connection.clone());
+        if self.would_create_cycle(&temp_connections, source_uuid, target_uuid) {
+            return Err("Connection would create a cycle".to_string());
+        }
+
+        self.connections.push(connection);
+        self.update_processing_order()?;
+        Ok(())
+    }
+
+    /// Disconnect two nodes by ID
+    pub fn disconnect_by_id(&mut self, source_id: &str, source_port: &str,
+                            target_id: &str, target_port: &str) -> Result<(), String> {
+        let source_uuid = Uuid::parse_str(source_id)
+            .map_err(|e| format!("Invalid source UUID: {}", e))?;
+        let target_uuid = Uuid::parse_str(target_id)
+            .map_err(|e| format!("Invalid target UUID: {}", e))?;
+
+        let initial_len = self.connections.len();
+        self.connections.retain(|conn| {
+            !(conn.source_node == source_uuid && 
+              conn.source_port == source_port &&
+              conn.target_node == target_uuid && 
+              conn.target_port == target_port)
+        });
+
+        if self.connections.len() != initial_len {
+            self.update_processing_order()?;
+        }
+
+        Ok(())
+    }
+
+    /// Get a node by ID
+    pub fn get_node(&self, node_id: &str) -> Option<&dyn AudioNode> {
+        let uuid = Uuid::parse_str(node_id).ok()?;
+        self.audio_nodes.get(&uuid).map(|n| n.as_ref())
+    }
+
+    /// Get a mutable node by ID
+    pub fn get_node_mut(&mut self, node_id: &str) -> Option<&mut dyn AudioNode> {
+        let uuid = Uuid::parse_str(node_id).ok()?;
+        self.audio_nodes.get_mut(&uuid).map(|n| n.as_mut())
+    }
+
+    /// Process audio through the entire graph
+    pub fn process_audio(&mut self, inputs: &mut InputPorts, outputs: &mut OutputPorts, 
+                         sample_rate: f32, buffer_size: usize) -> Result<(), ProcessingError> {
+        
+        // Process nodes in dependency order
+        for &node_id in &self.processing_order {
+            if let Some(node) = self.audio_nodes.get_mut(&node_id) {
+                // Create process context for this node
+                let mut node_inputs = InputPorts::new();
+                let mut node_outputs = OutputPorts::new();
+
+                // Initialize output buffers based on node's output ports
+                let node_info = node.node_info();
+                for output_port in &node_info.output_ports {
+                    match output_port.port_type {
+                        crate::graph::PortType::AudioMono => {
+                            node_outputs.add_audio(&output_port.name, vec![0.0; buffer_size]);
+                        }
+                        crate::graph::PortType::AudioStereo => {
+                            node_outputs.add_audio(&format!("{}_left", output_port.name), vec![0.0; buffer_size]);
+                            node_outputs.add_audio(&format!("{}_right", output_port.name), vec![0.0; buffer_size]);
+                        }
+                        crate::graph::PortType::CV => {
+                            node_outputs.add_cv(&output_port.name, 0.0);
+                        }
+                    }
+                }
+
+                // Route inputs from connected nodes
+                for connection in &self.connections {
+                    if connection.target_node == node_id {
+                        // This connection feeds into this node
+                        if let Some(source_node) = self.audio_nodes.get(&connection.source_node) {
+                            // Get the output from the source node (this is simplified)
+                            // In a full implementation, we'd need to track node outputs
+                        }
+                    }
+                }
+
+                // Create process context
+                let mut ctx = ProcessContext::new(node_inputs, node_outputs, sample_rate, buffer_size);
+                
+                // Process the node
+                node.process(&mut ctx)?;
+
+                // Route outputs to connected nodes (simplified)
+                // In a full implementation, we'd store the outputs for routing
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Check if adding a connection would create a cycle
+    fn would_create_cycle(&self, connections: &[Connection], from: Uuid, to: Uuid) -> bool {
+        let mut visited = std::collections::HashSet::new();
+        let mut stack = vec![to];
+
+        while let Some(current) = stack.pop() {
+            if current == from {
+                return true; // Cycle detected
+            }
+            if visited.contains(&current) {
+                continue;
+            }
+            visited.insert(current);
+
+            // Find all nodes this node connects to
+            for connection in connections {
+                if connection.source_node == current {
+                    if !visited.contains(&connection.target_node) {
+                        stack.push(connection.target_node);
+                    }
+                }
+            }
+        }
+
+        false
+    }
+
+    /// Update processing order using topological sort
+    fn update_processing_order(&mut self) -> Result<(), String> {
+        self.processing_order.clear();
+        let mut visited = std::collections::HashSet::new();
+        let mut temp_visited = std::collections::HashSet::new();
+
+        let node_ids: Vec<Uuid> = self.audio_nodes.keys().copied().collect();
+        for node_id in node_ids {
+            if !visited.contains(&node_id) {
+                if !self.visit_node(node_id, &mut visited, &mut temp_visited) {
+                    self.processing_order.clear();
+                    return Err("Failed to create processing order due to cycles".to_string());
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Visit node for topological sort
+    fn visit_node(&mut self, node_id: Uuid, 
+                  visited: &mut std::collections::HashSet<Uuid>,
+                  temp_visited: &mut std::collections::HashSet<Uuid>) -> bool {
+        if temp_visited.contains(&node_id) {
+            return false; // Cycle detected
+        }
+        if visited.contains(&node_id) {
+            return true; // Already processed
+        }
+
+        temp_visited.insert(node_id);
+
+        // Visit all dependencies (nodes that feed into this node)
+        let dependencies: Vec<Uuid> = self.connections.iter()
+            .filter(|conn| conn.target_node == node_id)
+            .map(|conn| conn.source_node)
+            .collect();
+        
+        for dep_node in dependencies {
+            if !self.visit_node(dep_node, visited, temp_visited) {
+                temp_visited.remove(&node_id);
+                return false;
+            }
+        }
+
+        temp_visited.remove(&node_id);
+        visited.insert(node_id);
+        self.processing_order.push(node_id);
+        true
+    }
+}
+
+impl Default for ProcessingGraph {
+    fn default() -> Self {
+        Self::new()
     }
 }

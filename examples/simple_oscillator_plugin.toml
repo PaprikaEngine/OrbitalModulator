@@ -1,0 +1,41 @@
+# Example Plugin Manifest
+# This file defines the metadata and configuration for the Simple Oscillator plugin
+
+[plugin]
+id = "simple_oscillator"
+name = "Simple Oscillator"
+version = "1.0.0"
+description = "A simple triangle wave oscillator example plugin"
+author = "OrbitalModulator Example"
+website = "https://github.com/orbital-modulator"
+category = "Generator"
+license = "MIT"
+api_version = 1
+node_types = ["simple_triangle_osc"]
+dependencies = []
+tags = ["oscillator", "generator", "triangle"]
+min_orbital_version = "1.0.0"
+
+[build]
+target = "x86_64-unknown-linux-gnu"
+rust_version = "1.70.0"
+orbital_version = "1.0.0"
+build_date = "2025-06-29T12:00:00Z"
+build_hash = "abc123def456"
+optimization = "release"
+features = ["std"]
+
+[files]
+"libsimple_oscillator.so" = { path = "libsimple_oscillator.so", sha256 = "0123456789abcdef", size = 1048576, executable = true, required = true }
+"README.md" = { path = "README.md", sha256 = "fedcba9876543210", size = 2048, executable = false, required = false }
+
+[dependencies]
+
+[requirements]
+min_memory = 67108864  # 64MB
+min_cpu_cores = 1
+max_cpu_usage = 0.05   # 5%
+network_access = false
+file_access = []
+platforms = ["linux", "macos", "windows"]
+permissions = []
