@@ -94,17 +94,7 @@ const GenericNode: React.FC<GenericNodeProps> = ({ id, data, selected }) => {
   }, [isActive, updateParameter]);
 
   return (
-    <div 
-      className="node-container" 
-      style={{
-        background: nodeStyle.gradient,
-        borderLeft: `4px solid ${nodeStyle.borderColor}`,
-        width: '280px',
-        minHeight: '120px',
-        position: 'relative',
-        zIndex: 1
-      }}
-    >
+    <>
       {/* Input handles - 左側 */}
       {data.inputPorts.map((port, index) => (
         <Handle
@@ -144,6 +134,18 @@ const GenericNode: React.FC<GenericNodeProps> = ({ id, data, selected }) => {
           title={`${port.name} (${port.port_type})`}
         />
       ))}
+
+      <div 
+        className="node-container" 
+        style={{
+          background: nodeStyle.gradient,
+          borderLeft: `4px solid ${nodeStyle.borderColor}`,
+          width: '280px',
+          minHeight: '120px',
+          position: 'relative',
+          zIndex: 1
+        }}
+      >
 
       {/* ヘッダー */}
       <div className="node-header">
@@ -190,7 +192,8 @@ const GenericNode: React.FC<GenericNodeProps> = ({ id, data, selected }) => {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
