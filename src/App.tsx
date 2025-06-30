@@ -16,6 +16,7 @@ import 'reactflow/dist/style.css';
 import { invoke } from '@tauri-apps/api/core';
 import OscillatorNode from './components/OscillatorNode';
 import OutputNode from './components/OutputNode';
+import GenericNode from './components/GenericNode';
 import OscilloscopeNode from './components/OscilloscopeNode';
 import FilterNode from './components/FilterNode';
 import ADSRNode from './components/ADSRNode';
@@ -36,22 +37,22 @@ import ParameterPanel from './components/ParameterPanel';
 const nodeTypes = {
   oscillator: OscillatorNode,
   output: OutputNode,
-  oscilloscope: OscilloscopeNode,
-  filter: FilterNode,
-  adsr: ADSRNode,
-  lfo: LFONode,
-  mixer: MixerNode,
-  mixer8: MixerNode,
-  delay: DelayNode,
-  noise: NoiseNode,
-  vca: VCANode,
-  sequencer: SequencerNode,
-  spectrum_analyzer: SpectrumAnalyzerNode,
-  ring_modulator: RingModulatorNode,
-  sample_hold: SampleHoldNode,
-  attenuverter: AttenuverterNode,
-  multiple: MultipleNode,
-  multiple8: MultipleNode,
+  oscilloscope: GenericNode,
+  filter: GenericNode,
+  adsr: GenericNode,
+  lfo: GenericNode,
+  mixer: GenericNode,
+  mixer8: GenericNode,
+  delay: GenericNode,
+  noise: GenericNode,
+  vca: GenericNode,
+  sequencer: GenericNode,
+  spectrum_analyzer: GenericNode,
+  ring_modulator: GenericNode,
+  sample_hold: GenericNode,
+  attenuverter: GenericNode,
+  multiple: GenericNode,
+  multiple8: GenericNode,
   sine_oscillator: OscillatorNode,
   triangle_oscillator: OscillatorNode,
   sawtooth_oscillator: OscillatorNode,

@@ -78,16 +78,32 @@ body {
   opacity: 0.8;
 }
 
+/* ReactFlow Default Override */
+.react-flow__node {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.react-flow__handle {
+  background: #4285f4 !important;
+  border: 2px solid #fff !important;
+  border-radius: 50% !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
 /* Node Container - フラットデザイン */
 .node-container {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  min-width: 280px;
-  position: relative;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1) !important;
+  padding: 16px !important;
+  min-width: 280px !important;
+  position: relative !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
 .oscillator-node {
@@ -228,6 +244,27 @@ body {
   font-weight: 500;
   text-align: right;
   margin-top: 2px;
+}
+
+.parameter-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.parameter-display .control-label {
+  margin-bottom: 0;
+  font-size: 11px;
+}
+
+.parameter-display .control-value {
+  margin-top: 0;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 /* Node Ports */
