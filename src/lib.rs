@@ -27,7 +27,7 @@ pub mod plugin;
 
 pub use audio::AudioEngine;
 pub use graph::{AudioGraph, Node, Port, PortType, Connection, ProcessingGraph};
-pub use nodes::{AudioNode, create_node};
+// Node exports moved to audio::AudioEngine for unified architecture
 pub use parameters::{Parameterizable, ParameterDescriptor, ParameterError};
 pub use processing::{ProcessContext, ProcessingError, NodeInfo, NodeCategory, InputPorts, OutputPorts};
 pub use errors::{AudioEngineError, AudioEngineResult, Logger, ConsoleLogger, LogLevel};

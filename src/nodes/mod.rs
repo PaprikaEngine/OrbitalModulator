@@ -100,48 +100,6 @@ pub use output::OutputNode;
 pub use oscilloscope::{OscilloscopeNode, TriggerMode, TriggerSlope, Measurements};
 pub use spectrum_analyzer::{SpectrumAnalyzerNode, WindowType};
 
-// === Legacy Trait for Backward Compatibility ===
-
-use crate::graph::Node;
-use std::collections::HashMap;
-
-pub trait AudioNode: Send {
-    fn process(&mut self, inputs: &HashMap<String, &[f32]>, outputs: &mut HashMap<String, &mut [f32]>);
-    fn create_node_info(&self, name: String) -> Node;
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
-    fn as_any(&self) -> &dyn std::any::Any;
-}
-
-pub fn create_node(node_type: &str, name: String) -> Result<Box<dyn AudioNode>, String> {
-    let sample_rate = 44100.0; // Default sample rate
-    
-    match node_type {
-        "output" => Ok(Box::new(OutputNode::new(sample_rate, name))),
-        "sine_oscillator" => Ok(Box::new(SineOscillatorNode::new(sample_rate, name))),
-        "triangle_oscillator" => Ok(Box::new(OscillatorNode::new(sample_rate, name))),
-        "sawtooth_oscillator" => Ok(Box::new(OscillatorNode::new(sample_rate, name))),
-        "pulse_oscillator" => Ok(Box::new(OscillatorNode::new(sample_rate, name))),
-        "oscillator" => Ok(Box::new(OscillatorNode::new(sample_rate, name))),
-        "oscilloscope" => Ok(Box::new(OscilloscopeNode::new(sample_rate, name))),
-        "vcf" | "filter" => Ok(Box::new(VCFNode::new(sample_rate, name))),
-        "adsr" => Ok(Box::new(ADSRNode::new(sample_rate, name))),
-        "lfo" => Ok(Box::new(LFONode::new(sample_rate, name))),
-        "mixer" => Ok(Box::new(MixerNode::new(sample_rate, name))),
-        "mixer8" => Ok(Box::new(MixerNode::new(sample_rate, name))),
-        "delay" => Ok(Box::new(DelayNode::new(sample_rate, name))),
-        "noise" => Ok(Box::new(NoiseNode::new(sample_rate, name))),
-        "vca" => Ok(Box::new(VCANode::new(sample_rate, name))),
-        "sequencer" => Ok(Box::new(SequencerNode::new(sample_rate, name))),
-        "spectrum_analyzer" => Ok(Box::new(SpectrumAnalyzerNode::new(sample_rate, name))),
-        "ring_modulator" => Ok(Box::new(RingModulatorNode::new(sample_rate, name))),
-        "sample_hold" => Ok(Box::new(SampleHoldNode::new(sample_rate, name))),
-        "attenuverter" => Ok(Box::new(AttenuverterNode::new(sample_rate, name))),
-        "multiple" => Ok(Box::new(MultipleNode::new(sample_rate, name, 4))),
-        "multiple8" => Ok(Box::new(MultipleNode::new(sample_rate, name, 8))),
-        "clock_divider" => Ok(Box::new(ClockDividerNode::new(sample_rate, name))),
-        "quantizer" => Ok(Box::new(QuantizerNode::new(sample_rate, name))),
-        "compressor" => Ok(Box::new(CompressorNode::new(sample_rate, name))),
-        "waveshaper" => Ok(Box::new(WaveshaperNode::new(sample_rate, name))),
-        _ => Err(format!("Unknown node type: {}", node_type)),
-    }
-}
+// === Node Creation ===
+// Note: Node creation is now handled by AudioEngine::create_builtin_node
+// This module only exports node types for the unified ProcessContext architecture
