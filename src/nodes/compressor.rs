@@ -389,8 +389,8 @@ mod tests {
         outputs.allocate_cv("gain_reduction_cv".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -425,8 +425,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 1024);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1024,
             timestamp: 0,
@@ -473,8 +473,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -504,8 +504,8 @@ mod tests {
         outputs.allocate_cv("gain_reduction_cv".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 256,
             timestamp: 0,
@@ -534,8 +534,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -564,8 +564,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 2048);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 2048,
             timestamp: 0,
@@ -597,8 +597,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,

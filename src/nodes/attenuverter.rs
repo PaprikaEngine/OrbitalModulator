@@ -18,7 +18,7 @@
 
 use uuid::Uuid;
 
-use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor, ModulationCurve};
+use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor};
 use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo, NodeCategory, PortInfo};
 use crate::graph::PortType;
 use crate::define_parameters;
@@ -39,6 +39,7 @@ pub struct AttenuverterNode {
     attenuation_param: ModulatableParameter,
     offset_param: ModulatableParameter,
     
+    #[allow(dead_code)]
     sample_rate: f32,
 }
 
@@ -348,8 +349,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -382,8 +383,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,
@@ -415,8 +416,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,
@@ -448,8 +449,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,
@@ -483,8 +484,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,
@@ -514,8 +515,8 @@ mod tests {
         outputs.allocate_audio("inverted_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,
@@ -524,7 +525,7 @@ mod tests {
         
         assert!(atten.process(&mut ctx).is_ok());
         
-        let main_output = ctx.outputs.get_audio("signal_out").unwrap();
+        let _main_output = ctx.outputs.get_audio("signal_out").unwrap();
         let inverted_output = ctx.outputs.get_audio("inverted_out").unwrap();
         
         // Inverted output should be negative of input (without offset)
@@ -549,8 +550,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,

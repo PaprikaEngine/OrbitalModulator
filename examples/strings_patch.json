@@ -28,7 +28,7 @@
     },
     {
       "id": "strings_filter",
-      "type": "filter",
+      "type": "vcf",
       "name": "Strings Filter",
       "position": { "x": 400, "y": 200 },
       "parameters": {

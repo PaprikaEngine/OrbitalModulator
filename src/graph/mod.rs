@@ -21,7 +21,6 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::processing::{AudioNode, ProcessContext, ProcessingError, InputPorts, OutputPorts};
-use crate::parameters::Parameterizable;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum PortType {
@@ -426,13 +425,13 @@ impl ProcessingGraph {
     }
 
     /// Process audio through the entire graph
-    pub fn process_audio(&mut self, inputs: &mut InputPorts, outputs: &mut OutputPorts, 
+    pub fn process_audio(&mut self, _inputs: &mut InputPorts, _outputs: &mut OutputPorts, 
                          sample_rate: f32, buffer_size: usize) -> Result<(), ProcessingError> {
         
         // Process nodes in dependency order
         for &node_id in &self.processing_order {
             // First, prepare the context without holding any borrows
-            let mut node_inputs = InputPorts::new();
+            let node_inputs = InputPorts::new();
             let mut node_outputs = OutputPorts::new();
 
             // Get node info for output buffer initialization

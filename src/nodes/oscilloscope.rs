@@ -358,8 +358,8 @@ impl AudioNode for OscilloscopeNode {
 
         // Apply CV modulation
         let effective_trigger_level = self.trigger_level_param.modulate(self.trigger_level, trigger_level_cv);
-        let effective_time_scale = self.time_scale_param.modulate(self.time_scale, time_scale_cv);
-        let effective_voltage_scale = self.voltage_scale_param.modulate(self.voltage_scale, voltage_scale_cv);
+        let _effective_time_scale = self.time_scale_param.modulate(self.time_scale, time_scale_cv);
+        let _effective_voltage_scale = self.voltage_scale_param.modulate(self.voltage_scale, voltage_scale_cv);
 
         // Process each sample
         let mut trigger_out_value = 0.0;
@@ -579,8 +579,8 @@ mod tests {
         outputs.allocate_cv("trigger_out".to_string(), 8);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 8,
             timestamp: 0,
@@ -647,8 +647,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,

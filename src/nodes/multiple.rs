@@ -18,10 +18,9 @@
 
 use uuid::Uuid;
 
-use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor, ModulationCurve};
+use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor};
 use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo, NodeCategory, PortInfo};
 use crate::graph::PortType;
-use crate::define_parameters;
 
 /// リファクタリング済みMultipleNode - プロ品質の信号分配器
 pub struct MultipleNode {
@@ -40,6 +39,7 @@ pub struct MultipleNode {
     // CV Modulation parameters
     gain_params: Vec<ModulatableParameter>, // One per channel
     
+    #[allow(dead_code)]
     sample_rate: f32,
 }
 
@@ -67,7 +67,7 @@ impl MultipleNode {
 
         // Create modulation parameters for each channel
         let gain_params: Vec<ModulatableParameter> = (0..channels)
-            .map(|i| ModulatableParameter::new(
+            .map(|_i| ModulatableParameter::new(
                 BasicParameter::new("gain", 0.0, 2.0, 1.0),
                 0.8  // 80% CV modulation range
             ))
@@ -258,7 +258,7 @@ impl Parameterizable for MultipleNode {
         ];
 
         // Add per-channel gain parameters
-        for i in 0..self.output_gains.len() {
+        for _i in 0..self.output_gains.len() {
             descriptors.push(Box::new(BasicParameter::new(
                 "gain",  // Use static string for now
                 0.0, 2.0, 1.0
@@ -397,8 +397,8 @@ mod tests {
         }
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -437,8 +437,8 @@ mod tests {
         }
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,
@@ -469,8 +469,8 @@ mod tests {
         }
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,
@@ -501,8 +501,8 @@ mod tests {
         outputs.allocate_audio("out_2".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,
@@ -532,8 +532,8 @@ mod tests {
         }
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,

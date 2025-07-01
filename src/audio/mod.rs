@@ -9,13 +9,12 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 
-use cpal::{Device, Stream, StreamConfig, StreamError};
+use cpal::{Device, Stream, StreamConfig};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 
-use crate::graph::{AudioGraph, Node, PortType, ProcessingGraph};
-use crate::processing::{AudioNode, ProcessContext, ProcessingError, InputPorts, OutputPorts};
-use crate::parameters::{Parameterizable, ParameterError};
-use crate::plugin::{PluginManager, PluginError};
+use crate::graph::ProcessingGraph;
+use crate::processing::{AudioNode, InputPorts, OutputPorts};
+use crate::plugin::PluginManager;
 
 /// Modern Audio Engine with plugin support
 pub struct AudioEngine {
@@ -87,7 +86,7 @@ impl AudioEngine {
     }
 
     /// Create a built-in node
-    fn create_builtin_node(&self, node_type: &str, name: String) -> Result<String, String> {
+    pub fn create_builtin_node(&self, node_type: &str, name: String) -> Result<String, String> {
         let mut graph = self.graph.lock()
             .map_err(|e| format!("Failed to lock graph: {}", e))?;
 
@@ -136,7 +135,7 @@ impl AudioEngine {
     }
 
     /// Create a plugin node
-    fn create_plugin_node(&self, node_type: &str, name: String) -> Result<String, String> {
+    pub fn create_plugin_node(&self, node_type: &str, name: String) -> Result<String, String> {
         let manager = self.plugin_manager.lock()
             .map_err(|e| format!("Failed to lock plugin manager: {}", e))?;
 

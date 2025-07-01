@@ -89,7 +89,7 @@
     },
     {
       "id": "arp_filter",
-      "type": "filter",
+      "type": "vcf",
       "name": "Arpeggio Filter",
       "position": { "x": 600, "y": 200 },
       "parameters": {

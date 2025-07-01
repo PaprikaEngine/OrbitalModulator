@@ -369,8 +369,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -401,8 +401,8 @@ mod tests {
             outputs.allocate_audio("audio_out".to_string(), 64);
             
             let mut ctx = ProcessContext {
-                inputs: &inputs,
-                outputs: &mut outputs,
+                inputs: inputs,
+                outputs: outputs,
                 sample_rate: 44100.0,
                 buffer_size: 64,
                 timestamp: 0,
@@ -430,8 +430,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 64);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 64,
             timestamp: 0,
@@ -458,8 +458,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 64);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 64,
             timestamp: 0,
@@ -485,8 +485,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 1024);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1024,
             timestamp: 0,
@@ -517,8 +517,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,

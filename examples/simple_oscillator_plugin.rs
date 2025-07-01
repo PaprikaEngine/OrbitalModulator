@@ -5,8 +5,8 @@
  * This file would typically be compiled as a separate dynamic library (.so/.dll/.dylib).
  */
 
-use std::collections::HashMap;
 use orbital_modulator::plugin::prelude::*;
+use orbital_modulator::{create_oscillator_plugin, plugin_main};
 
 // Create a simple triangle oscillator using the SDK macro
 create_oscillator_plugin!(SimpleTriangleOscillator, |phase: f32| {
@@ -19,6 +19,7 @@ create_oscillator_plugin!(SimpleTriangleOscillator, |phase: f32| {
 });
 
 // Plugin factory implementation
+#[derive(Debug)]
 pub struct SimpleOscillatorFactory {
     metadata: PluginMetadata,
 }
@@ -101,6 +102,22 @@ impl PluginNodeFactory for SimpleOscillatorFactory {
 // This macro generates the required C-compatible entry points
 // In a real plugin, this would be in a separate library crate
 plugin_main!(SimpleOscillatorFactory);
+
+fn main() {
+    println!("Simple Oscillator Plugin Example");
+    println!("This demonstrates how to create a plugin for OrbitalModulator");
+    
+    // Create a factory and demonstrate basic functionality
+    let factory = SimpleOscillatorFactory::new();
+    println!("Plugin: {} v{}", factory.metadata().name, factory.metadata().version);
+    println!("Supported node types: {:?}", factory.supported_node_types());
+    
+    // Test creating a node
+    match factory.create_node("simple_triangle_osc", "example_osc".to_string(), 44100.0) {
+        Ok(_node) => println!("✅ Successfully created triangle oscillator node"),
+        Err(e) => println!("❌ Failed to create node: {}", e),
+    }
+}
 
 #[cfg(test)]
 mod tests {

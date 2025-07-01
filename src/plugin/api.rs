@@ -22,14 +22,12 @@
 //! It provides a stable ABI (Application Binary Interface) for dynamic loading.
 
 use std::collections::HashMap;
-use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_void};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo};
 use crate::parameters::Parameterizable;
-use crate::plugin::{PluginError, PluginResult, PluginStats, PluginConfig};
+use crate::plugin::{PluginResult, PluginStats, PluginConfig};
 
 /// Plugin API version - must match between host and plugin
 pub const PLUGIN_API_VERSION: u32 = 1;

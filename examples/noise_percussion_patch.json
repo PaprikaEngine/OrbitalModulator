@@ -39,7 +39,7 @@
     },
     {
       "id": "perc_filter",
-      "type": "filter",
+      "type": "vcf",
       "name": "Percussion Filter",
       "position": { "x": 350, "y": 250 },
       "parameters": {

@@ -32,3 +32,5 @@ pub use parameters::{Parameterizable, ParameterDescriptor, ParameterError};
 pub use processing::{ProcessContext, ProcessingError, NodeInfo, NodeCategory, InputPorts, OutputPorts};
 pub use errors::{AudioEngineError, AudioEngineResult, Logger, ConsoleLogger, LogLevel};
 pub use plugin::{PluginManager, PluginError, PluginResult, PluginConfig, PluginStats};
+
+// Plugin macros are automatically available via #[macro_export]

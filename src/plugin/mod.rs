@@ -52,11 +52,10 @@ pub mod prelude {
     pub use crate::plugin::{PluginError, PluginResult, PluginConfig, PluginStats};
     pub use crate::processing::{AudioNode, ProcessContext, ProcessingError};
     pub use crate::parameters::{Parameterizable, ParameterDescriptor, ParameterError};
+    // Macros are available via #[macro_export] - no need to re-export
     pub use std::collections::HashMap;
 }
 
-use std::collections::HashMap;
-use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
 /// Plugin system error types

@@ -120,6 +120,7 @@ impl OutputNode {
     }
     
     /// Calculate peak level with decay
+    #[allow(dead_code)]
     fn update_peak_level(&mut self, current_peak: f32, stored_peak: &mut f32) {
         let decay_rate = 0.99; // Peak hold decay rate
         if current_peak > *stored_peak {
@@ -130,6 +131,7 @@ impl OutputNode {
     }
     
     /// Calculate RMS level with smoothing
+    #[allow(dead_code)]
     fn update_rms_level(&mut self, sample: f32, stored_rms: &mut f32) {
         let smooth_factor = 0.01; // RMS smoothing factor
         let instant_power = sample * sample;
@@ -145,7 +147,7 @@ impl OutputNode {
             let required_gain = self.limiter_threshold / peak;
             
             // Smooth gain reduction using envelope follower
-            let attack_rate = 0.001; // Very fast attack
+            let _attack_rate = 0.001; // Very fast attack
             let release_rate = self.limiter_release / self.sample_rate;
             
             if required_gain < self.limiter_gain_reduction {
@@ -361,7 +363,7 @@ mod tests {
         output.set_parameter("limiter_threshold", 0.8).unwrap();
         
         // Test with signal below threshold
-        let (left, right) = output.apply_limiter(0.5, 0.5);
+        let (left, _right) = output.apply_limiter(0.5, 0.5);
         assert!((left - 0.5).abs() < 0.1); // Should pass through mostly unchanged
         
         // Test with signal above threshold
@@ -402,8 +404,8 @@ mod tests {
         outputs.allocate_cv("gain_reduction_cv".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -436,8 +438,8 @@ mod tests {
         outputs.allocate_audio("mixed_output".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -467,8 +469,8 @@ mod tests {
         outputs.allocate_audio("mixed_output".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -489,16 +491,17 @@ mod tests {
         let mut output = OutputNode::new(44100.0, "test".to_string());
         
         // Test peak detection
-        output.update_peak_level(0.8, &mut output.peak_level_l);
-        assert_eq!(output.peak_level_l, 0.8);
+        let mut peak_level = 0.0;
+        output.update_peak_level(0.8, &mut peak_level);
+        assert_eq!(peak_level, 0.8);
         
         // Test peak hold (lower value shouldn't immediately change peak)
-        output.update_peak_level(0.5, &mut output.peak_level_l);
-        assert!(output.peak_level_l > 0.5); // Should still be close to 0.8 due to decay
+        output.update_peak_level(0.5, &mut peak_level);
+        assert!(peak_level > 0.5); // Should still be close to 0.8 due to decay
         
         // Test higher peak updates immediately
-        output.update_peak_level(0.9, &mut output.peak_level_l);
-        assert_eq!(output.peak_level_l, 0.9);
+        output.update_peak_level(0.9, &mut peak_level);
+        assert_eq!(peak_level, 0.9);
     }
 
     #[test]
@@ -506,13 +509,14 @@ mod tests {
         let mut output = OutputNode::new(44100.0, "test".to_string());
         
         // Test RMS calculation
-        output.update_rms_level(1.0, &mut output.rms_level_l);
-        assert!(output.rms_level_l > 0.0);
+        let mut rms_level = 0.0;
+        output.update_rms_level(1.0, &mut rms_level);
+        assert!(rms_level > 0.0);
         
         // Test smoothing
-        let first_rms = output.rms_level_l;
-        output.update_rms_level(0.0, &mut output.rms_level_l);
-        assert!(output.rms_level_l < first_rms); // Should decay
-        assert!(output.rms_level_l > 0.0); // But not immediately to zero
+        let first_rms = rms_level;
+        output.update_rms_level(0.0, &mut rms_level);
+        assert!(rms_level < first_rms); // Should decay
+        assert!(rms_level > 0.0); // But not immediately to zero
     }
 }

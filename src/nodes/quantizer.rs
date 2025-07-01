@@ -18,10 +18,9 @@
 
 use uuid::Uuid;
 
-use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor, ModulationCurve};
+use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor};
 use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo, NodeCategory, PortInfo};
 use crate::graph::PortType;
-use crate::define_parameters;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ScaleType {
@@ -632,8 +631,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 5);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 5,
             timestamp: 0,
@@ -667,8 +666,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -708,8 +707,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,
@@ -740,8 +739,8 @@ mod tests {
         outputs.allocate_audio("trigger_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -778,8 +777,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,
@@ -808,8 +807,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,

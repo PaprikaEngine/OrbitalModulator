@@ -436,8 +436,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 44100); // 1 second
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 44100,
             timestamp: 0,
@@ -480,8 +480,8 @@ mod tests {
             outputs.allocate_audio("cv_out".to_string(), 512);
             
             let mut ctx = ProcessContext {
-                inputs: &inputs,
-                outputs: &mut outputs,
+                inputs: inputs,
+                outputs: outputs,
                 sample_rate: 44100.0,
                 buffer_size: 512,
                 timestamp: 0,
@@ -511,8 +511,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -545,8 +545,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -576,8 +576,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 4410); // 0.1 second = multiple complete cycles
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4410,
             timestamp: 0,
@@ -596,12 +596,13 @@ mod tests {
         lfo.reset();
         lfo.set_parameter("bipolar", 0.0).unwrap();
         
+        let inputs2 = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
         outputs.allocate_audio("cv_out".to_string(), 4410);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs2,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4410,
             timestamp: 0,
@@ -626,8 +627,8 @@ mod tests {
         outputs.allocate_audio("inverted_out".to_string(), 256);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 256,
             timestamp: 0,
@@ -657,8 +658,8 @@ mod tests {
         outputs.allocate_audio("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,

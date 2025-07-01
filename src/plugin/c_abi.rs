@@ -37,6 +37,7 @@ pub struct CPluginFactory {
 #[derive(Debug)]
 pub struct CFactoryWrapper {
     c_factory: *mut CPluginFactory,
+    #[allow(dead_code)]
     metadata_cache: Arc<Mutex<Option<PluginMetadata>>>,
 }
 
@@ -49,41 +50,42 @@ impl CFactoryWrapper {
         }
     }
     
-    /// Helper to get cached metadata
-    fn get_cached_metadata(&self) -> PluginResult<PluginMetadata> {
-        let mut cache = self.metadata_cache.lock()
-            .map_err(|e| PluginError::Internal { 
-                message: format!("Failed to lock metadata cache: {}", e) 
-            })?;
-        
-        if cache.is_none() {
-            // Load metadata from C factory
-            let metadata_json = unsafe {
-                let c_factory = &*self.c_factory;
-                let json_ptr = (c_factory.get_metadata)(c_factory.rust_factory);
-                if json_ptr.is_null() {
-                    return Err(PluginError::Internal {
-                        message: "C factory returned null metadata".to_string(),
-                    });
-                }
-                
-                let json_cstr = CStr::from_ptr(json_ptr);
-                json_cstr.to_str()
-                    .map_err(|e| PluginError::Internal {
-                        message: format!("Invalid UTF-8 in metadata: {}", e),
-                    })?
-            };
-            
-            let metadata: PluginMetadata = serde_json::from_str(metadata_json)
-                .map_err(|e| PluginError::Internal {
-                    message: format!("Failed to parse metadata JSON: {}", e),
-                })?;
-            
-            *cache = Some(metadata);
-        }
-        
-        Ok(cache.as_ref().unwrap().clone())
-    }
+    // TODO: Implement metadata caching optimization
+    // /// Helper to get cached metadata  
+    // fn get_cached_metadata(&self) -> PluginResult<PluginMetadata> {
+    //     let mut cache = self.metadata_cache.lock()
+    //         .map_err(|e| PluginError::Internal { 
+    //             message: format!("Failed to lock metadata cache: {}", e) 
+    //         })?;
+    //     
+    //     if cache.is_none() {
+    //         // Load metadata from C factory
+    //         let metadata_json = unsafe {
+    //             let c_factory = &*self.c_factory;
+    //             let json_ptr = (c_factory.get_metadata)(c_factory.rust_factory);
+    //             if json_ptr.is_null() {
+    //                 return Err(PluginError::Internal {
+    //                     message: "C factory returned null metadata".to_string(),
+    //                 });
+    //             }
+    //             
+    //             let json_cstr = CStr::from_ptr(json_ptr);
+    //             json_cstr.to_str()
+    //                 .map_err(|e| PluginError::Internal {
+    //                     message: format!("Invalid UTF-8 in metadata: {}", e),
+    //                 })?
+    //         };
+    //         
+    //         let metadata: PluginMetadata = serde_json::from_str(metadata_json)
+    //             .map_err(|e| PluginError::Internal {
+    //                 message: format!("Failed to parse metadata JSON: {}", e),
+    //             })?;
+    //         
+    //         *cache = Some(metadata);
+    //     }
+    //     
+    //     Ok(cache.as_ref().unwrap().clone())
+    // }
 }
 
 impl PluginNodeFactory for CFactoryWrapper {
@@ -266,7 +268,9 @@ impl Drop for CFactoryWrapper {
 
 /// C-compatible node wrapper
 pub struct CNodeWrapper {
+    #[allow(dead_code)]
     c_node: *mut c_void,
+    #[allow(dead_code)]
     c_factory: *mut CPluginFactory,
     node_info: crate::processing::NodeInfo,
 }
@@ -343,7 +347,7 @@ impl crate::parameters::Parameterizable for CNodeWrapper {
 /// Helper function to create a factory wrapper from C ABI entry points
 pub unsafe fn create_factory_from_c_symbols(
     create_fn: extern "C" fn() -> *mut c_void,
-    get_info_fn: extern "C" fn() -> *const c_char,
+    _get_info_fn: extern "C" fn() -> *const c_char,
     get_version_fn: extern "C" fn() -> u32,
 ) -> PluginResult<Box<dyn PluginNodeFactory>> {
     // Verify API version

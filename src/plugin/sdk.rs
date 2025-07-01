@@ -51,7 +51,7 @@ pub trait PluginNode: AudioNode + Parameterizable + Send + Sync {
     }
     
     /// Called when the plugin is being initialized
-    fn on_initialize(&mut self, sample_rate: f32) -> PluginResult<()> {
+    fn on_initialize(&mut self, _sample_rate: f32) -> PluginResult<()> {
         Ok(())
     }
     
@@ -108,10 +108,10 @@ pub trait EffectPlugin: PluginNode {
 /// Base oscillator node implementation
 pub struct BaseOscillator {
     node_info: NodeInfo,
-    frequency: f32,
-    phase: f32,
-    sample_rate: f32,
-    frequency_param: ModulatableParameter,
+    pub frequency: f32,
+    pub phase: f32,
+    pub sample_rate: f32,
+    pub frequency_param: ModulatableParameter,
 }
 
 impl BaseOscillator {
@@ -167,7 +167,7 @@ impl AudioNode for BaseOscillator {
         
         // Get CV input for frequency modulation
         let frequency_cv = ctx.inputs.get_cv_value("frequency_cv");
-        let effective_frequency = self.frequency_param.modulate(self.frequency, frequency_cv);
+        let _effective_frequency = self.frequency_param.modulate(self.frequency, frequency_cv);
         
         // Get output buffer
         let output = ctx.outputs.get_audio_mut("audio_out")
@@ -267,7 +267,7 @@ macro_rules! create_oscillator_plugin {
                 }
                 
                 let frequency_cv = ctx.inputs.get_cv_value("frequency_cv");
-                let effective_frequency = self.base.frequency_param.modulate(self.base.frequency, frequency_cv);
+                let _effective_frequency = self.base.frequency_param.modulate(self.base.frequency, frequency_cv);
                 
                 let output = ctx.outputs.get_audio_mut("audio_out")
                     .ok_or_else(|| ProcessingError::OutputBufferError {
@@ -288,6 +288,18 @@ macro_rules! create_oscillator_plugin {
             
             fn reset(&mut self) {
                 self.base.reset();
+            }
+            
+            fn latency(&self) -> u32 {
+                0
+            }
+            
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+            
+            fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+                self
             }
         }
         
@@ -321,7 +333,7 @@ macro_rules! create_oscillator_plugin {
         }
         
         impl OscillatorPlugin for $name {
-            fn generate_sample(&mut self, frequency: f32, phase: f32) -> f32 {
+            fn generate_sample(&mut self, _frequency: f32, phase: f32) -> f32 {
                 $generate_fn(phase)
             }
             
@@ -357,7 +369,7 @@ impl PluginNodeFactory for SimplePluginFactory {
         &self.metadata
     }
     
-    fn create_node(&self, node_type: &str, name: String, sample_rate: f32) -> PluginResult<Box<dyn AudioNode>> {
+    fn create_node(&self, node_type: &str, _name: String, _sample_rate: f32) -> PluginResult<Box<dyn AudioNode>> {
         Err(PluginError::NotFound {
             plugin_id: format!("Unknown node type: {}", node_type),
         })

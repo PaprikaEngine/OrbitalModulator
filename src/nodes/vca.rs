@@ -68,6 +68,7 @@ pub struct VCANode {
     gain_param: ModulatableParameter,
     cv_sensitivity_param: ModulatableParameter,
     
+    #[allow(dead_code)]
     sample_rate: f32,
 }
 
@@ -298,8 +299,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -331,8 +332,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 64);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 64,
             timestamp: 0,
@@ -379,8 +380,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 64);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 64,
             timestamp: 0,
@@ -421,8 +422,8 @@ mod tests {
         outputs.allocate_cv("gain_cv_out".to_string(), 64);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 64,
             timestamp: 0,
@@ -449,8 +450,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,

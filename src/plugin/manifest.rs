@@ -21,7 +21,7 @@
 //! Handles plugin metadata, validation, and package management.
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use serde::{Deserialize, Serialize};
 use sha2::{Sha256, Digest};
 
@@ -466,7 +466,7 @@ impl ManifestBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
+    // use tempfile::tempdir;
 
     #[test]
     fn test_manifest_builder() {

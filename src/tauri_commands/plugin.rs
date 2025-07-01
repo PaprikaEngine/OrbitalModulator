@@ -10,7 +10,7 @@ use std::sync::{Arc, Mutex};
 use serde::{Deserialize, Serialize};
 
 use crate::plugin::{
-    PluginManager, PluginMetadata, PluginStats, PluginConfig, 
+    PluginManager, PluginConfig, 
     PluginCategory, PluginSearchCriteria, SecurityViolation
 };
 

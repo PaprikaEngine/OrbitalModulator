@@ -22,15 +22,14 @@
 //! coordinating between loading, sandboxing, and node creation.
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
-use std::sync::{Arc, RwLock, Mutex};
+use std::path::Path;
+use std::sync::{Arc, RwLock};
 
 use crate::processing::AudioNode;
 use crate::plugin::{
     PluginError, PluginResult, PluginConfig, PluginStats,
-    api::{PluginNodeFactory, PluginMetadata, PluginCategory},
-    loader::{PluginLoader, LoadedPlugin},
-    manifest::PluginManifest,
+    api::{PluginMetadata, PluginCategory},
+    loader::PluginLoader,
     sandbox::{PluginSandbox, SecurityViolation},
 };
 
@@ -148,7 +147,7 @@ impl PluginManager {
             })?;
 
         // Load the plugin
-        let loaded_id = self.loader.load_plugin(manifest.clone())?;
+        let _loaded_id = self.loader.load_plugin(manifest.clone())?;
         
         // Create sandbox if enabled
         if self.default_config.enable_sandbox {

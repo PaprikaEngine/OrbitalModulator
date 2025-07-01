@@ -21,7 +21,6 @@ use uuid::Uuid;
 use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor};
 use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo, NodeCategory, PortInfo};
 use crate::graph::PortType;
-use crate::define_parameters;
 
 /// リファクタリング済みMixerNode - プロ仕様マルチチャンネルミキサー
 /// 
@@ -67,6 +66,7 @@ pub struct MixerNode {
     high_freq_state: f32,         // ハイパスフィルター状態
     low_freq_state: f32,          // ローパスフィルター状態
     
+    #[allow(dead_code)]
     sample_rate: f32,
 }
 
@@ -695,8 +695,8 @@ mod tests {
         outputs.allocate_audio("send1_r".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -756,8 +756,8 @@ mod tests {
         outputs.allocate_audio("mix_r".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,

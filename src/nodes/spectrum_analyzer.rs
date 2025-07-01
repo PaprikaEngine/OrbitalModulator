@@ -260,55 +260,6 @@ impl SpectrumAnalyzerNode {
     }
     
     
-    /// Cooley-Tukey FFT implementation
-    fn fft_inplace(&self, data: &mut [f32]) {
-        let size = data.len() / 2; // Complex numbers
-        
-        // Bit-reversal permutation
-        for i in 0..size {
-            let j = if i < self.bit_reversed_indices.len() {
-                self.bit_reversed_indices[i]
-            } else {
-                i
-            };
-            if i < j {
-                data.swap(i * 2, j * 2);         // Real part
-                data.swap(i * 2 + 1, j * 2 + 1); // Imaginary part
-            }
-        }
-        
-        // FFT computation
-        let mut length = 2;
-        while length <= size {
-            let step = size / length;
-            
-            for i in (0..size).step_by(length) {
-                for j in 0..length/2 {
-                    let twiddle_idx = j * step;
-                    let (cos_val, sin_val) = if twiddle_idx < self.twiddle_factors.len() {
-                        self.twiddle_factors[twiddle_idx]
-                    } else {
-                        (1.0, 0.0)
-                    };
-                    
-                    let even_idx = (i + j) * 2;
-                    let odd_idx = (i + j + length/2) * 2;
-                    
-                    // Complex multiplication: twiddle * odd
-                    let temp_real = data[odd_idx] * cos_val - data[odd_idx + 1] * sin_val;
-                    let temp_imag = data[odd_idx] * sin_val + data[odd_idx + 1] * cos_val;
-                    
-                    // Butterfly computation
-                    data[odd_idx] = data[even_idx] - temp_real;
-                    data[odd_idx + 1] = data[even_idx + 1] - temp_imag;
-                    data[even_idx] += temp_real;
-                    data[even_idx + 1] += temp_imag;
-                }
-            }
-            
-            length *= 2;
-        }
-    }
     
     /// Convert complex FFT result to magnitude spectrum
     fn calculate_magnitude_spectrum(&mut self) {
@@ -473,7 +424,7 @@ impl AudioNode for SpectrumAnalyzerNode {
 
         // Apply CV modulation
         let effective_smoothing = self.smoothing_param.modulate(self.smoothing, smoothing_cv);
-        let effective_gain = self.gain_param.modulate(self.gain, gain_cv);
+        let _effective_gain = self.gain_param.modulate(self.gain, gain_cv);
 
         // Add samples to input buffer
         for &sample in signal_input {
@@ -763,8 +714,8 @@ mod tests {
         outputs.allocate_cv("high_band_cv".to_string(), 2048);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 2048,
             timestamp: 0,
@@ -808,8 +759,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 4,
             timestamp: 0,
@@ -845,7 +796,7 @@ mod tests {
 
     #[test]
     fn test_fft_functionality() {
-        let analyzer = SpectrumAnalyzerNode::new(44100.0, "test".to_string());
+        let _analyzer = SpectrumAnalyzerNode::new(44100.0, "test".to_string());
         
         // Test with a simple signal
         let mut test_data = vec![0.0; 16]; // 8 complex numbers

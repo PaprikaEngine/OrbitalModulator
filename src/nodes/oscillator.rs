@@ -267,13 +267,13 @@ mod tests {
     fn test_oscillator_processing() {
         let mut osc = OscillatorNode::new(44100.0, "test".to_string());
         
-        let mut inputs = InputBuffers::new();
+        let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -300,8 +300,8 @@ mod tests {
         outputs.allocate_audio("audio_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,

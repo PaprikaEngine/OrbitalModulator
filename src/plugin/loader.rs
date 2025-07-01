@@ -22,10 +22,9 @@
 //! symbol resolution, and lifecycle management.
 
 use std::collections::HashMap;
-use std::ffi::{CStr, CString};
-use std::os::raw::{c_char, c_void};
+use std::ffi::CStr;
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::{Arc, RwLock};
 
 use libloading::{Library, Symbol};
 
@@ -33,7 +32,7 @@ use crate::plugin::{
     PluginError, PluginResult, PluginConfig, PluginStats,
     api::{
         PluginNodeFactory, PluginMetadata, PLUGIN_API_VERSION,
-        CreatePluginFactoryFn, DestroyPluginFactoryFn, 
+        CreatePluginFactoryFn, 
         GetPluginInfoFn, GetApiVersionFn
     },
     manifest::PluginManifest,
@@ -201,7 +200,7 @@ impl PluginLoader {
         self.verify_api_version(&library, &plugin_id)?;
         
         // Get plugin info and validate
-        let plugin_info = self.get_plugin_info(&library, &plugin_id)?;
+        let _plugin_info = self.get_plugin_info(&library, &plugin_id)?;
         
         // Create plugin factory
         let factory = self.create_plugin_factory(&library, &plugin_id)?;
@@ -233,7 +232,7 @@ impl PluginLoader {
     
     /// Unload a plugin
     pub fn unload_plugin(&self, plugin_id: &str) -> PluginResult<()> {
-        let loaded_plugin = {
+        let _loaded_plugin = {
             let mut loaded = self.loaded_plugins.write().unwrap();
             loaded.remove(plugin_id).ok_or_else(|| {
                 PluginError::NotFound {
@@ -271,9 +270,9 @@ impl PluginLoader {
     }
     
     /// Update plugin configuration
-    pub fn configure_plugin(&self, plugin_id: &str, config: PluginConfig) -> PluginResult<()> {
+    pub fn configure_plugin(&self, plugin_id: &str, _config: PluginConfig) -> PluginResult<()> {
         let loaded = self.loaded_plugins.read().unwrap();
-        let plugin = loaded.get(plugin_id).ok_or_else(|| {
+        let _plugin = loaded.get(plugin_id).ok_or_else(|| {
             PluginError::NotFound {
                 plugin_id: plugin_id.to_string(),
             }

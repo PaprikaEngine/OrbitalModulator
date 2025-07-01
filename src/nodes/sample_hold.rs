@@ -18,7 +18,7 @@
 
 use uuid::Uuid;
 
-use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor, ModulationCurve};
+use crate::parameters::{BasicParameter, ModulatableParameter, Parameterizable, ParameterDescriptor};
 use crate::processing::{AudioNode, ProcessContext, ProcessingError, NodeInfo, NodeCategory, PortInfo};
 use crate::graph::PortType;
 use crate::define_parameters;
@@ -356,8 +356,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 5);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 5,
             timestamp: 0,
@@ -397,8 +397,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,
@@ -436,8 +436,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 5);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 5,
             timestamp: 0,
@@ -472,8 +472,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,
@@ -504,8 +504,8 @@ mod tests {
         outputs.allocate_audio("signal_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 3,
             timestamp: 0,
@@ -539,8 +539,8 @@ mod tests {
         outputs.allocate_audio("gate_out".to_string(), 1);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 1,
             timestamp: 0,

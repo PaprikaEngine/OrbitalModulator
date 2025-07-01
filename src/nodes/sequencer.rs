@@ -303,7 +303,7 @@ impl SequencerNode {
         // External clock trigger
         if clock_trigger && self.running {
             step_trigger = true;
-            let was_last_step = self.current_step == (self.step_count as usize - 1) && 
+            let _was_last_step = self.current_step == (self.step_count as usize - 1) && 
                                SequencerMode::from_f32(self.mode) == SequencerMode::Forward;
             self.advance_step();
         }
@@ -643,7 +643,7 @@ impl AudioNode for SequencerNode {
             let step_triggered = self.process_triggers(clock_signal, reset_signal, run_stop_signal);
 
             let mut step_trigger = step_triggered;  // External clock triggered
-            let mut end_of_sequence = false;
+            let end_of_sequence = false;
 
             // Internal clock (if no external clock)
             if clock_input.is_empty() && self.running {
@@ -827,8 +827,8 @@ mod tests {
         outputs.allocate_audio("velocity_cv".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -908,8 +908,8 @@ mod tests {
         outputs.allocate_audio("trigger_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,
@@ -939,8 +939,8 @@ mod tests {
         outputs.allocate_audio("velocity_cv".to_string(), 8192);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 8192,
             timestamp: 0,
@@ -987,8 +987,8 @@ mod tests {
         outputs.allocate_audio("gate_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
-            inputs: &inputs,
-            outputs: &mut outputs,
+            inputs: inputs,
+            outputs: outputs,
             sample_rate: 44100.0,
             buffer_size: 512,
             timestamp: 0,

@@ -22,7 +22,6 @@
 //! their resource usage to prevent malicious or buggy plugins from
 //! affecting the host system.
 
-use std::collections::HashMap;
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{Duration, Instant, SystemTime};
 use std::thread;
@@ -49,7 +48,9 @@ struct ResourceMonitor {
     cpu_samples: Vec<f32>,
     memory_peak: usize,
     memory_current: usize,
+    #[allow(dead_code)]
     network_requests: u64,
+    #[allow(dead_code)]
     file_operations: u64,
     last_cpu_check: Instant,
     violations: Vec<SecurityViolation>,
@@ -133,10 +134,10 @@ impl PluginSandbox {
     /// Stop monitoring and cleanup
     pub fn stop_monitoring(&self) -> PluginResult<()> {
         // Generate final statistics
-        let uptime = self.start_time.elapsed();
+        let _uptime = self.start_time.elapsed();
         
         {
-            let mut stats = self.stats.write().unwrap();
+            let _stats = self.stats.write().unwrap();
             // Final CPU usage calculation would go here
         }
 
@@ -386,10 +387,10 @@ impl PluginSandbox {
 
     /// Start resource monitoring thread
     fn start_resource_monitor_thread(&self) {
-        let plugin_id = self.plugin_id.clone();
+        let _plugin_id = self.plugin_id.clone();
         let monitor = Arc::clone(&self.resource_monitor);
         let stats = Arc::clone(&self.stats);
-        let config = self.config.clone();
+        let _config = self.config.clone();
 
         thread::spawn(move || {
             let mut last_check = Instant::now();
@@ -438,7 +439,7 @@ pub enum OperationType {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::plugin::PluginCategory;
+    // use crate::plugin::PluginCategory;
 
     #[test]
     fn test_sandbox_creation() {
