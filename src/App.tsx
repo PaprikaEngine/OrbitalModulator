@@ -194,10 +194,10 @@ function App() {
 
       try {
         await invoke('connect_nodes', {
-          source_node: params.source,
-          source_port: params.sourceHandle,
-          target_node: params.target,
-          target_port: params.targetHandle,
+          sourceNode: params.source,
+          sourcePort: params.sourceHandle,
+          targetNode: params.target,
+          targetPort: params.targetHandle,
         });
         
         setEdges((eds) => addEdge({
@@ -267,10 +267,10 @@ function App() {
 
       // Call Tauri to disconnect the nodes
       await invoke('disconnect_nodes', {
-        source_node: sourceNodeId,
-        source_port: sourcePort,
-        target_node: targetNodeId,
-        target_port: targetPort,
+        sourceNode: sourceNodeId,
+        sourcePort: sourcePort,
+        targetNode: targetNodeId,
+        targetPort: targetPort,
       });
 
       // Update local edges state
@@ -295,10 +295,10 @@ function App() {
 
         // Call Tauri to disconnect the nodes
         await invoke('disconnect_nodes', {
-          source_node: sourceNodeId,
-          source_port: sourcePort,
-          target_node: targetNodeId,
-          target_port: targetPort,
+          sourceNode: sourceNodeId,
+          sourcePort: sourcePort,
+          targetNode: targetNodeId,
+          targetPort: targetPort,
         });
 
         setStatusMessage(`Disconnected ${sourceNodeId}:${sourcePort} from ${targetNodeId}:${targetPort}`);
