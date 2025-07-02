@@ -454,14 +454,14 @@ impl AudioNode for QuantizerNode {
         if !self.is_active() {
             // Inactive - pass through input CV
             if let (Some(input), Some(output)) = 
-                (ctx.inputs.get_audio("cv_in"), ctx.outputs.get_audio_mut("cv_out")) {
+                (ctx.inputs.get_cv("cv_in"), ctx.outputs.get_cv_mut("cv_out")) {
                 output.copy_from_slice(&input[..output.len().min(input.len())]);
             }
             return Ok(());
         }
 
         // Get input signals
-        let cv_input = ctx.inputs.get_audio("cv_in").unwrap_or(&[]);
+        let cv_input = ctx.inputs.get_cv("cv_in").unwrap_or(&[]);
         
         // Get CV inputs
         let root_note_cv = ctx.inputs.get_cv_value("root_note_cv");
@@ -486,7 +486,7 @@ impl AudioNode for QuantizerNode {
         };
 
         // Get buffer size
-        let buffer_size = ctx.outputs.get_audio("cv_out")
+        let buffer_size = ctx.outputs.get_cv("cv_out")
             .ok_or_else(|| ProcessingError::OutputBufferError { 
                 port_name: "cv_out".to_string() 
             })?.len();
@@ -535,7 +535,7 @@ impl AudioNode for QuantizerNode {
         }
 
         // Write to output buffers
-        if let Some(cv_output) = ctx.outputs.get_audio_mut("cv_out") {
+        if let Some(cv_output) = ctx.outputs.get_cv_mut("cv_out") {
             for (i, &sample) in output_samples.iter().enumerate() {
                 if i < cv_output.len() {
                     cv_output[i] = sample;
@@ -625,10 +625,10 @@ mod tests {
         let cv_data = vec![0.0, 0.5, 1.0, 1.5, 2.0]; // C, F#, C, F#, C
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("cv_in".to_string(), cv_data);
+        inputs.add_cv("cv_in".to_string(), cv_data);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 5);
+        outputs.allocate_cv("cv_out".to_string(), 5);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -641,7 +641,7 @@ mod tests {
         
         assert!(quant.process(&mut ctx).is_ok());
         
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         
         // In chromatic scale, all values should quantize to nearest semitone
         assert!((output[0] - 0.0).abs() < 0.001, "0V should quantize to 0V");
@@ -660,10 +660,10 @@ mod tests {
         let cv_data = vec![0.1, 0.2, 0.3, 0.4]; // All should quantize to nearby major scale notes
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("cv_in".to_string(), cv_data);
+        inputs.add_cv("cv_in".to_string(), cv_data);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 4);
+        outputs.allocate_cv("cv_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -676,7 +676,7 @@ mod tests {
         
         assert!(quant.process(&mut ctx).is_ok());
         
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         
         // All values should quantize to valid major scale notes
         // 0.1V (close to C) should quantize to 0V (C)
@@ -701,10 +701,10 @@ mod tests {
         let cv_data = vec![0.0]; // C
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("cv_in".to_string(), cv_data);
+        inputs.add_cv("cv_in".to_string(), cv_data);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 1);
+        outputs.allocate_cv("cv_out".to_string(), 1);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -717,7 +717,7 @@ mod tests {
         
         assert!(quant.process(&mut ctx).is_ok());
         
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         
         // Should be affected by transpose and root note
         // The exact value depends on the quantization algorithm
@@ -732,10 +732,10 @@ mod tests {
         let cv_data = vec![0.0, 0.1, 0.5, 0.5]; // Should trigger on quantization changes
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("cv_in".to_string(), cv_data);
+        inputs.add_cv("cv_in".to_string(), cv_data);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 4);
+        outputs.allocate_cv("cv_out".to_string(), 4);
         outputs.allocate_audio("trigger_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
@@ -771,10 +771,10 @@ mod tests {
         let cv_data = vec![0.25]; // Between C and D, should quantize to C
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("cv_in".to_string(), cv_data);
+        inputs.add_cv("cv_in".to_string(), cv_data);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 1);
+        outputs.allocate_cv("cv_out".to_string(), 1);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -787,7 +787,7 @@ mod tests {
         
         assert!(quant.process(&mut ctx).is_ok());
         
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         
         // Should quantize to C (0V) since it's the closest note in the custom scale
         assert!((output[0] - 0.0).abs() < 0.1, "Should quantize to C in custom scale");
@@ -801,10 +801,10 @@ mod tests {
         let cv_data = vec![0.123, 0.456, 0.789];
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("cv_in".to_string(), cv_data.clone());
+        inputs.add_cv("cv_in".to_string(), cv_data.clone());
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 3);
+        outputs.allocate_cv("cv_out".to_string(), 3);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -817,7 +817,7 @@ mod tests {
         
         assert!(quant.process(&mut ctx).is_ok());
         
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         
         // Should pass through input unchanged when inactive
         for (i, &expected) in cv_data.iter().enumerate() {

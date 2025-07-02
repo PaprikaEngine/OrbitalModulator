@@ -247,13 +247,13 @@ impl AudioNode for LFONode {
     fn process(&mut self, ctx: &mut ProcessContext) -> Result<(), ProcessingError> {
         if !self.is_active() {
             // Inactive - output zero
-            if let Some(cv_output) = ctx.outputs.get_audio_mut("cv_out") {
+            if let Some(cv_output) = ctx.outputs.get_cv_mut("cv_out") {
                 cv_output.fill(0.0);
             }
-            if let Some(inv_output) = ctx.outputs.get_audio_mut("inverted_out") {
+            if let Some(inv_output) = ctx.outputs.get_cv_mut("inverted_out") {
                 inv_output.fill(0.0);
             }
-            if let Some(eoc_output) = ctx.outputs.get_audio_mut("end_of_cycle") {
+            if let Some(eoc_output) = ctx.outputs.get_cv_mut("end_of_cycle") {
                 eoc_output.fill(0.0);
             }
             return Ok(());
@@ -282,7 +282,7 @@ impl AudioNode for LFONode {
         };
 
         // Get the buffer size
-        let buffer_size = ctx.outputs.get_audio("cv_out")
+        let buffer_size = ctx.outputs.get_cv("cv_out")
             .ok_or_else(|| ProcessingError::OutputBufferError { 
                 port_name: "cv_out".to_string() 
             })?.len();
@@ -342,7 +342,7 @@ impl AudioNode for LFONode {
         }
 
         // Write to output buffers
-        if let Some(cv_output) = ctx.outputs.get_audio_mut("cv_out") {
+        if let Some(cv_output) = ctx.outputs.get_cv_mut("cv_out") {
             for (i, &sample) in cv_samples.iter().enumerate() {
                 if i < cv_output.len() {
                     cv_output[i] = sample;
@@ -350,7 +350,7 @@ impl AudioNode for LFONode {
             }
         }
 
-        if let Some(inv_output) = ctx.outputs.get_audio_mut("inverted_out") {
+        if let Some(inv_output) = ctx.outputs.get_cv_mut("inverted_out") {
             for (i, &sample) in inv_samples.iter().enumerate() {
                 if i < inv_output.len() {
                     inv_output[i] = sample;
@@ -358,7 +358,7 @@ impl AudioNode for LFONode {
             }
         }
 
-        if let Some(eoc_output) = ctx.outputs.get_audio_mut("end_of_cycle") {
+        if let Some(eoc_output) = ctx.outputs.get_cv_mut("end_of_cycle") {
             for (i, &sample) in eoc_samples.iter().enumerate() {
                 if i < eoc_output.len() {
                     eoc_output[i] = sample;
@@ -433,7 +433,7 @@ mod tests {
         
         let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 44100); // 1 second
+        outputs.allocate_cv("cv_out".to_string(), 44100); // 1 second
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -448,7 +448,7 @@ mod tests {
         assert!(lfo.process(&mut ctx).is_ok());
         
         // Check sine wave properties
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         
         // Should start near 0 (sine starts at 0)
         assert!(output[0].abs() < 1.0, "Sine should start near zero: {}", output[0]);
@@ -477,7 +477,7 @@ mod tests {
             
             let inputs = InputBuffers::new();
             let mut outputs = OutputBuffers::new();
-            outputs.allocate_audio("cv_out".to_string(), 512);
+            outputs.allocate_cv("cv_out".to_string(), 512);
             
             let mut ctx = ProcessContext {
                 inputs: inputs,
@@ -490,7 +490,7 @@ mod tests {
             
             assert!(lfo.process(&mut ctx).is_ok());
             
-            let output = ctx.outputs.get_audio("cv_out").unwrap();
+            let output = ctx.outputs.get_cv("cv_out").unwrap();
             let has_signal = output.iter().any(|&s| s.abs() > 0.1);
             assert!(has_signal, "Waveform {} should produce output", waveform);
             
@@ -508,7 +508,7 @@ mod tests {
         inputs.add_cv("frequency_cv".to_string(), vec![2.0]); // +2V should increase frequency
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 512);
+        outputs.allocate_cv("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -522,7 +522,7 @@ mod tests {
         assert!(lfo.process(&mut ctx).is_ok());
         
         // CV should modulate the frequency
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let has_modulated_frequency = output.iter().any(|&s| s.abs() > 0.1);
         assert!(has_modulated_frequency, "Frequency CV should affect the LFO");
     }
@@ -542,7 +542,7 @@ mod tests {
         inputs.add_audio("sync_in".to_string(), sync_signal);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 512);
+        outputs.allocate_cv("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -573,7 +573,7 @@ mod tests {
         
         let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 4410); // 0.1 second = multiple complete cycles
+        outputs.allocate_cv("cv_out".to_string(), 4410); // 0.1 second = multiple complete cycles
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -586,7 +586,7 @@ mod tests {
         
         assert!(lfo.process(&mut ctx).is_ok());
         
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let has_negative = output.iter().any(|&s| s < -1.0);
         let min_value = output.iter().fold(f32::INFINITY, |a, &b| a.min(b));
         let max_value = output.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
@@ -598,7 +598,7 @@ mod tests {
         
         let inputs2 = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 4410);
+        outputs.allocate_cv("cv_out".to_string(), 4410);
         
         let mut ctx = ProcessContext {
             inputs: inputs2,
@@ -611,7 +611,7 @@ mod tests {
         
         assert!(lfo.process(&mut ctx).is_ok());
         
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let all_positive = output.iter().all(|&s| s >= -0.1); // Allow for small rounding errors
         assert!(all_positive, "Unipolar output should be non-negative");
     }
@@ -624,7 +624,7 @@ mod tests {
         let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
         outputs.allocate_audio("cv_out".to_string(), 256);
-        outputs.allocate_audio("inverted_out".to_string(), 256);
+        outputs.allocate_cv("inverted_out".to_string(), 256);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -638,8 +638,8 @@ mod tests {
         assert!(lfo.process(&mut ctx).is_ok());
         
         // Inverted output should be negative of normal output
-        let normal_output = ctx.outputs.get_audio("cv_out").unwrap();
-        let inverted_output = ctx.outputs.get_audio("inverted_out").unwrap();
+        let normal_output = ctx.outputs.get_cv("cv_out").unwrap();
+        let inverted_output = ctx.outputs.get_cv("inverted_out").unwrap();
         
         for (i, (&normal, &inverted)) in normal_output.iter().zip(inverted_output.iter()).enumerate() {
             let expected_inverted = -normal;
@@ -655,7 +655,7 @@ mod tests {
         
         let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 512);
+        outputs.allocate_cv("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -669,7 +669,7 @@ mod tests {
         assert!(lfo.process(&mut ctx).is_ok());
         
         // Should output zero when inactive
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let avg_output = output.iter().sum::<f32>() / output.len() as f32;
         assert!((avg_output - 0.0).abs() < 0.001, "Should output zero when inactive: {}", avg_output);
     }

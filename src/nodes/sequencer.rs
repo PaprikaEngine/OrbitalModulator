@@ -587,13 +587,13 @@ impl AudioNode for SequencerNode {
     fn process(&mut self, ctx: &mut ProcessContext) -> Result<(), ProcessingError> {
         if !self.is_active() {
             // Inactive - output silence
-            if let Some(note_output) = ctx.outputs.get_audio_mut("note_cv") {
+            if let Some(note_output) = ctx.outputs.get_cv_mut("note_cv") {
                 note_output.fill(0.0);
             }
             if let Some(gate_output) = ctx.outputs.get_audio_mut("gate_out") {
                 gate_output.fill(0.0);
             }
-            if let Some(velocity_output) = ctx.outputs.get_audio_mut("velocity_cv") {
+            if let Some(velocity_output) = ctx.outputs.get_cv_mut("velocity_cv") {
                 velocity_output.fill(0.0);
             }
             if let Some(trigger_output) = ctx.outputs.get_audio_mut("trigger_out") {
@@ -622,7 +622,7 @@ impl AudioNode for SequencerNode {
         self.update_timing(effective_bpm);
 
         // Get buffer size
-        let buffer_size = ctx.outputs.get_audio("note_cv")
+        let buffer_size = ctx.outputs.get_cv("note_cv")
             .ok_or_else(|| ProcessingError::OutputBufferError { 
                 port_name: "note_cv".to_string() 
             })?.len();
@@ -699,7 +699,7 @@ impl AudioNode for SequencerNode {
         }
 
         // Write to output buffers
-        if let Some(note_output) = ctx.outputs.get_audio_mut("note_cv") {
+        if let Some(note_output) = ctx.outputs.get_cv_mut("note_cv") {
             for (i, &sample) in note_samples.iter().enumerate() {
                 if i < note_output.len() {
                     note_output[i] = sample;
@@ -715,7 +715,7 @@ impl AudioNode for SequencerNode {
             }
         }
 
-        if let Some(velocity_output) = ctx.outputs.get_audio_mut("velocity_cv") {
+        if let Some(velocity_output) = ctx.outputs.get_cv_mut("velocity_cv") {
             for (i, &sample) in velocity_samples.iter().enumerate() {
                 if i < velocity_output.len() {
                     velocity_output[i] = sample;
@@ -822,9 +822,9 @@ mod tests {
         
         let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("note_cv".to_string(), 512);
+        outputs.allocate_cv("note_cv".to_string(), 512);
         outputs.allocate_audio("gate_out".to_string(), 512);
-        outputs.allocate_audio("velocity_cv".to_string(), 512);
+        outputs.allocate_cv("velocity_cv".to_string(), 512);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -839,7 +839,7 @@ mod tests {
         assert!(seq.process(&mut ctx).is_ok());
         
         // Should produce output when running
-        let note_output = ctx.outputs.get_audio("note_cv").unwrap();
+        let note_output = ctx.outputs.get_cv("note_cv").unwrap();
         let gate_output = ctx.outputs.get_audio("gate_out").unwrap();
         let has_note_output = note_output.iter().any(|&s| s.abs() > 0.1);
         let has_gate_output = gate_output.iter().any(|&s| s > 2.0);
@@ -902,9 +902,9 @@ mod tests {
         inputs.add_audio("clock_in".to_string(), clock_signal);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("note_cv".to_string(), 512);
+        outputs.allocate_cv("note_cv".to_string(), 512);
         outputs.allocate_audio("gate_out".to_string(), 512);
-        outputs.allocate_audio("velocity_cv".to_string(), 512);
+        outputs.allocate_cv("velocity_cv".to_string(), 512);
         outputs.allocate_audio("trigger_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
@@ -934,9 +934,9 @@ mod tests {
         let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
         // Use longer buffer to capture multiple steps
-        outputs.allocate_audio("note_cv".to_string(), 8192);
+        outputs.allocate_cv("note_cv".to_string(), 8192);
         outputs.allocate_audio("gate_out".to_string(), 8192);
-        outputs.allocate_audio("velocity_cv".to_string(), 8192);
+        outputs.allocate_cv("velocity_cv".to_string(), 8192);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -983,7 +983,7 @@ mod tests {
         
         let inputs = InputBuffers::new();
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("note_cv".to_string(), 512);
+        outputs.allocate_cv("note_cv".to_string(), 512);
         outputs.allocate_audio("gate_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
@@ -998,7 +998,7 @@ mod tests {
         assert!(seq.process(&mut ctx).is_ok());
         
         // Should output silence when inactive
-        let note_output = ctx.outputs.get_audio("note_cv").unwrap();
+        let note_output = ctx.outputs.get_cv("note_cv").unwrap();
         let gate_output = ctx.outputs.get_audio("gate_out").unwrap();
         let avg_note = note_output.iter().sum::<f32>() / note_output.len() as f32;
         let avg_gate = gate_output.iter().sum::<f32>() / gate_output.len() as f32;

@@ -397,14 +397,27 @@ pub async fn load_patch_file(
     
     // Create nodes from patch
     for patch_node in &patch.nodes {
-        // Create node (engine will assign new UUID)
-        let node_id = engine.create_builtin_node(&patch_node.node_type, patch_node.name.clone())
-            .map_err(|e| format!("Failed to create node {}: {}", patch_node.name, e))?;
-        
-        // Set parameters
-        for (param_name, param_value) in &patch_node.parameters {
-            let _ = engine.set_node_parameter(&node_id, param_name, *param_value);
-            // Ignore parameter errors to allow partial loading
+        // Create node using patch ID as name for consistent referencing
+        match engine.create_builtin_node(&patch_node.node_type, patch_node.id.clone()) {
+            Ok(node_id) => {
+                println!("✅ Created node: {} '{}' ({}) with ID: {}", patch_node.id, patch_node.name, patch_node.node_type, node_id);
+                
+                // Set parameters
+                for (param_name, param_value) in &patch_node.parameters {
+                    match engine.set_node_parameter(&node_id, param_name, *param_value) {
+                        Ok(()) => {
+                            println!("  ✅ Set parameter {} = {}", param_name, param_value);
+                        },
+                        Err(e) => {
+                            println!("  ❌ Failed to set parameter {}: {}", param_name, e);
+                        }
+                    }
+                }
+            },
+            Err(e) => {
+                println!("❌ Failed to create node {} '{}': {}", patch_node.id, patch_node.name, e);
+                return Err(format!("Failed to create node {} '{}': {}", patch_node.id, patch_node.name, e));
+            }
         }
     }
     
@@ -414,14 +427,35 @@ pub async fn load_patch_file(
         let source_id = engine.find_node_by_name(&connection.source_node);
         let target_id = engine.find_node_by_name(&connection.target_node);
         
-        if let (Some(src_id), Some(tgt_id)) = (source_id, target_id) {
-            let _ = engine.connect_nodes(
-                &src_id.to_string(), 
-                &connection.source_port, 
-                &tgt_id.to_string(), 
-                &connection.target_port
-            );
-            // Ignore connection errors to allow partial loading
+        match (source_id, target_id) {
+            (Some(src_id), Some(tgt_id)) => {
+                println!("🔗 Attempting connection: {} [{}] {} -> {} [{}] {}", 
+                       connection.source_node, src_id, connection.source_port,
+                       connection.target_node, tgt_id, connection.target_port);
+                match engine.connect_nodes(
+                    &src_id.to_string(), 
+                    &connection.source_port, 
+                    &tgt_id.to_string(), 
+                    &connection.target_port
+                ) {
+                    Ok(()) => {
+                        println!("✅ Connected: {} {} -> {} {}", 
+                               connection.source_node, connection.source_port,
+                               connection.target_node, connection.target_port);
+                    },
+                    Err(e) => {
+                        println!("❌ Connection failed: {} {} -> {} {}: {}", 
+                               connection.source_node, connection.source_port,
+                               connection.target_node, connection.target_port, e);
+                    }
+                }
+            },
+            (None, _) => {
+                println!("❌ Source node not found: {}", connection.source_node);
+            },
+            (_, None) => {
+                println!("❌ Target node not found: {}", connection.target_node);
+            }
         }
     }
     

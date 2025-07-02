@@ -315,7 +315,7 @@ impl AudioNode for ADSRNode {
     fn process(&mut self, ctx: &mut ProcessContext) -> Result<(), ProcessingError> {
         if !self.is_active() {
             // Inactive - output zero
-            if let Some(cv_output) = ctx.outputs.get_audio_mut("cv_out") {
+            if let Some(cv_output) = ctx.outputs.get_cv_mut("cv_out") {
                 cv_output.fill(0.0);
             }
             if let Some(gate_output) = ctx.outputs.get_audio_mut("gate_out") {
@@ -339,7 +339,7 @@ impl AudioNode for ADSRNode {
         
         if gate_input.is_empty() {
             // No gate input - output zero
-            if let Some(cv_output) = ctx.outputs.get_audio_mut("cv_out") {
+            if let Some(cv_output) = ctx.outputs.get_cv_mut("cv_out") {
                 cv_output.fill(0.0);
             }
             if let Some(gate_output) = ctx.outputs.get_audio_mut("gate_out") {
@@ -364,7 +364,7 @@ impl AudioNode for ADSRNode {
         let effective_release = self.release_param.modulate(self.release, release_cv);
 
         // Get the buffer size from the first output
-        let buffer_size = ctx.outputs.get_audio("cv_out")
+        let buffer_size = ctx.outputs.get_cv("cv_out")
             .ok_or_else(|| ProcessingError::OutputBufferError { 
                 port_name: "cv_out".to_string() 
             })?.len();
@@ -407,7 +407,7 @@ impl AudioNode for ADSRNode {
         }
 
         // Now write to the output buffers
-        if let Some(cv_output) = ctx.outputs.get_audio_mut("cv_out") {
+        if let Some(cv_output) = ctx.outputs.get_cv_mut("cv_out") {
             for (i, &sample) in cv_samples.iter().enumerate() {
                 if i < cv_output.len() {
                     cv_output[i] = sample;
@@ -501,7 +501,7 @@ mod tests {
         inputs.add_audio("gate_in".to_string(), vec![5.0; 512]); // Gate high
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 512);
+        outputs.allocate_cv("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -516,7 +516,7 @@ mod tests {
         assert!(adsr.process(&mut ctx).is_ok());
         
         // Output should start from 0 and increase (attack phase)
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         assert!(output[0] >= 0.0, "Should start at zero");
         assert!(output[100] > output[0], "Should increase during attack");
         
@@ -537,7 +537,7 @@ mod tests {
         inputs.add_audio("gate_in".to_string(), vec![5.0; 1024]); // Gate high
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 1024);
+        outputs.allocate_cv("cv_out".to_string(), 1024);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -551,7 +551,7 @@ mod tests {
         assert!(adsr.process(&mut ctx).is_ok());
         
         // Should progress through attack and into decay/sustain
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let final_level = output[1023];
         assert!(final_level > 0.0, "Should be in sustain phase: {}", final_level);
         
@@ -559,7 +559,7 @@ mod tests {
         let mut inputs = InputBuffers::new();
         inputs.add_audio("gate_in".to_string(), vec![0.0; 1024]); // Gate low
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 1024);
+        outputs.allocate_cv("cv_out".to_string(), 1024);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -573,7 +573,7 @@ mod tests {
         assert!(adsr.process(&mut ctx).is_ok());
         
         // Should decay toward zero in release
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         assert!(output[1023] < final_level, "Should decay during release");
     }
 
@@ -588,7 +588,7 @@ mod tests {
         inputs.add_audio("velocity_in".to_string(), vec![5.0; 256]); // 50% velocity
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 256);
+        outputs.allocate_cv("cv_out".to_string(), 256);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -602,7 +602,7 @@ mod tests {
         assert!(adsr.process(&mut ctx).is_ok());
         
         // With 50% velocity, output should be scaled down
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let max_output = output.iter().fold(0.0f32, |a, &b| a.max(b));
         assert!(max_output < 8.0, "Should be scaled by velocity: {}", max_output); // Less than 80% of 10V
     }
@@ -616,7 +616,7 @@ mod tests {
         inputs.add_cv("attack_cv".to_string(), vec![3.0]); // Increase attack time
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 256);
+        outputs.allocate_cv("cv_out".to_string(), 256);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -630,7 +630,7 @@ mod tests {
         assert!(adsr.process(&mut ctx).is_ok());
         
         // CV should modulate the attack time
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let has_modulated_attack = output.iter().any(|&s| s > 0.0);
         assert!(has_modulated_attack, "Attack CV should affect the envelope");
     }
@@ -644,7 +644,7 @@ mod tests {
         inputs.add_audio("gate_in".to_string(), vec![0.0, 0.0, 5.0, 5.0]); // Rising edge
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 4);
+        outputs.allocate_cv("cv_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -662,7 +662,7 @@ mod tests {
         let mut inputs = InputBuffers::new();
         inputs.add_audio("gate_in".to_string(), vec![5.0, 5.0, 0.0, 0.0]); // Falling edge
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 4);
+        outputs.allocate_cv("cv_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -686,7 +686,7 @@ mod tests {
         inputs.add_audio("gate_in".to_string(), vec![5.0; 512]);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("cv_out".to_string(), 512);
+        outputs.allocate_cv("cv_out".to_string(), 512);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -700,7 +700,7 @@ mod tests {
         assert!(adsr.process(&mut ctx).is_ok());
         
         // Should output zero when inactive
-        let output = ctx.outputs.get_audio("cv_out").unwrap();
+        let output = ctx.outputs.get_cv("cv_out").unwrap();
         let avg_output = output.iter().sum::<f32>() / output.len() as f32;
         assert!((avg_output - 0.0).abs() < 0.001, "Should output zero when inactive: {}", avg_output);
         

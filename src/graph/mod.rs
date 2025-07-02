@@ -425,16 +425,19 @@ impl ProcessingGraph {
     }
 
     /// Process audio through the entire graph
-    pub fn process_audio(&mut self, _inputs: &mut InputPorts, _outputs: &mut OutputPorts, 
+    pub fn process_audio(&mut self, _inputs: &mut InputPorts, final_outputs: &mut OutputPorts, 
                          sample_rate: f32, buffer_size: usize) -> Result<(), ProcessingError> {
+        
+        // Storage for node outputs (for signal routing)
+        let mut node_output_storage: HashMap<(Uuid, String), Vec<f32>> = HashMap::new();
         
         // Process nodes in dependency order
         for &node_id in &self.processing_order {
-            // First, prepare the context without holding any borrows
-            let node_inputs = InputPorts::new();
+            // Prepare input buffers for this node
+            let mut node_inputs = InputPorts::new();
             let mut node_outputs = OutputPorts::new();
 
-            // Get node info for output buffer initialization
+            // Get node info for buffer initialization
             let node_info = if let Some(node) = self.audio_nodes.get(&node_id) {
                 node.node_info().clone()
             } else {
@@ -457,20 +460,105 @@ impl ProcessingGraph {
                 }
             }
 
-            // Route inputs from connected nodes (simplified)
-            // TODO: Implement proper signal routing between nodes
+            // Route inputs from connected nodes
+            for connection in &self.connections {
+                if connection.target_node == node_id {
+                    // This connection feeds INTO the current node
+                    let source_key = (connection.source_node, connection.source_port.clone());
+                    
+                    if let Some(source_data) = node_output_storage.get(&source_key) {
+                        // Determine the target port type from node info
+                        let target_port_type = node_info.input_ports.iter()
+                            .find(|p| p.name == connection.target_port)
+                            .map(|p| p.port_type);
+                        
+                        match target_port_type {
+                            Some(crate::graph::PortType::AudioMono) => {
+                                node_inputs.add_audio(connection.target_port.clone(), source_data.clone());
+                            }
+                            Some(crate::graph::PortType::CV) => {
+                                node_inputs.add_cv(connection.target_port.clone(), source_data.clone());
+                            }
+                            Some(crate::graph::PortType::AudioStereo) => {
+                                // For stereo, add to both channels
+                                node_inputs.add_audio(format!("{}_left", connection.target_port), source_data.clone());
+                                node_inputs.add_audio(format!("{}_right", connection.target_port), source_data.clone());
+                            }
+                            None => {
+                                eprintln!("Warning: Unknown target port {} for node {}", 
+                                         connection.target_port, node_id);
+                            }
+                        }
+                    }
+                }
+            }
 
-            // Create process context
+            // Create process context and process the node
             let mut ctx = ProcessContext::new(node_inputs, node_outputs, sample_rate, buffer_size);
 
-            // Now process the node
             if let Some(node) = self.audio_nodes.get_mut(&node_id) {
-                
                 // Process the node
                 node.process(&mut ctx)?;
 
-                // Route outputs to connected nodes (simplified)
-                // In a full implementation, we'd store the outputs for routing
+                // Store outputs for routing to other nodes
+                for output_port in &node_info.output_ports {
+                    match output_port.port_type {
+                        crate::graph::PortType::AudioMono => {
+                            if let Some(output_data) = ctx.outputs.get_audio(&output_port.name) {
+                                let key = (node_id, output_port.name.clone());
+                                node_output_storage.insert(key, output_data.to_vec());
+                            }
+                        }
+                        crate::graph::PortType::CV => {
+                            if let Some(output_data) = ctx.outputs.get_cv(&output_port.name) {
+                                let key = (node_id, output_port.name.clone());
+                                node_output_storage.insert(key, output_data.to_vec());
+                            }
+                        }
+                        crate::graph::PortType::AudioStereo => {
+                            // Handle stereo outputs
+                            if let Some(left_data) = ctx.outputs.get_audio(&format!("{}_left", output_port.name)) {
+                                let key = (node_id, format!("{}_left", output_port.name));
+                                node_output_storage.insert(key, left_data.to_vec());
+                            }
+                            if let Some(right_data) = ctx.outputs.get_audio(&format!("{}_right", output_port.name)) {
+                                let key = (node_id, format!("{}_right", output_port.name));
+                                node_output_storage.insert(key, right_data.to_vec());
+                            }
+                        }
+                    }
+                }
+
+                // Special handling for OutputNode - route to final output buffers
+                if node_info.node_type == "output" {
+                    // Route OutputNode's processed inputs (which are stored in mixed_output) to main_left/main_right
+                    // Since OutputNode processes stereo to mono in mixed_output, we'll use that for both channels
+                    if let Some(mixed_output) = ctx.outputs.get_audio("mixed_output") {
+                        final_outputs.allocate_audio("main_left".to_string(), buffer_size);
+                        final_outputs.allocate_audio("main_right".to_string(), buffer_size);
+                        
+                        if let Some(main_left) = final_outputs.get_audio_mut("main_left") {
+                            main_left.copy_from_slice(mixed_output);
+                        }
+                        if let Some(main_right) = final_outputs.get_audio_mut("main_right") {
+                            main_right.copy_from_slice(mixed_output);
+                        }
+                    } else {
+                        // Fallback: route inputs directly if no mixed output
+                        if let Some(left_input) = ctx.inputs.get_audio("audio_in_l") {
+                            final_outputs.allocate_audio("main_left".to_string(), buffer_size);
+                            if let Some(main_left) = final_outputs.get_audio_mut("main_left") {
+                                main_left.copy_from_slice(left_input);
+                            }
+                        }
+                        if let Some(right_input) = ctx.inputs.get_audio("audio_in_r") {
+                            final_outputs.allocate_audio("main_right".to_string(), buffer_size);
+                            if let Some(main_right) = final_outputs.get_audio_mut("main_right") {
+                                main_right.copy_from_slice(right_input);
+                            }
+                        }
+                    }
+                }
             }
         }
 
