@@ -83,17 +83,6 @@ pub struct MeasurementData {
 
 pub type AudioEngineState = Arc<Mutex<AudioEngine>>;
 
-#[derive(Debug, Deserialize)]
-pub struct ConnectNodesParams {
-    #[serde(rename = "sourceNode")]
-    source_node: String,
-    #[serde(rename = "sourcePort")]
-    source_port: String,
-    #[serde(rename = "targetNode")]
-    target_node: String,
-    #[serde(rename = "targetPort")]
-    target_port: String,
-}
 
 #[tauri::command]
 pub async fn create_node(
@@ -121,19 +110,25 @@ pub async fn remove_node(
 #[tauri::command]
 pub async fn connect_nodes(
     engine: State<'_, AudioEngineState>,
-    params: ConnectNodesParams,
+    source_node: String,
+    source_port: String,
+    target_node: String,
+    target_port: String,
 ) -> Result<(), String> {
     let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    engine.connect_nodes(&params.source_node, &params.source_port, &params.target_node, &params.target_port)
+    engine.connect_nodes(&source_node, &source_port, &target_node, &target_port)
 }
 
 #[tauri::command]
 pub async fn disconnect_nodes(
     engine: State<'_, AudioEngineState>,
-    params: ConnectNodesParams,
+    source_node: String,
+    source_port: String,
+    target_node: String,
+    target_port: String,
 ) -> Result<(), String> {
     let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    engine.disconnect_nodes(&params.source_node, &params.source_port, &params.target_node, &params.target_port)
+    engine.disconnect_nodes(&source_node, &source_port, &target_node, &target_port)
 }
 
 #[tauri::command]
