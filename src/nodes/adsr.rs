@@ -461,6 +461,18 @@ impl AudioNode for ADSRNode {
     }
 }
 
+impl ADSRNode {
+    /// Manually trigger the ADSR envelope (for testing/manual triggering)
+    pub fn trigger_gate(&mut self) {
+        // Trigger attack phase
+        self.state = EnvelopeState::Attack;
+        self.stage_progress = 0.0;
+        self.velocity = 1.0; // Full velocity
+        self.gate_was_high = false; // Reset gate state so it triggers properly
+        println!("🎹 ADSR gate manually triggered: {}", self.node_info.name);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

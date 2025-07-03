@@ -13,6 +13,8 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './styles.css';
+import './styles/oscilloscope.css';
+import './styles/eurorack.css';
 
 import { invoke } from '@tauri-apps/api/core';
 import OscillatorNode from './components/OscillatorNode';
@@ -24,6 +26,10 @@ import ADSRNode from './components/ADSRNode';
 import LFONode from './components/LFONode';
 import MixerNode from './components/MixerNode';
 import DelayNode from './components/DelayNode';
+import VCONode from './components/VCONode';
+import VCFNode from './components/VCFNode';
+import EurorackADSRNode from './components/EurorackADSRNode';
+import EurorackLFONode from './components/EurorackLFONode';
 import NoiseNode from './components/NoiseNode';
 import VCANode from './components/VCANode';
 import SequencerNode from './components/SequencerNode';
@@ -36,26 +42,26 @@ import Toolbar from './components/Toolbar';
 import ParameterPanel from './components/ParameterPanel';
 
 const nodeTypes = {
-  // Generator Nodes
-  oscillator: GenericNode,
+  // Generator Nodes - Eurorack Style
+  oscillator: VCONode,
   sine_oscillator: GenericNode,
   triangle_oscillator: GenericNode,
   sawtooth_oscillator: GenericNode,
   pulse_oscillator: GenericNode,
   noise: GenericNode,
   
-  // Processor Nodes
-  vcf: GenericNode,
-  filter: GenericNode, // Alias for vcf
+  // Processor Nodes - Eurorack Style  
+  vcf: VCFNode,
+  filter: VCFNode, // Alias for vcf
   vca: GenericNode,
   delay: GenericNode,
   compressor: GenericNode,
   waveshaper: GenericNode,
   ring_modulator: GenericNode,
   
-  // Controller Nodes
-  adsr: GenericNode,
-  lfo: GenericNode,
+  // Controller Nodes - Eurorack Style
+  adsr: EurorackADSRNode,
+  lfo: EurorackLFONode,
   sequencer: GenericNode,
   
   // Utility Nodes
@@ -72,7 +78,7 @@ const nodeTypes = {
   output: GenericNode,
   
   // Analysis Nodes
-  oscilloscope: GenericNode,
+  oscilloscope: OscilloscopeNode,
   spectrum_analyzer: GenericNode,
 };
 
@@ -142,6 +148,17 @@ function App() {
   const [statusMessage, setStatusMessage] = useState('Initializing...');
   const [tauriReady, setTauriReady] = useState(false);
 
+  // Trigger gate for ADSR nodes
+  const triggerGate = useCallback(async (nodeId: string) => {
+    try {
+      await invoke('trigger_gate', { request: { node_id: nodeId } });
+      setStatusMessage(`Gate triggered for node: ${nodeId}`);
+    } catch (error) {
+      console.error('Failed to trigger gate:', error);
+      setStatusMessage(`Trigger failed: ${error}`);
+    }
+  }, []);
+
   // Load nodes and connections from Rust backend
   const loadGraph = useCallback(async () => {
     try {
@@ -193,12 +210,14 @@ function App() {
       }
 
       try {
-        await invoke('connect_nodes', {
+        const connectionParams = {
           source_node: params.source,
           source_port: params.sourceHandle,
           target_node: params.target,
           target_port: params.targetHandle,
-        });
+        };
+        console.log('Connecting with params:', connectionParams);
+        await invoke('connect_nodes', { request: connectionParams });
         
         setEdges((eds) => addEdge({
           ...params,
@@ -266,12 +285,14 @@ function App() {
       const [targetNodeId, targetPort] = targetInfo.split(':');
 
       // Call Tauri to disconnect the nodes
-      await invoke('disconnect_nodes', {
+      const disconnectParams = {
         source_node: sourceNodeId,
         source_port: sourcePort,
         target_node: targetNodeId,
         target_port: targetPort,
-      });
+      };
+      console.log('Disconnecting with params:', disconnectParams);
+      await invoke('disconnect_nodes', { request: disconnectParams });
 
       // Update local edges state
       setEdges((eds) => eds.filter((e) => e.id !== edge.id));
@@ -294,12 +315,14 @@ function App() {
         const [targetNodeId, targetPort] = targetInfo.split(':');
 
         // Call Tauri to disconnect the nodes
-        await invoke('disconnect_nodes', {
+        const disconnectParams = {
           source_node: sourceNodeId,
           source_port: sourcePort,
           target_node: targetNodeId,
           target_port: targetPort,
-        });
+        };
+        console.log('Disconnecting (delete) with params:', disconnectParams);
+        await invoke('disconnect_nodes', { request: disconnectParams });
 
         setStatusMessage(`Disconnected ${sourceNodeId}:${sourcePort} from ${targetNodeId}:${targetPort}`);
       } catch (error) {
@@ -539,6 +562,7 @@ function App() {
         <ParameterPanel
           node={selectedNode}
           onUpdateParameter={updateParameter}
+          onTriggerGate={triggerGate}
           onClose={() => setSelectedNode(null)}
         />
       )}

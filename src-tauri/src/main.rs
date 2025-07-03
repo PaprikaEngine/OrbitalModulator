@@ -38,7 +38,8 @@ fn main() {
             load_project,
             get_oscilloscope_data,
             load_patch_file,
-            save_patch_file
+            save_patch_file,
+            trigger_gate
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

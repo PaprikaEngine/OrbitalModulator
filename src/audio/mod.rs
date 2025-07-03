@@ -213,6 +213,21 @@ impl AudioEngine {
         graph.disconnect_by_id(source_id, source_port, target_id, target_port)
     }
 
+    /// Trigger gate signal for ADSR nodes
+    pub fn trigger_node_gate(&self, node_id: &str) -> Result<(), String> {
+        let mut graph = self.graph.lock()
+            .map_err(|e| format!("Failed to lock graph: {}", e))?;
+
+        if let Some(node) = graph.get_node_mut(node_id) {
+            if let Some(adsr_node) = node.as_any_mut().downcast_mut::<crate::nodes::ADSRNode>() {
+                adsr_node.trigger_gate();
+                return Ok(());
+            }
+        }
+        
+        Err(format!("ADSR node not found: {}", node_id))
+    }
+
     /// Start audio processing
     pub fn start(&mut self) -> Result<(), String> {
         if self.is_playing {

@@ -4,10 +4,11 @@ import { Node } from 'reactflow';
 interface ParameterPanelProps {
   node: Node;
   onUpdateParameter: (nodeId: string, param: string, value: number) => void;
+  onTriggerGate?: (nodeId: string) => void;
   onClose: () => void;
 }
 
-const ParameterPanel: React.FC<ParameterPanelProps> = ({ node, onUpdateParameter, onClose }) => {
+const ParameterPanel: React.FC<ParameterPanelProps> = ({ node, onUpdateParameter, onTriggerGate, onClose }) => {
   const [localParams, setLocalParams] = useState<Record<string, number>>(node.data.parameters || {});
 
   useEffect(() => {
@@ -164,6 +165,28 @@ const ParameterPanel: React.FC<ParameterPanelProps> = ({ node, onUpdateParameter
       {Object.keys(localParams).length === 0 && (
         <div style={{ color: '#666', fontStyle: 'italic' }}>
           No parameters available for this node.
+        </div>
+      )}
+
+      {/* ADSR Trigger Button */}
+      {node.data.nodeType === 'adsr' && onTriggerGate && (
+        <div style={{ marginTop: '16px' }}>
+          <button 
+            onClick={() => onTriggerGate(node.id)}
+            style={{ 
+              width: '100%', 
+              padding: '8px 16px', 
+              backgroundColor: '#4CAF50', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '4px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            🎹 Trigger Gate
+          </button>
         </div>
       )}
 

@@ -107,28 +107,38 @@ pub async fn remove_node(
     engine.remove_node(uuid)
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ConnectNodesRequest {
+    pub source_node: String,
+    pub source_port: String,
+    pub target_node: String,
+    pub target_port: String,
+}
+
 #[tauri::command]
 pub async fn connect_nodes(
     engine: State<'_, AudioEngineState>,
-    source_node: String,
-    source_port: String,
-    target_node: String,
-    target_port: String,
+    request: ConnectNodesRequest,
 ) -> Result<(), String> {
     let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    engine.connect_nodes(&source_node, &source_port, &target_node, &target_port)
+    engine.connect_nodes(&request.source_node, &request.source_port, &request.target_node, &request.target_port)
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DisconnectNodesRequest {
+    pub source_node: String,
+    pub source_port: String,
+    pub target_node: String,
+    pub target_port: String,
 }
 
 #[tauri::command]
 pub async fn disconnect_nodes(
     engine: State<'_, AudioEngineState>,
-    source_node: String,
-    source_port: String,
-    target_node: String,
-    target_port: String,
+    request: DisconnectNodesRequest,
 ) -> Result<(), String> {
     let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    engine.disconnect_nodes(&source_node, &source_port, &target_node, &target_port)
+    engine.disconnect_nodes(&request.source_node, &request.source_port, &request.target_node, &request.target_port)
 }
 
 #[tauri::command]
@@ -461,6 +471,28 @@ pub async fn load_patch_file(
     }
     
     Ok(())
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TriggerGateRequest {
+    pub node_id: String,
+}
+
+#[tauri::command]
+pub async fn trigger_gate(
+    engine: State<'_, AudioEngineState>,
+    request: TriggerGateRequest,
+) -> Result<(), String> {
+    let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
+    
+    // ADSRノードのgate_inポートに5Vのゲート信号を送信
+    match engine.trigger_node_gate(&request.node_id) {
+        Ok(()) => {
+            println!("🎹 Gate triggered for node: {}", request.node_id);
+            Ok(())
+        },
+        Err(e) => Err(format!("Failed to trigger gate: {}", e))
+    }
 }
 
 #[tauri::command]

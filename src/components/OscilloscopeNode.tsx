@@ -148,7 +148,7 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
   const fetchWaveformData = useCallback(async () => {
     try {
       // TauriのAPIを呼び出して実際の波形データを取得
-      const data = await invoke('get_oscilloscope_data', { nodeId: id }) as {
+      const data = await invoke('get_oscilloscope_data', { node_id: id }) as {
         waveform: number[];
         measurements: {
           vpp: number;
@@ -198,7 +198,7 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
   const updateParameter = useCallback(async (param: string, value: number) => {
     try {
       await invoke('set_node_parameter', {
-        nodeId: id,
+        node_id: id,
         param,
         value,
       });
