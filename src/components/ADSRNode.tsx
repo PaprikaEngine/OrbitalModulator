@@ -32,7 +32,7 @@ const ADSRNode: React.FC<ADSRNodeProps> = ({ id, data }) => {
       const newActiveState = !isActive;
       
       await invoke('set_node_parameter', {
-        nodeId: id,
+        node_id: id,
         param: 'active',
         value: newActiveState ? 1.0 : 0.0,
       });

@@ -33,7 +33,7 @@ const SampleHoldNode: React.FC<SampleHoldNodeProps> = ({ id, data }) => {
       if (active) {
         try {
           const value = await invoke<number>('get_node_parameter', {
-            nodeId: id,
+            node_id: id,
             param: 'held_value',
           });
           setHeldValue(value);
@@ -49,7 +49,7 @@ const SampleHoldNode: React.FC<SampleHoldNodeProps> = ({ id, data }) => {
   const updateParameter = async (param: string, value: number) => {
     try {
       await invoke('set_node_parameter', {
-        nodeId: id,
+        node_id: id,
         param,
         value,
       });

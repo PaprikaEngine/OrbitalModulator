@@ -31,7 +31,7 @@ const DelayNode: React.FC<DelayNodeProps> = ({ id, data }) => {
   const updateParameter = async (param: string, value: number) => {
     try {
       await invoke('set_node_parameter', {
-        nodeId: id,
+        node_id: id,
         param,
         value,
       });

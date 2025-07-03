@@ -36,7 +36,7 @@ const SpectrumAnalyzerNode: React.FC<SpectrumAnalyzerNodeProps> = ({ id, data })
   const updateParameter = async (param: string, value: number) => {
     try {
       await invoke('set_node_parameter', {
-        nodeId: id,
+        node_id: id,
         param,
         value,
       });
@@ -80,8 +80,8 @@ const SpectrumAnalyzerNode: React.FC<SpectrumAnalyzerNodeProps> = ({ id, data })
       
       try {
         const [magnitudes, freqs] = await Promise.all([
-          invoke<number[]>('get_spectrum_data', { nodeId: id }),
-          invoke<number[]>('get_spectrum_frequencies', { nodeId: id })
+          invoke<number[]>('get_spectrum_data', { node_id: id }),
+          invoke<number[]>('get_spectrum_frequencies', { node_id: id })
         ]);
         
         setSpectrumData(magnitudes);
