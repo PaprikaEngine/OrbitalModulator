@@ -495,15 +495,18 @@ pub async fn trigger_gate(
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GetOscilloscopeDataRequest {
+    pub node_id: String,
+}
+
 #[tauri::command]
 pub async fn get_oscilloscope_data(
     engine: State<'_, AudioEngineState>,
-    node_id: String,
+    request: GetOscilloscopeDataRequest,
 ) -> Result<OscilloscopeData, String> {
-    
-    
     let engine = engine.inner().lock().map_err(|e| format!("Failed to lock engine: {}", e))?;
-    let uuid = Uuid::parse_str(&node_id).map_err(|_| "Invalid UUID format".to_string())?;
+    let uuid = Uuid::parse_str(&request.node_id).map_err(|_| "Invalid UUID format".to_string())?;
     
     // ノードインスタンスを取得
     let mut graph = engine.graph.lock().map_err(|e| format!("Failed to lock graph: {}", e))?;

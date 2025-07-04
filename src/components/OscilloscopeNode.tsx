@@ -33,10 +33,10 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
   });
   
   const [parameters, setParameters] = useState({
-    time_div: data.parameters.time_div || 0.01,
-    volt_div: data.parameters.volt_div || 1.0,
-    position_h: data.parameters.position_h || 0.0,
-    position_v: data.parameters.position_v || 0.0,
+    time_scale: data.parameters.time_scale || 0.01,
+    voltage_scale: data.parameters.voltage_scale || 1.0,
+    horizontal_position: data.parameters.horizontal_position || 0.0,
+    vertical_position: data.parameters.vertical_position || 0.0,
     trigger_level: data.parameters.trigger_level || 0.0,
   });
 
@@ -95,7 +95,7 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
     ctx.stroke();
 
     // トリガーレベル線
-    const triggerY = height / 2 - (parameters.trigger_level / parameters.volt_div) * (height / 8);
+    const triggerY = height / 2 - (parameters.trigger_level / parameters.voltage_scale) * (height / 8);
     if (triggerY >= 0 && triggerY <= height) {
       ctx.strokeStyle = '#ffff00';
       ctx.lineWidth = 1;
@@ -119,11 +119,11 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
       ctx.beginPath();
       
       const centerY = height / 2;
-      const scaleY = (height / 8) / parameters.volt_div; // 8 divisions vertically
+      const scaleY = (height / 8) / parameters.voltage_scale; // 8 divisions vertically
       
       for (let i = 0; i < waveformData.length; i++) {
         const x = (i / (waveformData.length - 1)) * width;
-        const y = centerY - (waveformData[i] * scaleY) + (parameters.position_v * height * 0.1);
+        const y = centerY - (waveformData[i] * scaleY) + (parameters.vertical_position * height * 0.1);
         
         if (i === 0) {
           ctx.moveTo(x, y);
@@ -148,7 +148,7 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
   const fetchWaveformData = useCallback(async () => {
     try {
       // TauriのAPIを呼び出して実際の波形データを取得
-      const data = await invoke('get_oscilloscope_data', { node_id: id }) as {
+      const data = await invoke('get_oscilloscope_data', { request: { node_id: id } }) as {
         waveform: number[];
         measurements: {
           vpp: number;
@@ -240,6 +240,11 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
 
   return (
     <div className="oscilloscope-node">
+      {/* ドラッグハンドル（上部）*/}
+      <div className="oscilloscope-header drag-handle">
+        <span>📺 OSCILLOSCOPE</span>
+      </div>
+
       {/* 入力ハンドル */}
       <Handle
         type="target"
@@ -258,8 +263,8 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
           <div className="control-section">
             <label>VOLT/DIV</label>
             <select 
-              value={parameters.volt_div}
-              onChange={(e) => updateParameter('volt_div', parseFloat(e.target.value))}
+              value={parameters.voltage_scale}
+              onChange={(e) => updateParameter('voltage_scale', parseFloat(e.target.value))}
             >
               <option value={0.1}>0.1V</option>
               <option value={0.2}>0.2V</option>
@@ -273,8 +278,8 @@ const OscilloscopeNode: React.FC<OscilloscopeNodeProps> = ({ id, data }) => {
           <div className="control-section">
             <label>TIME/DIV</label>
             <select 
-              value={parameters.time_div}
-              onChange={(e) => updateParameter('time_div', parseFloat(e.target.value))}
+              value={parameters.time_scale}
+              onChange={(e) => updateParameter('time_scale', parseFloat(e.target.value))}
             >
               <option value={0.0001}>0.1ms</option>
               <option value={0.0002}>0.2ms</option>

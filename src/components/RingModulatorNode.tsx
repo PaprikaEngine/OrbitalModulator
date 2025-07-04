@@ -82,8 +82,8 @@ const RingModulatorNode: React.FC<RingModulatorNodeProps> = ({ id, data }) => {
         style={{ background: '#3498db', top: '70%' }}
       />
 
-      {/* Header */}
-      <div className="node-header">
+      {/* Header - ドラッグハンドル */}
+      <div className="node-header drag-handle">
         <div className="node-title">{data.label}</div>
         <button
           className={`active-button ${active ? 'active' : 'inactive'}`}
@@ -144,7 +144,10 @@ const RingModulatorNode: React.FC<RingModulatorNodeProps> = ({ id, data }) => {
       </div>
 
       {/* Controls */}
-      <div className="ring-mod-controls">
+      <div 
+        className="ring-mod-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Mix Control */}
         <div className="control-group">
           <label className="control-label">Mix</label>

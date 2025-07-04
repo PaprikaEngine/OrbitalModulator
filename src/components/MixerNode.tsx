@@ -130,7 +130,7 @@ const MixerNode: React.FC<MixerNodeProps> = ({ id, data }) => {
       />
 
       {/* Node Content */}
-      <div className="node-header">
+      <div className="node-header drag-handle">
         <span className="node-title">MIXER {channelCount}CH</span>
         <button 
           className={`active-button ${isActive ? 'active' : 'inactive'}`}
@@ -141,7 +141,10 @@ const MixerNode: React.FC<MixerNodeProps> = ({ id, data }) => {
         </button>
       </div>
 
-      <div className="mixer-content">
+      <div 
+        className="mixer-content"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Channel Strips */}
         <div className="channel-strips">
           {channels.map((channel, index) => (

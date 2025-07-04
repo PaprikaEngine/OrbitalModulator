@@ -70,79 +70,105 @@ const LFONode: React.FC<LFONodeProps> = ({ id, data }) => {
   }, [isActive, updateParameter]);
 
   return (
-    <div className="lfo-node">
-      {/* Input Handles */}
+    <div className={`eurorack-module lfo-module ${isActive ? 'active' : 'inactive'}`}>
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
+        <div className="module-brand">ORBITAL</div>
+        <div className="module-name">LFO</div>
+        <div className={`power-led ${isActive ? 'active' : ''}`}></div>
+      </div>
+
+      {/* CV Inputs */}
       <Handle
         type="target"
         position={Position.Left}
         id="frequency_cv"
-        style={{ top: '30%', background: '#f39c12' }}
-        title="Frequency CV"
+        style={{ top: '25%', background: '#3498db' }}
+        className="cv-input"
       />
       <Handle
         type="target"
         position={Position.Left}
         id="amplitude_cv"
-        style={{ top: '70%', background: '#f39c12' }}
-        title="Amplitude CV"
+        style={{ top: '40%', background: '#2ecc71' }}
+        className="cv-input"
       />
 
-      {/* Node Content */}
-      <div className="node-header">
-        <span className="node-title">LFO</span>
-        <button 
-          className={`active-button ${isActive ? 'active' : 'inactive'}`}
-          onClick={toggleActive}
-          title={isActive ? 'Click to deactivate' : 'Click to activate'}
-        >
-          {isActive ? '●' : '○'}
-        </button>
-      </div>
-
-      <div className="node-content">
-        {/* Waveform Selection */}
-        <div className="control-group">
-          <label>Wave:</label>
-          <select value={waveform} onChange={handleWaveformChange} className="waveform-select">
-            {waveformOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.symbol} {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Frequency Control */}
-        <div className="control-group">
-          <label>Freq: {frequency.toFixed(2)}Hz</label>
-          <input
-            type="range"
-            min="0.01"
-            max="20"
-            step="0.01"
-            value={frequency}
-            onChange={handleFrequencyChange}
-            className="slider"
-          />
+      {/* Main Controls */}
+      <div 
+        className="control-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
+        {/* Frequency Control (Large Knob) */}
+        <div className="knob-group large-knob">
+          <label className="knob-label">RATE</label>
+          <div className="knob-container">
+            <input
+              type="range"
+              min="0.01"
+              max="20"
+              step="0.01"
+              value={frequency}
+              onChange={handleFrequencyChange}
+              className="rate-knob"
+            />
+            <div className="knob-value">
+              {frequency < 1 ? `${(frequency * 1000).toFixed(0)}m` : `${frequency.toFixed(1)}`}Hz
+            </div>
+          </div>
         </div>
 
         {/* Amplitude Control */}
-        <div className="control-group">
-          <label>Amp: {(amplitude * 100).toFixed(0)}%</label>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={amplitude}
-            onChange={handleAmplitudeChange}
-            className="slider"
-          />
+        <div className="knob-group">
+          <label className="knob-label">LEVEL</label>
+          <div className="knob-container">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={amplitude}
+              onChange={handleAmplitudeChange}
+              className="amplitude-knob"
+            />
+            <div className="knob-value">{Math.round(amplitude * 100)}%</div>
+          </div>
         </div>
+      </div>
 
-        {/* Phase Offset Control */}
-        <div className="control-group">
-          <label>Phase: {(phaseOffset * 360).toFixed(0)}°</label>
+      {/* Waveform Selector */}
+      <div 
+        className="waveform-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
+        <label className="section-label">WAVE</label>
+        <div className="lfo-waveform-grid">
+          {waveformOptions.map((option, index) => (
+            <button
+              key={index}
+              className={`lfo-wave-btn ${waveform === index ? 'active' : ''}`}
+              style={{ 
+                backgroundColor: waveform === index ? '#e74c3c' : 'transparent',
+                borderColor: '#e74c3c',
+                color: waveform === index ? '#fff' : '#e74c3c'
+              }}
+              onClick={() => handleWaveformChange({ target: { value: index.toString() } } as any)}
+              title={option.label}
+            >
+              <span className="wave-symbol">{option.symbol}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Secondary Controls */}
+      <div 
+        className="secondary-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
+        {/* Phase Offset */}
+        <div className="small-knob-group">
+          <label className="small-label">PHASE</label>
           <input
             type="range"
             min="0"
@@ -150,31 +176,47 @@ const LFONode: React.FC<LFONodeProps> = ({ id, data }) => {
             step="0.01"
             value={phaseOffset}
             onChange={handlePhaseOffsetChange}
-            className="slider"
+            className="small-knob"
           />
-        </div>
-
-        {/* LFO Rate Indicator */}
-        <div className="lfo-indicator">
-          <div 
-            className="lfo-pulse"
-            style={{
-              animationDuration: `${1/frequency}s`,
-              animationPlayState: isActive ? 'running' : 'paused'
-            }}
-          />
-          <span className="rate-label">{frequency.toFixed(2)}Hz</span>
+          <div className="small-value">{Math.round(phaseOffset * 360)}°</div>
         </div>
       </div>
 
-      {/* Output Handle */}
+      {/* CV Input Labels */}
+      <div className="cv-labels">
+        <div className="cv-label" style={{ top: '22%' }}>RATE</div>
+        <div className="cv-label" style={{ top: '37%' }}>LEVEL</div>
+      </div>
+
+      {/* CV Outputs */}
       <Handle
         type="source"
         position={Position.Right}
         id="cv_out"
-        style={{ background: '#f39c12' }}
-        title="CV Output"
+        style={{ top: '40%', background: '#e74c3c', width: '12px', height: '12px' }}
+        className="cv-output"
       />
+      <div className="output-label" style={{ top: '37%' }}>CV</div>
+
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="bipolar_out"
+        style={{ top: '55%', background: '#9b59b6', width: '12px', height: '12px' }}
+        className="cv-output"
+      />
+      <div className="output-label" style={{ top: '52%' }}>BI</div>
+
+      {/* Phase LED indicator */}
+      <div className="phase-led" style={{
+        backgroundColor: isActive ? '#e74c3c' : '#666',
+        opacity: isActive ? 0.8 : 0.3
+      }}></div>
+
+      {/* Module Footer */}
+      <div className="module-footer">
+        <div className="hp-marking">6HP</div>
+      </div>
     </div>
   );
 };

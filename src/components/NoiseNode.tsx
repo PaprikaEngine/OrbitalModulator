@@ -82,39 +82,75 @@ const NoiseNode: React.FC<NoiseNodeProps> = ({ id, data }) => {
   };
 
   return (
-    <div className="noise-node">
-      {/* Input Handle */}
+    <div className={`eurorack-module noise-module ${active ? 'active' : 'inactive'}`}>
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
+        <div className="module-brand">ORBITAL</div>
+        <div className="module-name">NOISE</div>
+        <div className={`power-led ${active ? 'active' : ''}`}></div>
+      </div>
+
+      {/* CV Input */}
       <Handle
         type="target"
         position={Position.Left}
         id="amplitude_cv"
-        style={{ top: '60%', background: '#3498db' }}
+        style={{ top: '35%', background: '#3498db' }}
+        className="cv-input"
       />
+      <div className="cv-label" style={{ top: '32%' }}>LEVEL</div>
 
-      {/* Header */}
-      <div className="node-header">
-        <div className="node-title">{data.label}</div>
-        <button
-          className={`active-button ${active ? 'active' : 'inactive'}`}
-          onClick={toggleActive}
-          title={active ? 'Click to deactivate' : 'Click to activate'}
-        >
-          {active ? 'ON' : 'OFF'}
-        </button>
+      {/* Main Controls */}
+      <div 
+        className="control-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
+        {/* Amplitude Control (Large Knob) */}
+        <div className="knob-group large-knob">
+          <label className="knob-label">LEVEL</label>
+          <div className="knob-container">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={amplitude}
+              onChange={(e) => handleAmplitudeChange(Number(e.target.value))}
+              className="amplitude-knob"
+            />
+            <div className="knob-value">{Math.round(amplitude * 100)}%</div>
+          </div>
+        </div>
       </div>
 
-      {/* Noise Type Display */}
-      <div className="noise-type-display">
-        <div className="current-noise-type">
-          <span className="noise-symbol">{currentNoiseType.symbol}</span>
-          <span className="noise-label">{currentNoiseType.label} Noise</span>
+      {/* Noise Type Selector */}
+      <div 
+        className="noise-type-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
+        <label className="section-label">COLOR</label>
+        <div className="noise-type-buttons">
+          {noiseTypes.map((type, index) => (
+            <button
+              key={index}
+              className={`noise-btn ${noiseType === index ? 'active' : ''}`}
+              style={{ 
+                backgroundColor: noiseType === index ? getNoiseColor() : 'transparent',
+                borderColor: getNoiseColor(),
+                color: noiseType === index ? '#fff' : getNoiseColor()
+              }}
+              onClick={() => handleNoiseTypeChange(index)}
+            >
+              {type.symbol}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Visual Noise Indicator */}
-      <div className="noise-indicator">
+      <div className="noise-display">
         <div className="noise-bars">
-          {[...Array(8)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <div
               key={i}
               className="noise-bar"
@@ -127,63 +163,24 @@ const NoiseNode: React.FC<NoiseNodeProps> = ({ id, data }) => {
             />
           ))}
         </div>
-        <div className="amplitude-display">
-          {(amplitude * 100).toFixed(0)}%
+        <div className="noise-type-display">
+          <span className="noise-label">{currentNoiseType.label}</span>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="noise-controls">
-        {/* Noise Type Selector */}
-        <div className="control-group">
-          <label className="control-label">Type</label>
-          <select
-            value={noiseType}
-            onChange={(e) => handleNoiseTypeChange(Number(e.target.value))}
-            className="noise-type-select"
-          >
-            {noiseTypes.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.symbol} {type.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Amplitude Control */}
-        <div className="control-group">
-          <label className="control-label">Amplitude</label>
-          <div className="amplitude-control">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={amplitude}
-              onChange={(e) => handleAmplitudeChange(Number(e.target.value))}
-              className="amplitude-slider"
-            />
-            <div className="control-value">{(amplitude * 100).toFixed(0)}%</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Output Handle */}
+      {/* Audio Output */}
       <Handle
         type="source"
         position={Position.Right}
         id="audio_out"
-        style={{ background: '#e74c3c' }}
+        style={{ top: '70%', background: '#e74c3c', width: '12px', height: '12px' }}
+        className="audio-output"
       />
+      <div className="output-label">OUT</div>
 
-      {/* Port Labels */}
-      <div className="port-labels">
-        <div className="input-labels">
-          <div style={{ top: '60%' }}>Amp CV</div>
-        </div>
-        <div className="output-labels">
-          <div>Audio</div>
-        </div>
+      {/* Module Footer */}
+      <div className="module-footer">
+        <div className="hp-marking">4HP</div>
       </div>
     </div>
   );

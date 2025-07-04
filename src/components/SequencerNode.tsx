@@ -137,8 +137,8 @@ const SequencerNode: React.FC<SequencerNodeProps> = ({ id, data }) => {
 
   return (
     <div className="sequencer-node">
-      {/* Header */}
-      <div className="node-header">
+      {/* Header - ドラッグハンドル */}
+      <div className="node-header drag-handle">
         <div className="node-title">{data.label}</div>
         <button
           className={`active-button ${active ? 'active' : 'inactive'}`}
@@ -150,7 +150,10 @@ const SequencerNode: React.FC<SequencerNodeProps> = ({ id, data }) => {
       </div>
 
       {/* Transport Controls */}
-      <div className="sequencer-transport">
+      <div 
+        className="sequencer-transport"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         <button 
           className={`transport-button ${running ? 'running' : 'stopped'}`}
           onClick={toggleRunning}
@@ -198,7 +201,10 @@ const SequencerNode: React.FC<SequencerNodeProps> = ({ id, data }) => {
       </div>
 
       {/* Step Grid */}
-      <div className="step-grid">
+      <div 
+        className="step-grid"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {steps.slice(0, stepCount).map((step, index) => (
           <div
             key={index}

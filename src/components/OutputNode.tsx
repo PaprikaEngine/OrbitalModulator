@@ -62,8 +62,8 @@ const OutputNode: React.FC<OutputNodeProps> = ({ id, data }) => {
         />
       ))}
 
-      {/* ヘッダー */}
-      <div className="node-header">
+      {/* ヘッダー - ドラッグハンドル */}
+      <div className="node-header drag-handle">
         <div className="node-title">🔊 {data.label}</div>
         <button 
           className={`mute-button ${isMuted ? 'muted' : 'unmuted'}`}
@@ -75,7 +75,10 @@ const OutputNode: React.FC<OutputNodeProps> = ({ id, data }) => {
       </div>
       
       {/* パラメーター調整UI */}
-      <div className="node-controls">
+      <div 
+        className="node-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* マスターボリューム */}
         <div className="control-group">
           <label className="control-label">Master Volume</label>

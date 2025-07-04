@@ -100,8 +100,8 @@ const SampleHoldNode: React.FC<SampleHoldNodeProps> = ({ id, data }) => {
         style={{ background: '#f39c12', top: '65%' }}
       />
 
-      {/* Header */}
-      <div className="node-header">
+      {/* Header - ドラッグハンドル */}
+      <div className="node-header drag-handle">
         <div className="node-title">{data.label}</div>
         <button
           className={`active-button ${active ? 'active' : 'inactive'}`}
@@ -167,7 +167,10 @@ const SampleHoldNode: React.FC<SampleHoldNodeProps> = ({ id, data }) => {
       </div>
 
       {/* Controls */}
-      <div className="sample-hold-controls">
+      <div 
+        className="sample-hold-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Trigger Threshold */}
         <div className="control-group">
           <label className="control-label">Threshold</label>

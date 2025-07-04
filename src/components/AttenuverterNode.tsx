@@ -69,8 +69,8 @@ const AttenuverterNode: React.FC<AttenuverterNodeProps> = ({ id, data }) => {
         style={{ background: '#3498db' }}
       />
 
-      {/* Header */}
-      <div className="node-header">
+      {/* Header - ドラッグハンドル */}
+      <div className="node-header drag-handle">
         <div className="node-title">{data.label}</div>
         <button
           className={`active-button ${active ? 'active' : 'inactive'}`}
@@ -141,7 +141,10 @@ const AttenuverterNode: React.FC<AttenuverterNodeProps> = ({ id, data }) => {
       </div>
 
       {/* Controls */}
-      <div className="attenuverter-controls">
+      <div 
+        className="attenuverter-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Attenuation Control */}
         <div className="control-group">
           <label className="control-label">Gain/Atten</label>

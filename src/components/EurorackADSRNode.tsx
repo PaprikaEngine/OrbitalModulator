@@ -55,8 +55,8 @@ const EurorackADSRNode: React.FC<EurorackADSRNodeProps> = ({ id, data, selected 
 
   return (
     <div className={`eurorack-module adsr-module ${selected ? 'selected' : ''}`}>
-      {/* Module Header */}
-      <div className="module-header">
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
         <div className="module-brand">ORBITAL</div>
         <div className="module-name">ADSR</div>
         <div className="power-led active"></div>
@@ -82,7 +82,10 @@ const EurorackADSRNode: React.FC<EurorackADSRNodeProps> = ({ id, data, selected 
       />
 
       {/* ADSR Controls in vertical layout */}
-      <div className="adsr-controls">
+      <div 
+        className="adsr-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Attack */}
         <div className="adsr-knob-group">
           <label className="adsr-label">A</label>
@@ -153,7 +156,10 @@ const EurorackADSRNode: React.FC<EurorackADSRNodeProps> = ({ id, data, selected 
       </div>
 
       {/* Manual Trigger Button */}
-      <div className="trigger-section">
+      <div 
+        className="trigger-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         <button 
           className="trigger-button"
           onClick={triggerGate}

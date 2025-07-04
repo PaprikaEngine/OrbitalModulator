@@ -159,6 +159,59 @@ function App() {
     }
   }, []);
 
+  // Node drag event handlers
+  const onNodeDragStart = useCallback((event: React.MouseEvent, node: Node) => {
+    console.log('Node drag started:', node.id);
+  }, []);
+
+  const onNodeDrag = useCallback((event: React.MouseEvent, node: Node) => {
+    // Optional: Add debug logging if needed
+  }, []);
+
+  const onNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
+    console.log('Node drag stopped:', node.id);
+  }, []);
+
+  // Global mouse event handlers to ensure drag state is properly reset
+  useEffect(() => {
+    const handleGlobalMouseUp = (event: MouseEvent) => {
+      // Force release any pointer capture
+      if (document.body.style.cursor === 'grabbing') {
+        document.body.style.cursor = '';
+      }
+      
+      // Clear any ReactFlow drag states by triggering a re-render
+      setStatusMessage(prev => prev); // Trigger state update
+    };
+
+    const handleGlobalMouseLeave = () => {
+      handleGlobalMouseUp({} as MouseEvent);
+    };
+
+    document.addEventListener('mouseup', handleGlobalMouseUp, true); // Use capture phase
+    document.addEventListener('mouseleave', handleGlobalMouseLeave);
+    window.addEventListener('blur', handleGlobalMouseLeave);
+
+    return () => {
+      document.removeEventListener('mouseup', handleGlobalMouseUp, true);
+      document.removeEventListener('mouseleave', handleGlobalMouseLeave);
+      window.removeEventListener('blur', handleGlobalMouseLeave);
+    };
+  }, []);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedNode(null);
+        console.log('Node selection cleared by Escape key');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Load nodes and connections from Rust backend
   const loadGraph = useCallback(async () => {
     try {
@@ -236,8 +289,22 @@ function App() {
   );
 
   // Handle node selection
-  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
-    setSelectedNode(node);
+  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    // Prevent event from interfering with other interactions
+    event.stopPropagation();
+    
+    // Only select node if not already performing other operations
+    if (!event.defaultPrevented) {
+      setSelectedNode(node);
+      console.log('Node selected:', node.id);
+    }
+  }, []);
+
+  // Handle pane (background) click to deselect nodes
+  const onPaneClick = useCallback((event: React.MouseEvent) => {
+    // Clear selection when clicking on background
+    setSelectedNode(null);
+    console.log('Node selection cleared');
   }, []);
 
   // Create new node
@@ -537,11 +604,25 @@ function App() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onPaneClick={onPaneClick}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDrag={onNodeDrag}
+        onNodeDragStop={onNodeDragStop}
         onEdgesDelete={onEdgesDelete}
         onEdgeDoubleClick={onEdgeDoubleClick}
         nodeTypes={nodeTypes}
+        nodesDraggable={true}
+        nodesConnectable={true}
+        elementsSelectable={true}
+        selectNodesOnDrag={false}
+        multiSelectionKeyCode={null}
+        panOnDrag={true}
+        nodeDragHandle=".drag-handle"
+        preventScrolling={false}
         fitView
         deleteKeyCode="Delete"
+        nodeDragThreshold={5}
+        nodeOrigin={[0.5, 0]}
       >
         <Controls />
         <MiniMap />

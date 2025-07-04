@@ -78,67 +78,56 @@ const DelayNode: React.FC<DelayNodeProps> = ({ id, data }) => {
   };
 
   return (
-    <div className="delay-node">
-      {/* Input Handles */}
+    <div className={`eurorack-module delay-module ${active ? 'active' : 'inactive'}`}>
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
+        <div className="module-brand">ORBITAL</div>
+        <div className="module-name">DELAY</div>
+        <div className={`power-led ${active ? 'active' : ''}`}></div>
+      </div>
+
+      {/* Audio Input */}
       <Handle
         type="target"
         position={Position.Left}
         id="audio_in"
-        style={{ top: '30%', background: '#e74c3c' }}
+        style={{ top: '15%', background: '#e74c3c', width: '12px', height: '12px' }}
+        className="audio-input"
       />
+      <div className="input-label" style={{ top: '12%' }}>IN</div>
+
+      {/* CV Inputs */}
       <Handle
         type="target"
         position={Position.Left}
         id="delay_time_cv"
-        style={{ top: '50%', background: '#3498db' }}
+        style={{ top: '30%', background: '#3498db' }}
+        className="cv-input"
       />
       <Handle
         type="target"
         position={Position.Left}
         id="feedback_cv"
-        style={{ top: '65%', background: '#3498db' }}
+        style={{ top: '45%', background: '#2ecc71' }}
+        className="cv-input"
       />
       <Handle
         type="target"
         position={Position.Left}
         id="mix_cv"
-        style={{ top: '80%', background: '#3498db' }}
+        style={{ top: '60%', background: '#f39c12' }}
+        className="cv-input"
       />
 
-      {/* Header */}
-      <div className="node-header">
-        <div className="node-title">{data.label}</div>
-        <button
-          className={`active-button ${active ? 'active' : 'inactive'}`}
-          onClick={toggleActive}
-          title={active ? 'Click to deactivate' : 'Click to activate'}
-        >
-          {active ? 'ON' : 'OFF'}
-        </button>
-      </div>
-
-      {/* Effect Indicator */}
-      <div className="delay-indicator">
-        <div className="effect-visual">
-          <div 
-            className="effect-bar"
-            style={{
-              background: getEffectColor(),
-              width: `${effectIntensity * 100}%`,
-            }}
-          />
-        </div>
-        <div className="delay-time-display">
-          {formatDelayTime(delayTime)}
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div className="delay-controls">
-        {/* Delay Time */}
-        <div className="control-group">
-          <label className="control-label">Time</label>
-          <div className="delay-time-control">
+      {/* Main Controls */}
+      <div 
+        className="control-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
+        {/* Delay Time Control (Large Knob) */}
+        <div className="knob-group large-knob">
+          <label className="knob-label">TIME</label>
+          <div className="knob-container">
             <input
               type="range"
               min="1"
@@ -146,16 +135,16 @@ const DelayNode: React.FC<DelayNodeProps> = ({ id, data }) => {
               step="1"
               value={delayTime}
               onChange={(e) => handleDelayTimeChange(Number(e.target.value))}
-              className="delay-slider"
+              className="delay-time-knob"
             />
-            <div className="control-value">{formatDelayTime(delayTime)}</div>
+            <div className="knob-value">{formatDelayTime(delayTime)}</div>
           </div>
         </div>
 
-        {/* Feedback */}
-        <div className="control-group">
-          <label className="control-label">Feedback</label>
-          <div className="knob-control">
+        {/* Feedback Control */}
+        <div className="knob-group">
+          <label className="knob-label">FEEDBACK</label>
+          <div className="knob-container">
             <input
               type="range"
               min="0"
@@ -165,14 +154,14 @@ const DelayNode: React.FC<DelayNodeProps> = ({ id, data }) => {
               onChange={(e) => handleFeedbackChange(Number(e.target.value))}
               className="feedback-knob"
             />
-            <div className="control-value">{(feedback * 100).toFixed(0)}%</div>
+            <div className="knob-value">{Math.round(feedback * 100)}%</div>
           </div>
         </div>
 
-        {/* Mix (Dry/Wet) */}
-        <div className="control-group">
-          <label className="control-label">Mix</label>
-          <div className="knob-control">
+        {/* Mix Control */}
+        <div className="knob-group">
+          <label className="knob-label">MIX</label>
+          <div className="knob-container">
             <input
               type="range"
               min="0"
@@ -182,30 +171,47 @@ const DelayNode: React.FC<DelayNodeProps> = ({ id, data }) => {
               onChange={(e) => handleMixChange(Number(e.target.value))}
               className="mix-knob"
             />
-            <div className="control-value">{(mix * 100).toFixed(0)}%</div>
+            <div className="knob-value">{Math.round(mix * 100)}%</div>
           </div>
         </div>
       </div>
 
-      {/* Output Handle */}
+      {/* Effect Display */}
+      <div className="delay-display">
+        <div className="time-readout">
+          {formatDelayTime(delayTime)}
+        </div>
+        <div className="effect-meter">
+          <div 
+            className="meter-fill"
+            style={{
+              width: `${effectIntensity * 100}%`,
+              backgroundColor: getEffectColor(),
+            }}
+          />
+        </div>
+      </div>
+
+      {/* CV Input Labels */}
+      <div className="cv-labels">
+        <div className="cv-label" style={{ top: '27%' }}>TIME</div>
+        <div className="cv-label" style={{ top: '42%' }}>FB</div>
+        <div className="cv-label" style={{ top: '57%' }}>MIX</div>
+      </div>
+
+      {/* Audio Output */}
       <Handle
         type="source"
         position={Position.Right}
         id="audio_out"
-        style={{ background: '#e74c3c' }}
+        style={{ top: '75%', background: '#e74c3c', width: '12px', height: '12px' }}
+        className="audio-output"
       />
+      <div className="output-label">OUT</div>
 
-      {/* Port Labels */}
-      <div className="port-labels">
-        <div className="input-labels">
-          <div style={{ top: '30%' }}>Audio</div>
-          <div style={{ top: '50%' }}>Time CV</div>
-          <div style={{ top: '65%' }}>FB CV</div>
-          <div style={{ top: '80%' }}>Mix CV</div>
-        </div>
-        <div className="output-labels">
-          <div>Audio</div>
-        </div>
+      {/* Module Footer */}
+      <div className="module-footer">
+        <div className="hp-marking">10HP</div>
       </div>
     </div>
   );

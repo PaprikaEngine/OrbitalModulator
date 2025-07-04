@@ -69,7 +69,7 @@ const ADSRNode: React.FC<ADSRNodeProps> = ({ id, data }) => {
         />
       ))}
 
-      <div className="node-header">
+      <div className="node-header drag-handle">
         <div className="node-title">{data.label}</div>
         <button 
           className={`active-button ${isActive ? 'active' : 'inactive'}`}

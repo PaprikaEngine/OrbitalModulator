@@ -51,15 +51,18 @@ const EurorackLFONode: React.FC<EurorackLFONodeProps> = ({ id, data, selected })
 
   return (
     <div className={`eurorack-module lfo-module ${selected ? 'selected' : ''}`}>
-      {/* Module Header */}
-      <div className="module-header">
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
         <div className="module-brand">ORBITAL</div>
         <div className="module-name">LFO</div>
         <div className="power-led active"></div>
       </div>
 
       {/* Rate Control (Large Knob) */}
-      <div className="rate-control">
+      <div 
+        className="rate-control"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         <label className="rate-label">RATE</label>
         <div className="rate-knob-container">
           <input
@@ -86,7 +89,10 @@ const EurorackLFONode: React.FC<EurorackLFONodeProps> = ({ id, data, selected })
       <div className="cv-label" style={{ top: '32%' }}>RATE</div>
 
       {/* Waveform Selector */}
-      <div className="waveform-section">
+      <div 
+        className="waveform-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         <label className="section-label">WAVE</label>
         <div className="lfo-waveform-grid">
           {waveformSymbols.map((symbol, index) => (
@@ -108,7 +114,10 @@ const EurorackLFONode: React.FC<EurorackLFONodeProps> = ({ id, data, selected })
       </div>
 
       {/* Secondary Controls */}
-      <div className="secondary-controls">
+      <div 
+        className="secondary-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Amplitude */}
         <div className="small-knob-group">
           <label className="small-label">AMP</label>

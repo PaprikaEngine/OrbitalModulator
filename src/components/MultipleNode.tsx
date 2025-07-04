@@ -124,8 +124,8 @@ const MultipleNode: React.FC<MultipleNodeProps> = ({ id, data }) => {
         style={{ background: '#e74c3c' }}
       />
 
-      {/* Header */}
-      <div className="node-header">
+      {/* Header - ドラッグハンドル */}
+      <div className="node-header drag-handle">
         <div className="node-title">{data.label}</div>
         <button
           className={`active-button ${active ? 'active' : 'inactive'}`}
@@ -187,7 +187,10 @@ const MultipleNode: React.FC<MultipleNodeProps> = ({ id, data }) => {
       </div>
 
       {/* Individual Gain Controls */}
-      <div className="multiple-controls">
+      <div 
+        className="multiple-controls"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         <div className="controls-header">Channel Gains</div>
         <div className="gain-controls-grid">
           {renderGainControls()}

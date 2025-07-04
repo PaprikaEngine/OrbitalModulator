@@ -176,8 +176,14 @@ impl AudioEngine {
             .map_err(|e| format!("Failed to lock graph: {}", e))?;
 
         if let Some(node) = graph.get_node_mut(node_id) {
-            node.set_parameter(param_name, value)
-                .map_err(|e| format!("Failed to set parameter: {}", e))?;
+            // Special handling for oscilloscope nodes with UI parameter aliases
+            if let Some(osc_node) = node.as_any_mut().downcast_mut::<crate::nodes::OscilloscopeNode>() {
+                osc_node.set_parameter_override(param_name, value)
+                    .map_err(|e| format!("Failed to set parameter: {}", e))?;
+            } else {
+                node.set_parameter(param_name, value)
+                    .map_err(|e| format!("Failed to set parameter: {}", e))?;
+            }
             Ok(())
         } else {
             Err(format!("Node not found: {}", node_id))
@@ -190,8 +196,14 @@ impl AudioEngine {
             .map_err(|e| format!("Failed to lock graph: {}", e))?;
 
         if let Some(node) = graph.get_node(node_id) {
-            node.get_parameter(param_name)
-                .map_err(|e| format!("Failed to get parameter: {}", e))
+            // Special handling for oscilloscope nodes with UI parameter aliases
+            if let Some(osc_node) = node.as_any().downcast_ref::<crate::nodes::OscilloscopeNode>() {
+                osc_node.get_parameter_override(param_name)
+                    .map_err(|e| format!("Failed to get parameter: {}", e))
+            } else {
+                node.get_parameter(param_name)
+                    .map_err(|e| format!("Failed to get parameter: {}", e))
+            }
         } else {
             Err(format!("Node not found: {}", node_id))
         }

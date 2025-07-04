@@ -119,7 +119,7 @@ impl OscilloscopeNode {
             
             // Input ports: audio signal + CV inputs
             input_ports: vec![
-                PortInfo::new("signal_in", PortType::AudioMono),
+                PortInfo::new("audio_in", PortType::AudioMono),
                 PortInfo::new("trigger_level_cv", PortType::CV),
                 PortInfo::new("time_scale_cv", PortType::CV),
                 PortInfo::new("voltage_scale_cv", PortType::CV),
@@ -128,7 +128,7 @@ impl OscilloscopeNode {
             
             // Output ports: measurements as CV + pass-through
             output_ports: vec![
-                PortInfo::new("signal_out", PortType::AudioMono),
+                PortInfo::new("audio_out", PortType::AudioMono),
                 PortInfo::new("vpp_cv", PortType::CV),
                 PortInfo::new("vrms_cv", PortType::CV),
                 PortInfo::new("frequency_cv", PortType::CV),
@@ -343,14 +343,14 @@ impl AudioNode for OscilloscopeNode {
         if !self.is_active() {
             // Inactive - pass through input signal
             if let (Some(input), Some(output)) = 
-                (ctx.inputs.get_audio("signal_in"), ctx.outputs.get_audio_mut("signal_out")) {
+                (ctx.inputs.get_audio("audio_in"), ctx.outputs.get_audio_mut("audio_out")) {
                 output.copy_from_slice(&input[..output.len().min(input.len())]);
             }
             return Ok(());
         }
 
         // Get input signals
-        let signal_input = ctx.inputs.get_audio("signal_in").unwrap_or(&[]);
+        let audio_input = ctx.inputs.get_audio("audio_in").unwrap_or(&[]);
         let trigger_level_cv = ctx.inputs.get_cv_value("trigger_level_cv");
         let time_scale_cv = ctx.inputs.get_cv_value("time_scale_cv");
         let voltage_scale_cv = ctx.inputs.get_cv_value("voltage_scale_cv");
@@ -364,7 +364,7 @@ impl AudioNode for OscilloscopeNode {
         // Process each sample
         let mut trigger_out_value = 0.0;
         
-        for &sample in signal_input {
+        for &sample in audio_input {
             // Add to sample buffer
             self.sample_buffer.push_back(sample);
             if self.sample_buffer.len() > 8192 {
@@ -412,7 +412,7 @@ impl AudioNode for OscilloscopeNode {
 
         // Pass through input signal
         if let (Some(input), Some(output)) = 
-            (ctx.inputs.get_audio("signal_in"), ctx.outputs.get_audio_mut("signal_out")) {
+            (ctx.inputs.get_audio("audio_in"), ctx.outputs.get_audio_mut("audio_out")) {
             output.copy_from_slice(&input[..output.len().min(input.len())]);
         }
 
@@ -569,10 +569,10 @@ mod tests {
         let signal_data = vec![0.0, 0.5, 1.0, 0.5, 0.0, -0.5, -1.0, -0.5];
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("signal_in".to_string(), signal_data);
+        inputs.add_audio("audio_in".to_string(), signal_data);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("signal_out".to_string(), 8);
+        outputs.allocate_audio("audio_out".to_string(), 8);
         outputs.allocate_cv("vpp_cv".to_string(), 8);
         outputs.allocate_cv("vrms_cv".to_string(), 8);
         outputs.allocate_cv("frequency_cv".to_string(), 8);
@@ -589,12 +589,12 @@ mod tests {
         
         assert!(scope.process(&mut ctx).is_ok());
         
-        let signal_out = ctx.outputs.get_audio("signal_out").unwrap();
+        let audio_out = ctx.outputs.get_audio("audio_out").unwrap();
         let trigger_out = ctx.outputs.get_cv("trigger_out").unwrap();
         
         // Check pass-through
-        assert_eq!(signal_out[0], 0.0);
-        assert_eq!(signal_out[2], 1.0);
+        assert_eq!(audio_out[0], 0.0);
+        assert_eq!(audio_out[2], 1.0);
         
         // Check trigger output (should be 5.0 in auto mode)
         assert_eq!(trigger_out[0], 5.0);
@@ -641,10 +641,10 @@ mod tests {
         scope.set_parameter("active", 0.0).unwrap(); // Disable
         
         let mut inputs = InputBuffers::new();
-        inputs.add_audio("signal_in".to_string(), vec![1.0, 2.0, 3.0, 4.0]);
+        inputs.add_audio("audio_in".to_string(), vec![1.0, 2.0, 3.0, 4.0]);
         
         let mut outputs = OutputBuffers::new();
-        outputs.allocate_audio("signal_out".to_string(), 4);
+        outputs.allocate_audio("audio_out".to_string(), 4);
         
         let mut ctx = ProcessContext {
             inputs: inputs,
@@ -657,12 +657,41 @@ mod tests {
         
         assert!(scope.process(&mut ctx).is_ok());
         
-        let signal_out = ctx.outputs.get_audio("signal_out").unwrap();
+        let audio_out = ctx.outputs.get_audio("audio_out").unwrap();
         
         // Should pass through when bypassed
-        assert_eq!(signal_out[0], 1.0);
-        assert_eq!(signal_out[1], 2.0);
-        assert_eq!(signal_out[2], 3.0);
-        assert_eq!(signal_out[3], 4.0);
+        assert_eq!(audio_out[0], 1.0);
+        assert_eq!(audio_out[1], 2.0);
+        assert_eq!(audio_out[2], 3.0);
+        assert_eq!(audio_out[3], 4.0);
+    }
+}
+
+
+impl OscilloscopeNode {
+    /// Override parameter setting to handle UI aliases
+    pub fn set_parameter_override(&mut self, param: &str, value: f32) -> Result<(), String> {
+        match param {
+            // UI alias mappings
+            "time_div" => self.set_parameter("time_scale", value).map_err(|e| e.to_string()),
+            "volt_div" => self.set_parameter("voltage_scale", value).map_err(|e| e.to_string()),
+            "position_h" => self.set_parameter("horizontal_position", value).map_err(|e| e.to_string()),
+            "position_v" => self.set_parameter("vertical_position", value).map_err(|e| e.to_string()),
+            // Default parameter handling
+            _ => self.set_parameter(param, value).map_err(|e| e.to_string()),
+        }
+    }
+    
+    /// Override parameter getting to handle UI aliases
+    pub fn get_parameter_override(&self, param: &str) -> Result<f32, String> {
+        match param {
+            // UI alias mappings
+            "time_div" => self.get_parameter("time_scale").map_err(|e| e.to_string()),
+            "volt_div" => self.get_parameter("voltage_scale").map_err(|e| e.to_string()),
+            "position_h" => self.get_parameter("horizontal_position").map_err(|e| e.to_string()),
+            "position_v" => self.get_parameter("vertical_position").map_err(|e| e.to_string()),
+            // Default parameter handling
+            _ => self.get_parameter(param).map_err(|e| e.to_string()),
+        }
     }
 }

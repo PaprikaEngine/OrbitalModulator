@@ -73,57 +73,42 @@ const VCANode: React.FC<VCANodeProps> = ({ id, data }) => {
   };
 
   return (
-    <div className="vca-node">
-      {/* Input Handles */}
+    <div className={`eurorack-module vca-module ${active ? 'active' : 'inactive'}`}>
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
+        <div className="module-brand">ORBITAL</div>
+        <div className="module-name">VCA</div>
+        <div className={`power-led ${active ? 'active' : ''}`}></div>
+      </div>
+
+      {/* Audio Input */}
       <Handle
         type="target"
         position={Position.Left}
         id="audio_in"
-        style={{ top: '35%', background: '#e74c3c' }}
+        style={{ top: '20%', background: '#e74c3c', width: '12px', height: '12px' }}
+        className="audio-input"
       />
+      <div className="input-label" style={{ top: '17%' }}>IN</div>
+
+      {/* CV Input */}
       <Handle
         type="target"
         position={Position.Left}
         id="gain_cv"
-        style={{ top: '65%', background: '#3498db' }}
+        style={{ top: '35%', background: '#3498db' }}
+        className="cv-input"
       />
 
-      {/* Header */}
-      <div className="node-header">
-        <div className="node-title">{data.label}</div>
-        <button
-          className={`active-button ${active ? 'active' : 'inactive'}`}
-          onClick={toggleActive}
-          title={active ? 'Click to deactivate' : 'Click to activate'}
-        >
-          {active ? 'ON' : 'OFF'}
-        </button>
-      </div>
-
-      {/* VCA Visual Indicator */}
-      <div className="vca-indicator">
-        <div className="gain-meter">
-          <div 
-            className="gain-bar"
-            style={{
-              height: `${getGainBarHeight()}px`,
-              backgroundColor: getGainColor(),
-              opacity: active ? 0.8 : 0.3,
-            }}
-          />
-          <div className="unity-line" />
-        </div>
-        <div className="gain-display">
-          {gain.toFixed(2)}x
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div className="vca-controls">
-        {/* Gain Control */}
-        <div className="control-group">
-          <label className="control-label">Gain</label>
-          <div className="gain-control">
+      {/* Main Controls */}
+      <div 
+        className="control-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
+        {/* Gain Control (Large Knob) */}
+        <div className="knob-group large-knob">
+          <label className="knob-label">GAIN</label>
+          <div className="knob-container">
             <input
               type="range"
               min="0"
@@ -131,16 +116,16 @@ const VCANode: React.FC<VCANodeProps> = ({ id, data }) => {
               step="0.01"
               value={gain}
               onChange={(e) => handleGainChange(Number(e.target.value))}
-              className="gain-slider"
+              className="gain-knob"
             />
-            <div className="control-value">{gain.toFixed(2)}x</div>
+            <div className="knob-value">{gain.toFixed(2)}x</div>
           </div>
         </div>
 
         {/* CV Sensitivity Control */}
-        <div className="control-group">
-          <label className="control-label">CV Sens</label>
-          <div className="cv-sensitivity-control">
+        <div className="knob-group">
+          <label className="knob-label">CV SENS</label>
+          <div className="knob-container">
             <input
               type="range"
               min="0"
@@ -148,44 +133,49 @@ const VCANode: React.FC<VCANodeProps> = ({ id, data }) => {
               step="0.01"
               value={cvSensitivity}
               onChange={(e) => handleCvSensitivityChange(Number(e.target.value))}
-              className="cv-sensitivity-slider"
-              style={{ accentColor: getSensitivityColor() }}
+              className="cv-sensitivity-knob"
             />
-            <div className="control-value">{cvSensitivity.toFixed(2)}</div>
+            <div className="knob-value">{cvSensitivity.toFixed(2)}</div>
           </div>
         </div>
       </div>
 
-      {/* CV Sensitivity Indicator */}
-      <div className="cv-indicator">
-        <div 
-          className="cv-sensitivity-bar"
-          style={{
-            width: `${cvSensitivity * 50}%`,
-            backgroundColor: getSensitivityColor(),
-            opacity: active ? 0.7 : 0.3,
-          }}
-        />
-        <div className="cv-label">CV Response</div>
+      {/* VCA Visual Indicator */}
+      <div className="vca-display">
+        <div className="gain-meter">
+          <div className="meter-background"></div>
+          <div 
+            className="meter-fill"
+            style={{
+              height: `${Math.min(100, gain * 50)}%`,
+              backgroundColor: getGainColor(),
+              opacity: active ? 0.8 : 0.3,
+            }}
+          />
+        </div>
+        <div className="gain-readout">
+          {gain.toFixed(2)}x
+        </div>
       </div>
 
-      {/* Output Handle */}
+      {/* CV Input Labels */}
+      <div className="cv-labels">
+        <div className="cv-label" style={{ top: '32%' }}>CV</div>
+      </div>
+
+      {/* Audio Output */}
       <Handle
         type="source"
         position={Position.Right}
         id="audio_out"
-        style={{ background: '#e74c3c' }}
+        style={{ top: '70%', background: '#e74c3c', width: '12px', height: '12px' }}
+        className="audio-output"
       />
+      <div className="output-label">OUT</div>
 
-      {/* Port Labels */}
-      <div className="port-labels">
-        <div className="input-labels">
-          <div style={{ top: '35%' }}>Audio</div>
-          <div style={{ top: '65%' }}>Gain CV</div>
-        </div>
-        <div className="output-labels">
-          <div>Audio</div>
-        </div>
+      {/* Module Footer */}
+      <div className="module-footer">
+        <div className="hp-marking">6HP</div>
       </div>
     </div>
   );

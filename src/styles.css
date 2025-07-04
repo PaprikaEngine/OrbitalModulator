@@ -46,6 +46,25 @@ body {
   border-radius: 4px;
 }
 
+/* ドラッグハンドル - ヘッダー部分のみドラッグ可能 */
+.drag-handle {
+  cursor: grab;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ノード本体はドラッグ無効 */
+.react-flow__node {
+  cursor: default;
+}
+
+.react-flow__node.dragging .drag-handle {
+  cursor: grabbing;
+}
+
 .node-title {
   font-weight: bold;
   font-size: 14px;

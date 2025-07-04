@@ -43,8 +43,8 @@ const VCFNode: React.FC<VCFNodeProps> = ({ id, data, selected }) => {
 
   return (
     <div className={`eurorack-module vcf-module ${selected ? 'selected' : ''}`}>
-      {/* Module Header */}
-      <div className="module-header">
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
         <div className="module-brand">ORBITAL</div>
         <div className="module-name">VCF</div>
         <div className="power-led active"></div>
@@ -77,7 +77,10 @@ const VCFNode: React.FC<VCFNodeProps> = ({ id, data, selected }) => {
       />
 
       {/* Main Controls */}
-      <div className="control-section">
+      <div 
+        className="control-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Cutoff Frequency */}
         <div className="knob-group large-knob">
           <label className="knob-label">CUTOFF</label>
@@ -118,7 +121,10 @@ const VCFNode: React.FC<VCFNodeProps> = ({ id, data, selected }) => {
       </div>
 
       {/* Filter Type Selector */}
-      <div className="filter-type-section">
+      <div 
+        className="filter-type-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         <label className="section-label">MODE</label>
         <div className="filter-type-buttons">
           {filterTypes.map((type, index) => (

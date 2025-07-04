@@ -43,8 +43,8 @@ const VCONode: React.FC<VCONodeProps> = ({ id, data, selected }) => {
 
   return (
     <div className={`eurorack-module vco-module ${selected ? 'selected' : ''}`}>
-      {/* Module Header */}
-      <div className="module-header">
+      {/* Module Header - ドラッグハンドル */}
+      <div className="module-header drag-handle">
         <div className="module-brand">ORBITAL</div>
         <div className="module-name">VCO</div>
         <div className="power-led active"></div>
@@ -67,7 +67,10 @@ const VCONode: React.FC<VCONodeProps> = ({ id, data, selected }) => {
       />
 
       {/* Main Controls */}
-      <div className="control-section">
+      <div 
+        className="control-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         {/* Frequency Control */}
         <div className="knob-group">
           <label className="knob-label">FREQ</label>
@@ -108,7 +111,10 @@ const VCONode: React.FC<VCONodeProps> = ({ id, data, selected }) => {
       </div>
 
       {/* Waveform Selector */}
-      <div className="waveform-section">
+      <div 
+        className="waveform-section"
+        onMouseDown={(e) => e.stopPropagation()} // ドラッグ開始を防ぐ
+      >
         <label className="section-label">WAVEFORM</label>
         <div className="waveform-buttons">
           {waveformNames.map((name, index) => (

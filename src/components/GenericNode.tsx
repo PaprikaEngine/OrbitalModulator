@@ -292,8 +292,8 @@ const GenericNode: React.FC<GenericNodeProps> = ({ id, data, selected }) => {
         />
       ))}
 
-      {/* ヘッダー */}
-      <div className="node-header">
+      {/* ヘッダー - ドラッグハンドル */}
+      <div className="node-header drag-handle">
         <div className="node-title">
           {nodeStyle.icon} {data.label}
         </div>
